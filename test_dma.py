@@ -1,12 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Mar 16 18:23:02 2018
-
-@author: helf
-"""
-
-# -*- coding: utf-8 -*-
-"""
 Created on Wed Mar 14 20:40:23 2018
 
 @author: helf
@@ -35,7 +28,7 @@ kline_df = qapi.to_dataframe(kline_data)
 kline_df.index = kline_df['strtime']
 kline_df = kline_df.sort_values(by='utc_time')
 print(kline_df.head())
-data = kline_df[['utc_time', 'close', 'volume']]
+data = kline_df[['utc_time', 'close', 'volume']].copy()
 
 # 变量初始化
 data['ma'] = data['close']
@@ -51,6 +44,7 @@ while (1):
 
     time_struct = time.localtime()
     time_str = time.strftime('%Y-%m-%d %H:%M:%S', time_struct)
+    print(time_str)
 
     if time_struct.tm_sec == 0:
 
@@ -112,4 +106,5 @@ while (1):
             data.loc[now, 'signal'] = data.loc[last, 'signal']
             data.loc[now, 'account'] = data.loc[now, 'account']
 
-    time.sleep(50)
+   	time.sleep(50)
+
