@@ -74,16 +74,20 @@ class StrategyBase(object):
     def stop(self):
         pass
 
+
     def get_ticks(self, exchange='huobipro', symbol_list='btcusdt', begin_time='', end_time=''):
         return get_ticks(exchange=exchange, symbol_list=symbol_list, begin_time=begin_time, end_time=end_time)
+
 
     def get_bars(self, exchange='huobipro', symbol_list='btcusdt', bar_type='1min', begin_time='', end_time=''):
         return get_bars(exchange=exchange, symbol_list=symbol_list, bar_type=bar_type, begin_time=begin_time,
                         end_time=end_time)
 
+
     def get_last_ticks(self, exchange='huobipro', symbol_list='btcusdt'):
 
         return get_last_ticks(exchange=exchange, symbol_list=symbol_list)
+
 
     def get_last_bars(self, exchange='huobipro', symbol_list='btcusdt', bar_type='1min'):
 
@@ -94,13 +98,16 @@ class StrategyBase(object):
 
         return get_instruments(exchange=exchange)
 
+
     def open_long(self, exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
 
         return open_long(exchange=exchange, sec_id=sec_id, price=price, volume=0)
 
-    def close_short(self, exchange=exchange, sec_id=sec_id, price=0, volume=0):
+
+    def close_short(self, exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
 
         return close_short(exchange=exchange, sec_id=sec_id, price=price, volume=0)
+
 
     def open_short(self, exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
 

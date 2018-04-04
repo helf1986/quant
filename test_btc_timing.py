@@ -15,6 +15,8 @@ Created on Wed Mar 14 20:40:23 2018
 import pandas as pd
 import numpy as np
 import time
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import api.quant_api as qapi
 
@@ -50,11 +52,14 @@ plt.show()
 # 参数设置
 trade_fee = 0.002
 N_volt = 30
-N_short = 12
-N_long = 48
+N_short = 6
+N_long_1 = 48
+N_long_2 = 72
+volt_mul = 2
 
-data = kline_df[['utc_time', 'close', 'volume']]
+data = kline_df[['utc_time', 'close', 'volume']].iloc[0:]
 # 变量初始化
+data['ma_short'] = data['close']
 data['ref'] = data['close']
 data['signal'] = 0
 data['account'] = 1
@@ -63,7 +68,7 @@ data['voltility'] = 0
 data['pct_chg'] = 0
 
 
-for nn in range(N_long+1, len(data)):
+for nn in range(N_long_2+1, len(data)):
     
     today = data.index[nn]
     last_day = data.index[nn-1]
@@ -74,7 +79,6 @@ for nn in range(N_long+1, len(data)):
     data.loc[today, 'pct_chg'] = data.loc[today, 'close']/data.loc[last_day, 'close'] - 1
     if data.loc[last_day, 'signal'] == -1:     # 做空
         data.loc[today, 'account'] = data.loc[last_day, 'account']*(1-data.loc[today, 'pct_chg'])
-
     elif data.loc[last_day, 'signal'] == 1:    # 做多
         data.loc[today, 'account'] = data.loc[last_day, 'account']*(1+data.loc[today, 'pct_chg'])
     else:
@@ -83,32 +87,32 @@ for nn in range(N_long+1, len(data)):
     # 收盘后，计算波动率，确定均线参数
     volt_last = data['chg'].iloc[nn-N_volt+1:nn+1].std()
     data.loc[today, 'voltility'] = volt_last
-
     if volt_last > data['voltility'].iloc[0:nn].quantile(0.8):
-        N_MA = N_short
+        N_MA = N_long_1
     else:
-        N_MA = N_long
+        N_MA = N_long_2
     
     # 计算参考均线值
+    data.loc[today, 'ma_short'] = (data.loc[last_day, 'ma_short']*(N_short-1) + data.loc[today, 'close']*2)/(N_short+1)
     data.loc[today, 'ref'] = (data.loc[last_day, 'ref']*(N_MA-1) + data.loc[today, 'close']*2)/(N_MA+1)
     
     # 向上突破，买入
-    if (data.loc[last_day, 'close'] < data.loc[last_day, 'ref']) and (data.loc[today, 'close'] > data.loc[today, 'ref']):
+    if (data.loc[last_day, 'ma_short'] < data.loc[last_day, 'ref']) and (data.loc[today, 'ma_short'] > data.loc[today, 'ref']):
         data.loc[today, 'signal'] = 1
         # 考虑手续费
         data.loc[today, 'account'] = data.loc[today, 'account']*(1-trade_fee)
         
         # 调整参考均线的值
-        data.loc[today, 'ref'] = data.loc[today, 'ref'] - data.loc[today, 'voltility']
+        data.loc[today, 'ref'] = data.loc[today, 'ref'] - data.loc[today, 'voltility']*volt_mul
     
     # 向下突破，卖出
-    elif (data.loc[last_day, 'close'] > data.loc[last_day, 'ref']) and (data.loc[today, 'close'] < data.loc[today, 'ref']):
+    elif (data.loc[last_day, 'ma_short'] > data.loc[last_day, 'ref']) and (data.loc[today, 'ma_short'] < data.loc[today, 'ref']):
         data.loc[today, 'signal'] = -1
         # 考虑手续费
         data.loc[today, 'account'] = data.loc[today, 'account']*(1-trade_fee)
         
         # 调整参考均线的值
-        data.loc[today, 'ref'] = data.loc[today, 'ref'] + data.loc[today, 'voltility']
+        data.loc[today, 'ref'] = data.loc[today, 'ref'] + data.loc[today, 'voltility']*volt_mul
         
     # 信号维持不变
     else:
@@ -116,11 +120,11 @@ for nn in range(N_long+1, len(data)):
         data.loc[today, 'account'] = data.loc[today, 'account']
 
 
-result = data.iloc[N_long:]
+result = data.iloc[N_long_2:]
 result['benchmark'] = result['close']/result['close'].iloc[0]*result['account'].iloc[0]
 fig = plt.figure(figsize=(12,12))
 ax1 = fig.add_subplot(211)
-result[['close', 'ref']].plot(ax=ax1)
+result[['close', 'ma_short', 'ref']].plot(ax=ax1)
 ax1.set_ylabel('Close')
 
 ax2 = ax1.twinx()  # this is the important function
@@ -129,7 +133,7 @@ ax2.set_ylabel('Signal')
 
 ax3 = fig.add_subplot(212)
 result[['account', 'benchmark']].plot(ax=ax3)
-plt.show()
+plt.savefig('test.png')
 
 result.to_csv('btc_result.csv')
 
