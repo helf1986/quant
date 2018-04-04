@@ -59,7 +59,7 @@ volt_mul = 2
 
 data = kline_df[['utc_time', 'close', 'volume']].iloc[0:]
 # 变量初始化
-data['ma_short'] = data['close']
+data['ma'] = data['close']
 data['ref'] = data['close']
 data['signal'] = 0
 data['account'] = 1
@@ -88,16 +88,16 @@ for nn in range(N_long_2+1, len(data)):
     volt_last = data['chg'].iloc[nn-N_volt+1:nn+1].std()
     data.loc[today, 'voltility'] = volt_last
     if volt_last > data['voltility'].iloc[0:nn].quantile(0.8):
-        N_MA = N_long_1
+        N_LONG = N_long_1
     else:
-        N_MA = N_long_2
+        N_LONG = N_long_2
     
     # 计算参考均线值
-    data.loc[today, 'ma_short'] = (data.loc[last_day, 'ma_short']*(N_short-1) + data.loc[today, 'close']*2)/(N_short+1)
-    data.loc[today, 'ref'] = (data.loc[last_day, 'ref']*(N_MA-1) + data.loc[today, 'close']*2)/(N_MA+1)
+    data.loc[today, 'ma'] = (data.loc[last_day, 'ma']*(N_short-1) + data.loc[today, 'close']*2)/(N_short+1)
+    data.loc[today, 'ref'] = (data.loc[last_day, 'ref']*(N_LONG-1) + data.loc[today, 'close']*2)/(N_LONG+1)
     
     # 向上突破，买入
-    if (data.loc[last_day, 'ma_short'] < data.loc[last_day, 'ref']) and (data.loc[today, 'ma_short'] > data.loc[today, 'ref']):
+    if (data.loc[last_day, 'ma'] < data.loc[last_day, 'ref']) and (data.loc[today, 'ma'] > data.loc[today, 'ref']):
         data.loc[today, 'signal'] = 1
         # 考虑手续费
         data.loc[today, 'account'] = data.loc[today, 'account']*(1-trade_fee)
@@ -106,7 +106,7 @@ for nn in range(N_long_2+1, len(data)):
         data.loc[today, 'ref'] = data.loc[today, 'ref'] - data.loc[today, 'voltility']*volt_mul
     
     # 向下突破，卖出
-    elif (data.loc[last_day, 'ma_short'] > data.loc[last_day, 'ref']) and (data.loc[today, 'ma_short'] < data.loc[today, 'ref']):
+    elif (data.loc[last_day, 'ma'] > data.loc[last_day, 'ref']) and (data.loc[today, 'ma'] < data.loc[today, 'ref']):
         data.loc[today, 'signal'] = -1
         # 考虑手续费
         data.loc[today, 'account'] = data.loc[today, 'account']*(1-trade_fee)
@@ -124,7 +124,7 @@ result = data.iloc[N_long_2:]
 result['benchmark'] = result['close']/result['close'].iloc[0]*result['account'].iloc[0]
 fig = plt.figure(figsize=(12,12))
 ax1 = fig.add_subplot(211)
-result[['close', 'ma_short', 'ref']].plot(ax=ax1)
+result[['close', 'ma', 'ref']].plot(ax=ax1)
 ax1.set_ylabel('Close')
 
 ax2 = ax1.twinx()  # this is the important function

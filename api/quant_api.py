@@ -490,6 +490,8 @@ def get_last_ticks(exchange, symbol_list):
     :param symbol_list:
     :return:
     '''
+
+    symbol_list = symbol_list.replace(' ', '').split(',')
     ticks = []
     if exchange == 'huobipro':
         for each in symbol_list:
@@ -527,6 +529,7 @@ def get_last_bars(exchange, symbol_list, bar_type):
     :return:
     '''
 
+    symbol_list = symbol_list.replace(' ', '').split(',')
     bars = []
     if exchange == 'huobipro':
 
@@ -568,6 +571,7 @@ def get_bars(exchange, symbol_list, bar_type, begin_time='', end_time='', size=0
     :return:
     '''
 
+    symbol_list = symbol_list.replace(' ', '').split(',')
     bars = []
     for each_sec in symbol_list:
 
