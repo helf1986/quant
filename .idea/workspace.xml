@@ -1,0 +1,1200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="93e95a67-865c-48c0-adc9-928933eb9844" name="Default" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="btcquant.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/btcquant.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="114">
+              <caret line="6" column="25" lean-forward="false" selection-start-line="6" selection-start-column="25" selection-end-line="6" selection-end-column="25" />
+              <folding>
+                <element signature="e#0#28#0" expanded="true" />
+                <element signature="e#188#1679#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="logger.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/api/logger.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="950">
+              <caret line="50" column="9" lean-forward="false" selection-start-line="50" selection-start-column="9" selection-end-line="50" selection-end-column="9" />
+              <folding>
+                <element signature="e#78#93#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="quant_api.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/api/quant_api.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="83">
+              <caret line="846" column="0" lean-forward="true" selection-start-line="846" selection-start-column="0" selection-end-line="922" selection-end-column="0" />
+              <folding>
+                <element signature="e#45#64#0" expanded="true" />
+                <element signature="e#269#557#0" expanded="false" />
+                <element signature="e#856#4315#0" expanded="false" />
+                <element signature="e#856#876#1" expanded="false" />
+                <element signature="e#4340#4441#0" expanded="false" />
+                <element signature="e#4476#4694#0" expanded="false" />
+                <element signature="e#4728#5237#0" expanded="false" />
+                <element signature="e#5265#6578#0" expanded="false" />
+                <element signature="e#6608#7487#0" expanded="false" />
+                <element signature="e#7514#8540#0" expanded="false" />
+                <element signature="e#8571#9145#0" expanded="false" />
+                <element signature="e#9177#11083#0" expanded="false" />
+                <element signature="e#11110#12244#0" expanded="false" />
+                <element signature="e#12270#13073#0" expanded="false" />
+                <element signature="e#13105#13262#0" expanded="false" />
+                <element signature="e#13328#14203#0" expanded="false" />
+                <element signature="e#14239#15159#0" expanded="false" />
+                <element signature="e#15205#15565#0" expanded="false" />
+                <element signature="e#15600#15658#0" expanded="false" />
+                <element signature="e#15708#16848#0" expanded="false" />
+                <element signature="e#16907#18116#0" expanded="false" />
+                <element signature="e#18206#19461#0" expanded="false" />
+                <element signature="e#19516#22321#0" expanded="false" />
+                <element signature="e#22377#25110#0" expanded="false" />
+                <element signature="e#25166#28233#0" expanded="false" />
+                <element signature="e#28290#31414#0" expanded="false" />
+                <element signature="e#31475#31858#0" expanded="false" />
+                <element signature="e#31922#32263#0" expanded="false" />
+                <element signature="e#32323#32720#0" expanded="false" />
+                <element signature="e#32783#33142#0" expanded="false" />
+                <element signature="e#33193#33284#0" expanded="false" />
+                <element signature="e#33320#35438#0" expanded="false" />
+                <element signature="e#35461#35495#0" expanded="false" />
+                <element signature="e#35606#36365#0" expanded="false" />
+                <element signature="e#36416#36748#0" expanded="false" />
+                <element signature="e#36791#38157#0" expanded="false" />
+                <element signature="e#38259#40302#0" expanded="false" />
+                <element signature="e#41232#42495#0" expanded="false" />
+                <element signature="e#42562#43763#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_btc_timing.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test_btc_timing.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="931">
+              <caret line="49" column="6" lean-forward="false" selection-start-line="49" selection-start-column="6" selection-end-line="49" selection-end-column="6" />
+              <folding>
+                <element signature="e#168#187#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HuobiServices.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="5985">
+              <caret line="375" column="33" lean-forward="false" selection-start-line="375" selection-start-column="33" selection-end-line="375" selection-end-column="33" />
+              <folding>
+                <element signature="e#275#613#0" expanded="false" />
+                <element signature="e#665#929#0" expanded="false" />
+                <element signature="e#975#1130#0" expanded="false" />
+                <element signature="e#1178#1343#0" expanded="false" />
+                <element signature="e#1403#1559#0" expanded="false" />
+                <element signature="e#1613#1777#0" expanded="false" />
+                <element signature="e#1831#1943#0" expanded="false" />
+                <element signature="e#8465#8990#0" expanded="false" />
+                <element signature="e#9043#9234#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Utils.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/common/Utils.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="456">
+              <caret line="32" column="0" lean-forward="false" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="get_data_huobi.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/data/get_data_huobi.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="152">
+              <caret line="69" column="93" lean-forward="false" selection-start-line="69" selection-start-column="93" selection-end-line="69" selection-end-column="93" />
+              <folding>
+                <element signature="e#146#2037#0" expanded="false" />
+                <element signature="e#2140#3683#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="test_data.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test_data.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="247">
+              <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>ACCESS_KEY</find>
+      <find>SECRET_KEY</find>
+      <find>code</find>
+      <find>order_info</find>
+      <find>Order</find>
+      <find>send_order</find>
+      <find>订单</find>
+      <find>借贷订单</find>
+      <find>Bar</find>
+      <find>huobi</find>
+      <find>get_</find>
+      <find>get_balance</find>
+      <find>get_ticks</find>
+      <find>get_order</find>
+      <find>trade</find>
+      <find>open_long</find>
+      <find>get_account</find>
+      <find>Position</find>
+      <find>margin_ba</find>
+      <find>Instru</find>
+      <find>loan</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>symbol</replace>
+      <replace>myorder</replace>
+      <replace>huobipro</replace>
+    </replaceStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/api/HuobiServices.py" />
+        <option value="$PROJECT_DIR$/api/Utils.py" />
+        <option value="$PROJECT_DIR$/api/connection.py" />
+        <option value="$PROJECT_DIR$/data/get_data_huobi.py" />
+        <option value="$PROJECT_DIR$/data/connection.py" />
+        <option value="$PROJECT_DIR$/common/Utils.py" />
+        <option value="$PROJECT_DIR$/api/tmp.py" />
+        <option value="$PROJECT_DIR$/common/HuobiServices.py" />
+        <option value="$PROJECT_DIR$/test_data.py" />
+        <option value="$PROJECT_DIR$/btcquant.py" />
+        <option value="$PROJECT_DIR$/test_btc_timing.py" />
+        <option value="$PROJECT_DIR$/api/logger.py" />
+        <option value="$PROJECT_DIR$/api/quant_api.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-15" />
+    <option name="y" value="287" />
+    <option name="width" value="1004" />
+    <option name="height" value="688" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="quant" type="b2602c69:ProjectViewProjectNode" />
+              <item name="quant" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="quant" type="b2602c69:ProjectViewProjectNode" />
+              <item name="quant" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="quant" type="b2602c69:ProjectViewProjectNode" />
+              <item name="quant" type="462c0819:PsiDirectoryNode" />
+              <item name="common" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="quant" type="b2602c69:ProjectViewProjectNode" />
+              <item name="quant" type="462c0819:PsiDirectoryNode" />
+              <item name="log" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings module-name="quant" is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+        <option name="myModuleName" value="quant" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\helf\quant" />
+      <recent name="C:\Users\helf\quant\data" />
+      <recent name="C:\Users\helf\quant\common" />
+      <recent name="C:\Users\helf\quant\api" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.test_btc_timing">
+    <configuration name="btcquant" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="quant" />
+      <option name="SCRIPT_NAME" value="C:\Users\helf\quant\test_btcapi.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="quant_api" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/api" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="quant" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/api/quant_api.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="test_btc_timing" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="quant" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_btc_timing.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <configuration name="test_data" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="quant" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test_data.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+    </configuration>
+    <list size="4">
+      <item index="0" class="java.lang.String" itemvalue="Python.btcquant" />
+      <item index="1" class="java.lang.String" itemvalue="Python.test_data" />
+      <item index="2" class="java.lang.String" itemvalue="Python.test_btc_timing" />
+      <item index="3" class="java.lang.String" itemvalue="Python.quant_api" />
+    </list>
+    <recent_temporary>
+      <list size="4">
+        <item index="0" class="java.lang.String" itemvalue="Python.test_btc_timing" />
+        <item index="1" class="java.lang.String" itemvalue="Python.btcquant" />
+        <item index="2" class="java.lang.String" itemvalue="Python.test_data" />
+        <item index="3" class="java.lang.String" itemvalue="Python.quant_api" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="93e95a67-865c-48c0-adc9-928933eb9844" name="Default" comment="" />
+      <created>1521903794134</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1521903794134</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25297618" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32789558" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3496732" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.19412725" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32789558" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42973855" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32843137" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3888889" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.5441176" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32843137" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2019374" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31699347" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32843137" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Python Console" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30555555" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3496732" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32843137" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2533532" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.42973855" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>687</line>
+          <option name="timeStamp" value="35" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>1100</line>
+          <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>1099</line>
+          <option name="timeStamp" value="44" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>1126</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>740</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>807</line>
+          <option name="timeStamp" value="51" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>621</line>
+          <option name="timeStamp" value="54" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>969</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>976</line>
+          <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test_btcapi.py</url>
+          <line>91</line>
+          <option name="timeStamp" value="65" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+          <line>585</line>
+          <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/test_btc_timing.py</url>
+          <line>50</line>
+          <option name="timeStamp" value="70" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/api/logger.py</url>
+          <line>42</line>
+          <option name="timeStamp" value="71" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+      <option name="time" value="73" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/api/quant_api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="133">
+          <caret line="7" column="0" lean-forward="true" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding>
+            <element signature="e#45#64#0" expanded="true" />
+            <element signature="e#269#557#0" expanded="false" />
+            <element signature="e#856#4315#0" expanded="false" />
+            <element signature="e#856#876#1" expanded="false" />
+            <element signature="e#4340#4441#0" expanded="false" />
+            <element signature="e#4476#4694#0" expanded="false" />
+            <element signature="e#4728#5237#0" expanded="false" />
+            <element signature="e#5265#6578#0" expanded="false" />
+            <element signature="e#6608#7487#0" expanded="false" />
+            <element signature="e#7514#8540#0" expanded="false" />
+            <element signature="e#8571#9145#0" expanded="false" />
+            <element signature="e#9177#11083#0" expanded="false" />
+            <element signature="e#11110#12244#0" expanded="false" />
+            <element signature="e#12270#13073#0" expanded="false" />
+            <element signature="e#13105#13262#0" expanded="false" />
+            <element signature="e#13328#14203#0" expanded="false" />
+            <element signature="e#14239#15159#0" expanded="false" />
+            <element signature="e#15205#15565#0" expanded="false" />
+            <element signature="e#15600#15658#0" expanded="false" />
+            <element signature="e#15708#16848#0" expanded="false" />
+            <element signature="e#16907#18116#0" expanded="false" />
+            <element signature="e#18206#19461#0" expanded="false" />
+            <element signature="e#19516#22321#0" expanded="false" />
+            <element signature="e#22377#25110#0" expanded="false" />
+            <element signature="e#25166#28233#0" expanded="false" />
+            <element signature="e#28290#31414#0" expanded="false" />
+            <element signature="e#31475#31858#0" expanded="false" />
+            <element signature="e#31922#32263#0" expanded="false" />
+            <element signature="e#32323#32720#0" expanded="false" />
+            <element signature="e#32783#33142#0" expanded="false" />
+            <element signature="e#33193#33284#0" expanded="false" />
+            <element signature="e#33320#35438#0" expanded="false" />
+            <element signature="e#35461#35495#0" expanded="false" />
+            <element signature="e#35606#36365#0" expanded="false" />
+            <element signature="e#36416#36748#0" expanded="false" />
+            <element signature="e#36791#38157#0" expanded="false" />
+            <element signature="e#38259#40302#0" expanded="false" />
+            <element signature="e#41232#42495#0" expanded="false" />
+            <element signature="e#42562#43763#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btc_timing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="703">
+          <caret line="40" column="3" lean-forward="true" selection-start-line="40" selection-start-column="3" selection-end-line="40" selection-end-column="3" />
+          <folding>
+            <element signature="e#168#187#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2470">
+          <caret line="149" column="0" lean-forward="false" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="32" column="0" lean-forward="true" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/get_data_huobi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="72" column="30" lean-forward="false" selection-start-line="71" selection-start-column="0" selection-end-line="73" selection-end-column="39" />
+          <folding>
+            <element signature="e#146#2037#0" expanded="false" />
+            <element signature="e#2140#3683#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="33" lean-forward="false" selection-start-line="19" selection-start-column="33" selection-end-line="19" selection-end-column="33" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="855">
+          <caret line="50" column="0" lean-forward="false" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/connection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/quant_api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2242">
+          <caret line="179" column="92" lean-forward="false" selection-start-line="179" selection-start-column="92" selection-end-line="179" selection-end-column="92" />
+          <folding>
+            <element signature="e#45#64#0" expanded="true" />
+            <element signature="e#269#557#0" expanded="false" />
+            <element signature="e#856#4315#0" expanded="false" />
+            <element signature="e#856#876#1" expanded="false" />
+            <element signature="e#4340#4441#0" expanded="false" />
+            <element signature="e#4476#4694#0" expanded="false" />
+            <element signature="e#4728#5237#0" expanded="false" />
+            <element signature="e#5265#6578#0" expanded="false" />
+            <element signature="e#6608#7487#0" expanded="false" />
+            <element signature="e#7514#8540#0" expanded="false" />
+            <element signature="e#8571#9145#0" expanded="false" />
+            <element signature="e#9177#11083#0" expanded="false" />
+            <element signature="e#11110#12244#0" expanded="false" />
+            <element signature="e#12270#13073#0" expanded="false" />
+            <element signature="e#13105#13262#0" expanded="false" />
+            <element signature="e#13328#14203#0" expanded="false" />
+            <element signature="e#14239#15159#0" expanded="false" />
+            <element signature="e#15205#15565#0" expanded="false" />
+            <element signature="e#15600#15658#0" expanded="false" />
+            <element signature="e#15708#16848#0" expanded="false" />
+            <element signature="e#16907#18116#0" expanded="false" />
+            <element signature="e#18206#19461#0" expanded="false" />
+            <element signature="e#19516#22321#0" expanded="false" />
+            <element signature="e#22377#25110#0" expanded="false" />
+            <element signature="e#25166#28233#0" expanded="false" />
+            <element signature="e#28290#31414#0" expanded="false" />
+            <element signature="e#31475#31858#0" expanded="false" />
+            <element signature="e#31922#32263#0" expanded="false" />
+            <element signature="e#32323#32720#0" expanded="false" />
+            <element signature="e#32783#33142#0" expanded="false" />
+            <element signature="e#33193#33284#0" expanded="false" />
+            <element signature="e#33320#35438#0" expanded="false" />
+            <element signature="e#35461#35495#0" expanded="false" />
+            <element signature="e#35606#36365#0" expanded="false" />
+            <element signature="e#36416#36748#0" expanded="false" />
+            <element signature="e#36791#38157#0" expanded="false" />
+            <element signature="e#38259#40302#0" expanded="false" />
+            <element signature="e#41232#42495#0" expanded="false" />
+            <element signature="e#42562#43763#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2470">
+          <caret line="149" column="0" lean-forward="false" selection-start-line="149" selection-start-column="0" selection-end-line="149" selection-end-column="0" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1805">
+          <caret line="103" column="0" lean-forward="false" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/get_data_huobi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="209">
+          <caret line="72" column="30" lean-forward="false" selection-start-line="71" selection-start-column="0" selection-end-line="73" selection-end-column="39" />
+          <folding>
+            <element signature="e#146#2037#0" expanded="false" />
+            <element signature="e#2140#3683#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/codecs.py" />
+    <entry file="file://$PROJECT_DIR$/test_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="323">
+          <caret line="19" column="17" lean-forward="false" selection-start-line="19" selection-start-column="17" selection-end-line="19" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/connection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1995">
+          <caret line="105" column="30" lean-forward="false" selection-start-line="105" selection-start-column="30" selection-end-line="105" selection-end-column="30" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1482">
+          <caret line="86" column="33" lean-forward="true" selection-start-line="86" selection-start-column="33" selection-end-line="86" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/get_data_huobi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="266">
+          <caret line="75" column="14" lean-forward="false" selection-start-line="75" selection-start-column="14" selection-end-line="75" selection-end-column="14" />
+          <folding>
+            <element signature="e#146#2037#0" expanded="false" />
+            <element signature="e#2140#3683#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/fund_perform_eval.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="342">
+          <caret line="18" column="0" lean-forward="false" selection-start-line="18" selection-start-column="0" selection-end-line="18" selection-end-column="57" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/connection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="228">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3135">
+          <caret line="165" column="24" lean-forward="false" selection-start-line="165" selection-start-column="4" selection-end-line="165" selection-end-column="24" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/get_data_huobi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1425">
+          <caret line="75" column="14" lean-forward="true" selection-start-line="75" selection-start-column="14" selection-end-line="75" selection-end-column="14" />
+          <folding>
+            <element signature="e#146#2037#0" expanded="false" />
+            <element signature="e#2140#3683#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/fund_perform_eval.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/quant_api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1767">
+          <caret line="93" column="12" lean-forward="true" selection-start-line="93" selection-start-column="12" selection-end-line="93" selection-end-column="12" />
+          <folding>
+            <element signature="e#45#64#0" expanded="true" />
+            <element signature="e#269#557#0" expanded="false" />
+            <element signature="e#856#4315#0" expanded="false" />
+            <element signature="e#856#876#1" expanded="false" />
+            <element signature="e#4340#4441#0" expanded="false" />
+            <element signature="e#4476#4694#0" expanded="false" />
+            <element signature="e#4728#5237#0" expanded="false" />
+            <element signature="e#5265#6578#0" expanded="false" />
+            <element signature="e#6608#7487#0" expanded="false" />
+            <element signature="e#7514#8540#0" expanded="false" />
+            <element signature="e#8571#9145#0" expanded="false" />
+            <element signature="e#9177#11083#0" expanded="false" />
+            <element signature="e#11110#12244#0" expanded="false" />
+            <element signature="e#12270#13073#0" expanded="false" />
+            <element signature="e#13105#13262#0" expanded="false" />
+            <element signature="e#13328#14203#0" expanded="false" />
+            <element signature="e#14239#15159#0" expanded="false" />
+            <element signature="e#15205#15565#0" expanded="false" />
+            <element signature="e#15600#15658#0" expanded="false" />
+            <element signature="e#15708#16848#0" expanded="false" />
+            <element signature="e#16907#18116#0" expanded="false" />
+            <element signature="e#18206#19461#0" expanded="false" />
+            <element signature="e#19516#22321#0" expanded="false" />
+            <element signature="e#22377#25110#0" expanded="false" />
+            <element signature="e#25166#28233#0" expanded="false" />
+            <element signature="e#28290#31414#0" expanded="false" />
+            <element signature="e#31475#31858#0" expanded="false" />
+            <element signature="e#31922#32263#0" expanded="false" />
+            <element signature="e#32323#32720#0" expanded="false" />
+            <element signature="e#32783#33142#0" expanded="false" />
+            <element signature="e#33193#33284#0" expanded="false" />
+            <element signature="e#33320#35438#0" expanded="false" />
+            <element signature="e#35461#35495#0" expanded="false" />
+            <element signature="e#35606#36365#0" expanded="false" />
+            <element signature="e#36416#36748#0" expanded="false" />
+            <element signature="e#36791#38157#0" expanded="false" />
+            <element signature="e#38259#40302#0" expanded="false" />
+            <element signature="e#41232#42495#0" expanded="false" />
+            <element signature="e#42562#43763#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="703">
+          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="703">
+          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="855">
+          <caret line="45" column="0" lean-forward="false" selection-start-line="45" selection-start-column="0" selection-end-line="45" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="513">
+          <caret line="27" column="0" lean-forward="false" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/fund_perform_eval.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/connection.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="12" column="0" lean-forward="false" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/data/get_data_huobi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="152">
+          <caret line="69" column="93" lean-forward="false" selection-start-line="69" selection-start-column="93" selection-end-line="69" selection-end-column="93" />
+          <folding>
+            <element signature="e#146#2037#0" expanded="false" />
+            <element signature="e#2140#3683#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/IPython/core/interactiveshell.py" />
+    <entry file="file://$APPLICATION_HOME_DIR$/helpers/pydev/pydevd.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="31559">
+          <caret line="1661" column="0" lean-forward="false" selection-start-line="1661" selection-start-column="0" selection-end-line="1661" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/codecs.py" />
+    <entry file="file://C:/ProgramData/Anaconda3/Lib/site-packages/pandas/core/indexes/base.py" />
+    <entry file="file://$PROJECT_DIR$/api/tmp.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="28">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="15" column="0" lean-forward="false" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/HuobiServices.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="5985">
+          <caret line="375" column="33" lean-forward="false" selection-start-line="375" selection-start-column="33" selection-end-line="375" selection-end-column="33" />
+          <folding>
+            <element signature="e#275#613#0" expanded="false" />
+            <element signature="e#665#929#0" expanded="false" />
+            <element signature="e#975#1130#0" expanded="false" />
+            <element signature="e#1178#1343#0" expanded="false" />
+            <element signature="e#1403#1559#0" expanded="false" />
+            <element signature="e#1613#1777#0" expanded="false" />
+            <element signature="e#1831#1943#0" expanded="false" />
+            <element signature="e#8465#8990#0" expanded="false" />
+            <element signature="e#9043#9234#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btcapi.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="216">
+          <caret line="88" column="137" lean-forward="true" selection-start-line="88" selection-start-column="18" selection-end-line="88" selection-end-column="137" />
+          <folding>
+            <element signature="e#0#28#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btc_timing.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="931">
+          <caret line="49" column="6" lean-forward="false" selection-start-line="49" selection-start-column="6" selection-end-line="49" selection-end-column="6" />
+          <folding>
+            <element signature="e#168#187#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/common/Utils.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="456">
+          <caret line="32" column="0" lean-forward="false" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/logger.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="950">
+          <caret line="50" column="9" lean-forward="false" selection-start-line="50" selection-start-column="9" selection-end-line="50" selection-end-column="9" />
+          <folding>
+            <element signature="e#78#93#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/quant_api.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="83">
+          <caret line="846" column="0" lean-forward="true" selection-start-line="846" selection-start-column="0" selection-end-line="922" selection-end-column="0" />
+          <folding>
+            <element signature="e#45#64#0" expanded="true" />
+            <element signature="e#269#557#0" expanded="false" />
+            <element signature="e#856#4315#0" expanded="false" />
+            <element signature="e#856#876#1" expanded="false" />
+            <element signature="e#4340#4441#0" expanded="false" />
+            <element signature="e#4476#4694#0" expanded="false" />
+            <element signature="e#4728#5237#0" expanded="false" />
+            <element signature="e#5265#6578#0" expanded="false" />
+            <element signature="e#6608#7487#0" expanded="false" />
+            <element signature="e#7514#8540#0" expanded="false" />
+            <element signature="e#8571#9145#0" expanded="false" />
+            <element signature="e#9177#11083#0" expanded="false" />
+            <element signature="e#11110#12244#0" expanded="false" />
+            <element signature="e#12270#13073#0" expanded="false" />
+            <element signature="e#13105#13262#0" expanded="false" />
+            <element signature="e#13328#14203#0" expanded="false" />
+            <element signature="e#14239#15159#0" expanded="false" />
+            <element signature="e#15205#15565#0" expanded="false" />
+            <element signature="e#15600#15658#0" expanded="false" />
+            <element signature="e#15708#16848#0" expanded="false" />
+            <element signature="e#16907#18116#0" expanded="false" />
+            <element signature="e#18206#19461#0" expanded="false" />
+            <element signature="e#19516#22321#0" expanded="false" />
+            <element signature="e#22377#25110#0" expanded="false" />
+            <element signature="e#25166#28233#0" expanded="false" />
+            <element signature="e#28290#31414#0" expanded="false" />
+            <element signature="e#31475#31858#0" expanded="false" />
+            <element signature="e#31922#32263#0" expanded="false" />
+            <element signature="e#32323#32720#0" expanded="false" />
+            <element signature="e#32783#33142#0" expanded="false" />
+            <element signature="e#33193#33284#0" expanded="false" />
+            <element signature="e#33320#35438#0" expanded="false" />
+            <element signature="e#35461#35495#0" expanded="false" />
+            <element signature="e#35606#36365#0" expanded="false" />
+            <element signature="e#36416#36748#0" expanded="false" />
+            <element signature="e#36791#38157#0" expanded="false" />
+            <element signature="e#38259#40302#0" expanded="false" />
+            <element signature="e#41232#42495#0" expanded="false" />
+            <element signature="e#42562#43763#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
