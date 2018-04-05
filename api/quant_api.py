@@ -514,7 +514,7 @@ def repay_margin(exchange='huobipro', order_id=None, amount=0):
         return hb.repay_margin(order_id=order_id, amount=amount)
 
 
-def get_margin_orders(exchange='huobipro', symbol=None, currency=None, start_date="", end_date="", start="", direct="", size=0):
+def get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='btc', start_date="", end_date="", start="", direct="", size=0):
     """
     # 借贷订单
     :param symbol:
@@ -534,8 +534,9 @@ def get_margin_orders(exchange='huobipro', symbol=None, currency=None, start_dat
                 data_df['interest-rate'] = data_df['interest-rate'].astype('float')
                 data_df['loan-amount'] = data_df['loan-amount'].astype('float')
                 data_df['loan-balance'] = data_df['loan-balance'].astype('float')
-
+                data_df = data_df[data_df['currency'] == currency]
                 data_df.sort_values(by='accrued-at', inplace=True)
+
                 return data_df
             else:
                 print('No histroy orders found!')
@@ -795,7 +796,12 @@ def close_long(exchange, source, sec_id, price, volume):
             mtype = 'sell-limit'
 
         myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        result = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+
+        if source == 'api':
+            result = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+        elif source == 'margin-api':
+            result = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+
         if result['status'] == 'ok':
             myorder.ex_ord_id = result['data']
 

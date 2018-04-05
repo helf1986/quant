@@ -94,6 +94,10 @@ if __name__ == "__main__":
     print(result_pd)
         '''
 
-    result = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='usdt', start="2018-04-04", direct="next", size=20)
+    result = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='usdt', start="2018-04-05", direct="prev", size=10)
 
     result = qapi.repay_margin(exchange='huobipro', order_id=676027, amount=0.15)
+
+    result = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=100, leverage=1)
+
+    result = qapi.marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.001)
