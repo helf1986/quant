@@ -886,7 +886,7 @@ def margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
     unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
     margin_order_id = unpaid_orders.iloc[-1]['id']
-    unpaid_volume = unpaid_orders.iloc[-1]['loan-amount'] + unpaid_orders.iloc[-1]['interest-amount']
+    unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
 
     # 偿还借贷
     repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=unpaid_volume)
@@ -936,7 +936,7 @@ def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
     unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
     margin_order_id = unpaid_orders.iloc[-1]['id']
-    unpaid_volume = unpaid_orders.iloc[-1]['loan-amount'] + unpaid_orders.iloc[-1]['interest-amount']
+    unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
 
     if volume < unpaid_volume:
         paid_volume = volume

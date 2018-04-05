@@ -101,7 +101,9 @@ if __name__ == "__main__":
     margin_orders = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='btc', start="2018-04-06", direct="prev", size=10)
 
     result = qapi.apply_margin(exchange='huobipro', symbol='btcusdt', currency='btc', amount=0.001)
-    
+
+    result = qapi.apply_margin(exchange='huobipro', symbol='btcusdt', currency='usdt', amount=0.001)
+
     result = qapi.repay_margin(exchange='huobipro', order_id=676027, amount=0.15)
 
     myorder = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=50, leverage=2)
