@@ -86,7 +86,14 @@ if __name__ == "__main__":
 
     # result = qapi.get_positions(exchange='huobipro')
 
+    '''
+
     result = qapi.get_bars(exchange='huobipro', symbol_list=['btcusdt', 'ethusdt'], bar_type='1min', begin_time='', end_time='', size=50)
     result_dict = [each.__dict__ for each in result]
     result_pd = pd.DataFrame(result_dict)
     print(result_pd)
+        '''
+
+    result = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='usdt', start="2018-04-04", direct="next", size=20)
+
+    result = qapi.repay_margin(exchange='huobipro', order_id=676027, amount=0.15)

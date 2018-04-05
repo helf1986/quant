@@ -220,6 +220,10 @@ class Order(object):
         self.sending_time = 0.0               ## 委托下单时间
         self.transact_time = 0.0              ## 最新一次成交时间
 
+        self.margin_order_id = ''             ### 融资融券订单号
+        self.margin_currency = ''                    ### 融资融券品种
+        self.margin_amount = 0                 ### 融资融券金额
+
 
 class ExecRpt(object):
     '''
@@ -507,7 +511,7 @@ def repay_margin(exchange='huobipro', order_id=None, amount=0):
     :return:
     """
     if exchange == 'huobipro':
-        return hb.repay_margin(order_ip=order_id, amount=amount)
+        return hb.repay_margin(order_id=order_id, amount=amount)
 
 
 def get_margin_orders(exchange='huobipro', symbol=None, currency=None, start_date="", end_date="", start="", direct="", size=0):
@@ -534,7 +538,7 @@ def get_margin_orders(exchange='huobipro', symbol=None, currency=None, start_dat
                 data_df.sort_values(by='accrued-at', inplace=True)
                 return data_df
             else:
-                print('No histroy orders find!')
+                print('No histroy orders found!')
                 return None
 
         elif res['status'] == 'error':
@@ -615,7 +619,7 @@ def get_last_ticks(exchange, symbol_list):
     return ticks
 
 
-def get_last_bars(exchange, symbol_list, bar_type):
+def get_last_bars(exchange='btcusdt', symbol_list='btcusdt', bar_type='1min'):
     '''
 
     :param symbol_list:
@@ -694,7 +698,7 @@ def get_bars(exchange, symbol_list, bar_type, begin_time='', end_time='', size=0
     return bars
 
 
-def open_long(exchange, source, sec_id, price, volume):
+def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volume=0):
     '''
     异步开多仓，以参数指定的symbol、价和量下单。如果价格为0，为市价单，否则为限价单。
     :param exchange: string	交易所代码，如火币网：huobipro，OKCoin: okcoin
@@ -726,7 +730,11 @@ def open_long(exchange, source, sec_id, price, volume):
 
         # 买入指定数字货币
         myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        result = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+        if source == 'api':
+            result = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+        elif source == 'margin-api':
+            result = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+
         if result['status'] == 'ok':
             myorder.ex_ord_id = result['data']
 
@@ -824,17 +832,22 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     :param price:
     :param volume: 本金数量
     :param leverage: 杠杆比例
-    :return: 返回融资的订单，因为还钱的时候需要订单号
+    :return: Order 对象
     '''
 
     # 第一步：先融资
+    margin_currency = 'usdt'
     margin_amount = volume * leverage
-    margin_order_id = get_margin(exchange=exchange, symbol=sec_id, currency='usdt', amount=margin_amount)
+    margin_order_id = get_margin(exchange=exchange, symbol=sec_id, currency=margin_currency, amount=margin_amount)
 
     # 第二步：买入数字货币
-    long_order_id = open_long(exchange=exchange, source= 'margin-api', sec_id=sec_id, price=price, volume=volume)
+    buy_amount = volume + margin_amount
+    long_order_id = open_long(exchange=exchange, source= 'margin-api', sec_id=sec_id, price=price, volume=buy_amount)
+    long_order_id.margin_amount = margin_amount
+    long_order_id.margin_currency = margin_currency
+    long_order_id.margin_order_id = margin_order_id
 
-    return margin_order_id
+    return long_order_id
 
 
 def margincash_close(exchange, margin_order_id, sec_id, price, volume):
@@ -851,6 +864,8 @@ def margincash_close(exchange, margin_order_id, sec_id, price, volume):
     close_order = close_long(exchange=exchange, source= 'margin-api', sec_id=sec_id, price=price, volume=volume)
 
     # 第二步：归还USDT
+    # 获取待还金额
+    get_margin_balance(exchange=exchange, symbol=)
     repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=0)
 
     return repay_status
