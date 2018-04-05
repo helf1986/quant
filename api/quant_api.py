@@ -584,6 +584,8 @@ def get_last_ticks(exchange, symbol_list):
     :param symbol_list:
     :return:
     '''
+
+    symbol_list = symbol_list.replace(' ', '').split(',')
     ticks = []
     if exchange == 'huobipro':
         for each in symbol_list:
@@ -620,7 +622,7 @@ def get_last_bars(exchange, symbol_list, bar_type):
     :param bar_type: {1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
     :return:
     '''
-
+    symbol_list = symbol_list.replace(' ', '').split(',')
     bars = []
     if exchange == 'huobipro':
 
@@ -633,7 +635,7 @@ def get_last_bars(exchange, symbol_list, bar_type):
                 bar.sec_id = each
                 bar.bar_type = bar_type
                 bar.utc_time = data['id']
-                bar.utc_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(data['id']))
+                bar.strtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(data['id']))
                 bar.open = data['open']
                 bar.high = data['high']
                 bar.low = data['low']
@@ -661,7 +663,7 @@ def get_bars(exchange, symbol_list, bar_type, begin_time='', end_time='', size=0
     :param size: 取数数量，[1,2000]
     :return:
     '''
-
+    symbol_list = symbol_list.replace(' ', '').split(',')
     bars = []
     for each_sec in symbol_list:
 
