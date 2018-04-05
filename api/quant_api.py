@@ -732,21 +732,21 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
 
     if exchange == 'huobipro':         # 火币网接口
         if price == 0.0:
-            mtype = 'sell-market'
+            mtype = 'buy-market'
         else:
-            mtype = 'sell-limit'
+            mtype = 'buy-limit'
         myorder.order_type = mtype          ## 订单类型
         myorder.order_src = source  ## 订单来源
 
         # 买入指定数字货币
         myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         if source == 'api':
-            result = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+            res = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
         elif source == 'margin-api':
-            result = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+            res = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
 
-        if result['status'] == 'ok':
-            myorder.ex_ord_id = result['data']
+        if res['status'] == 'ok':
+            myorder.ex_ord_id = res['data']
 
             time.sleep(2) # 等待3 秒后查询订单
             # 查询订单信息
@@ -764,17 +764,17 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
             logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f，总成交额 = %f，手续费 = %f。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume, myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
-        elif result['status'] == 'error':
-            myorder.status = result['status']
-            myorder.ord_rej_reason = result['err-code']  ## 订单拒绝原因
-            myorder.ord_rej_reason_detail = result['err-msg']  ## 订单拒绝原因描述
+        elif res['status'] == 'error':
+            myorder.status = res['status']
+            myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
+            myorder.ord_rej_reason_detail = res['err-msg']  ## 订单拒绝原因描述
             logger.warn('%s 订单号 %s：%s 开多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason, myorder.ord_rej_reason_detail))
 
         return myorder
 
 
-def close_long(exchange, source, sec_id, price, volume):
+def close_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volume=0):
     '''
     异步平多仓，
     :param exchange: string	交易所代码，如火币网：huobipro，OKCoin: okcoin
@@ -807,12 +807,12 @@ def close_long(exchange, source, sec_id, price, volume):
         myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
         if source == 'api':
-            result = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+            res = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
         elif source == 'margin-api':
-            result = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+            res = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
 
-        if result['status'] == 'ok':
-            myorder.ex_ord_id = result['data']
+        if res['status'] == 'ok':
+            myorder.ex_ord_id = res['data']
 
             time.sleep(2)  # 等待3 秒后查询订单
             # 查询订单信息
@@ -829,10 +829,10 @@ def close_long(exchange, source, sec_id, price, volume):
             logger.info('%s 订单号 %s：%s 平多仓，成交量 = %f，成交均价 = %f，总成交额 = %f，手续费 = %f。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume, myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
-        elif result['status'] == 'error':
-            myorder.status = result['status']
-            myorder.ord_rej_reason = result['err-code']  ## 订单拒绝原因
-            myorder.ord_rej_reason_detail = result['err-msg']  ## 订单拒绝原因描述
+        elif res['status'] == 'error':
+            myorder.status = res['status']
+            myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
+            myorder.ord_rej_reason_detail = res['err-msg']  ## 订单拒绝原因描述
             logger.warn('%s 订单号 %s：%s 平多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason, myorder.ord_rej_reason_detail))
 
