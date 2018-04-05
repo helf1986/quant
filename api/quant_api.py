@@ -543,7 +543,7 @@ def get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='btc', sta
                 data_df['interest-rate'] = data_df['interest-rate'].astype('float')
                 data_df['loan-amount'] = data_df['loan-amount'].astype('float')
                 data_df['loan-balance'] = data_df['loan-balance'].astype('float')
-                data_df['strtime'] = [time.strftime('%Y-%m-%d %H:%M:%S', each/1000) for each in data_df['accrued-at']]
+                data_df['strtime'] = [time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(each/1000)) for each in data_df['accrued-at']]
                 data_df = data_df[data_df['currency'] == currency]
                 data_df.sort_values(by='accrued-at', inplace=True)
 
