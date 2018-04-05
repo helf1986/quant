@@ -11,7 +11,7 @@ import urllib.parse
 import urllib.request
 import requests
 
-LOGFILE = "log\\log.log"
+LOGFILE = "log/log.log"
 
 
 def get_vals(vs):
