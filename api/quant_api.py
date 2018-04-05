@@ -729,7 +729,6 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
     myorder.position_effect = 1          ## 开平标志，1：开仓，2：平仓
     myorder.side = 1                     ## 买卖方向，1：多方向，2：空方向
 
-
     if exchange == 'huobipro':         # 火币网接口
         if price == 0.0:
             mtype = 'buy-market'
@@ -761,7 +760,7 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
             myorder.filled_fee = float(order_info['data']['field-fees'])  ## 手续费
             myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['finished-at']/1000))  ## 最新一次成交时间
 
-            logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f，总成交额 = %f，手续费 = %f。' % \
+            logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f usdt。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume, myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
         elif res['status'] == 'error':
@@ -826,7 +825,7 @@ def close_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, vol
                 myorder.filled_vwap = round(myorder.filled_amount/myorder.filled_volume,4)  ## 已成交均价
             myorder.filled_fee = float(order_info['data']['field-fees'])  ## 已成交额
             myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['finished-at']/1000))  ## 最新一次成交时间
-            logger.info('%s 订单号 %s：%s 平多仓，成交量 = %f，成交均价 = %f，总成交额 = %f，手续费 = %f。' % \
+            logger.info('%s 订单号 %s：%s 平多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f usdt。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume, myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
         elif res['status'] == 'error':
@@ -857,7 +856,7 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
 
     # 第二步：买入数字货币
     buy_amount = volume + margin_amount
-    myorder = open_long(exchange=exchange, source='magin-api', sec_id=sec_id, price=price, volume=buy_amount)
+    myorder = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=buy_amount)
 
     myorder.margin_amount = margin_amount
     myorder.margin_currency = margin_currency
@@ -1098,7 +1097,7 @@ def send_order(exchange='huobipro', symbol='btcusdt', amount=0, margin=0, mtype=
     :return:
     '''
 
-    if ex=='huobipro':
+    if exchange=='huobipro':
         if margin == 1 :
             margin_order = 'margin_api'
         else:
