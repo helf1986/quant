@@ -921,7 +921,53 @@ def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     '''
 
     # 第一步：先买入数字货币
-    long_order = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=volume)
+    myorder = Order()
+    myorder.exchange = exchange
+    myorder.sec_id = sec_id
+    myorder.price = price                ## 委托价
+    myorder.volume = volume              ## 委托量
+    myorder.cl_ord_id = ''
+
+    myorder.position_effect = 1          ## 开平标志，1：开仓，2：平仓
+    myorder.side = 1                     ## 买卖方向，1：多方向，2：空方向
+
+
+    if exchange == 'huobipro':         # 火币网接口
+        if price == 0.0:
+            mtype = 'buy-market'
+        else:
+            mtype = 'buy-limit'
+        source =  'margin-api'
+        myorder.order_type = mtype          ## 订单类型
+        myorder.order_src = source ## 订单来源
+
+        # 买入指定数字货币
+        myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        result = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+
+        if result['status'] == 'ok':
+            myorder.ex_ord_id = result['data']
+
+            time.sleep(2) # 等待3 秒后查询订单
+            # 查询订单信息
+            order_info = hb.order_info(myorder.ex_ord_id)
+            myorder.account_id = order_info['data']['account-id']
+            myorder.status = order_info['data']['state']
+            myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['created-at']/1000))
+            myorder.filled_volume = float(order_info['data']['field-amount'])  ## 已成交量
+            myorder.filled_amount = float(order_info['data']['field-cash-amount'])  ## 已成交额
+            if (myorder.filled_volume > 0):
+                myorder.filled_vwap = round(myorder.filled_amount/myorder.filled_volume,4)  ## 已成交均价
+            myorder.filled_fee = float(order_info['data']['field-fees'])  ## 手续费
+            myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['finished-at']/1000))  ## 最新一次成交时间
+
+        elif result['status'] == 'error':
+            myorder.status = result['status']
+            myorder.ord_rej_reason = result['err-code']  ## 订单拒绝原因
+            myorder.ord_rej_reason_detail = result['err-msg']  ## 订单拒绝原因描述
+            logger.warn('%s 订单号 %s：%s 开多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
+                        (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason, myorder.ord_rej_reason_detail))
+
 
     # 第二步：归还数字货币
     # 获取待还金额
@@ -931,17 +977,22 @@ def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
     margin_order_id = unpaid_orders.iloc[-1]['id']
     unpaid_volume = unpaid_orders.iloc[-1]['loan-amount'] + unpaid_orders.iloc[-1]['interest-amount']
+
     if volume < unpaid_volume:
         paid_volume = volume
     else:
         paid_volume = unpaid_volume
 
     repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=paid_volume)
-    long_order.margin_order_id = margin_order_id
-    long_order.margin_currency = currency
-    long_order.margin_amount = -paid_volume
+    myorder.margin_order_id = margin_order_id
+    myorder.margin_currency = currency
+    myorder.margin_amount = -paid_volume
 
-    return long_order
+    logger.info('%s 订单号 %s：%s 融券平空仓，成交量 = %f，成交均价 = %f，总成交额 = %f，手续费 = %f。' % \
+                (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume, myorder.filled_vwap,
+                 myorder.filled_amount, myorder.filled_fee))
+
+    return myorder
 
 
 def get_position(exchange, sec_id, side):

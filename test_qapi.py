@@ -101,3 +101,5 @@ if __name__ == "__main__":
     result = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=100, leverage=1)
 
     result = qapi.marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.001)
+
+    result= qapi.marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=)
