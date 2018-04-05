@@ -221,7 +221,7 @@ class Order(object):
         self.transact_time = 0.0              ## 最新一次成交时间
 
         self.margin_order_id = ''             ### 融资融券订单号
-        self.margin_currency = ''                    ### 融资融券品种
+        self.margin_currency = ''             ### 融资融券品种
         self.margin_amount = 0                 ### 融资融券金额
 
 
@@ -850,7 +850,7 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     return long_order_id
 
 
-def margincash_close(exchange, margin_order_id, sec_id, price, volume):
+def margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     '''
     融资买入
     :param exchange:
@@ -865,13 +865,27 @@ def margincash_close(exchange, margin_order_id, sec_id, price, volume):
 
     # 第二步：归还USDT
     # 获取待还金额
-    get_margin_balance(exchange=exchange, symbol=)
-    repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=0)
+    currency = 'usdt'
+    today = time.strftime('%Y-%m-%d', time.localtime())
+    margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
+    unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
+    margin_order_id = unpaid_orders.iloc[-1]['id']
+    unpaid_volume = unpaid_orders.iloc[-1]['loan-amount'] + unpaid_orders.iloc[-1]['interest-amount']
+    if volume < unpaid_volume:
+        paid_volume = volume
+    else:
+        paid_volume = unpaid_volume
 
-    return repay_status
+    # 偿还借贷
+    repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=paid_volume)
+    close_order.margin_order_id = margin_order_id
+    close_order.margin_currency = currency
+    close_order.margin_amount = -paid_volume
+
+    return close_order
 
 
-def marginsec_open(exchange, sec_id, price, volume):
+def marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     '''
     融券做空
     :param exchange: 交易所
@@ -890,7 +904,7 @@ def marginsec_open(exchange, sec_id, price, volume):
     return margin_order_id
 
 
-def marginsec_close(exchange, margin_order_id, sec_id, price, volume):
+def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     '''
     卖券归还
     :param exchange:
@@ -904,9 +918,24 @@ def marginsec_close(exchange, margin_order_id, sec_id, price, volume):
     long_order = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=volume)
 
     # 第二步：归还数字货币
-    repay_order_id = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=0)
+    # 获取待还金额
+    currency = 'btc'
+    today = time.strftime('%Y-%m-%d', time.localtime())
+    margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
+    unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
+    margin_order_id = unpaid_orders.iloc[-1]['id']
+    unpaid_volume = unpaid_orders.iloc[-1]['loan-amount'] + unpaid_orders.iloc[-1]['interest-amount']
+    if volume < unpaid_volume:
+        paid_volume = volume
+    else:
+        paid_volume = unpaid_volume
 
-    return repay_order_id
+    repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=paid_volume)
+    long_order.margin_order_id = margin_order_id
+    long_order.margin_currency = currency
+    long_order.margin_amount = -paid_volume
+
+    return long_order
 
 
 def get_position(exchange, sec_id, side):
