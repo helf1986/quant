@@ -921,8 +921,6 @@ def marginsec_close(exchange, margin_order_id, volume):
     return repay_order_id
 
 
-
-
 def get_position(exchange, sec_id, side):
     '''
 
