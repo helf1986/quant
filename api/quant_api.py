@@ -816,18 +816,20 @@ def close_long(exchange, source, sec_id, price, volume):
         return myorder
 
 
-def margincash_open(exchange, sec_id, price, volume):
+def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, leverage=0):
     '''
     融资买入
     :param exchange:
     :param sec_id:
     :param price:
-    :param volume:
+    :param volume: 本金数量
+    :param leverage: 杠杆比例
     :return: 返回融资的订单，因为还钱的时候需要订单号
     '''
 
     # 第一步：先融资
-    margin_order_id = get_margin(exchange=exchange, symbol=sec_id, currency='usdt', amount=volume)
+    margin_amount = volume * leverage
+    margin_order_id = get_margin(exchange=exchange, symbol=sec_id, currency='usdt', amount=margin_amount)
 
     # 第二步：买入数字货币
     long_order_id = open_long(exchange=exchange, source= 'margin-api', sec_id=sec_id, price=price, volume=volume)
