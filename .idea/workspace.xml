@@ -2,10 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="93e95a67-865c-48c0-adc9-928933eb9844" name="Default" comment="">
+<<<<<<< HEAD
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/quant.iml" afterPath="$PROJECT_DIR$/.idea/quant.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/api/quant_api.py" afterPath="$PROJECT_DIR$/api/quant_api.py" />
+=======
+      <change beforePath="$PROJECT_DIR$/api/quant_api.py" afterPath="$PROJECT_DIR$/api/quant_api.py" />
+      <change beforePath="$PROJECT_DIR$/test_btc_timing.py" afterPath="$PROJECT_DIR$/test_btc_timing.py" />
+      <change beforePath="$PROJECT_DIR$/test_dma.py" afterPath="$PROJECT_DIR$/test_dma.py" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -16,11 +22,16 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="test_dma.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test_dma.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test_dma.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="513">
               <caret line="31" column="21" lean-forward="false" selection-start-line="31" selection-start-column="18" selection-end-line="31" selection-end-column="26" />
+=======
+            <state relative-caret-position="1045">
+              <caret line="103" column="61" lean-forward="false" selection-start-line="103" selection-start-column="61" selection-end-line="103" selection-end-column="61" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
               <folding>
                 <element signature="e#168#187#0" expanded="true" />
               </folding>
@@ -40,16 +51,22 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="quant_api.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="quant_api.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/quant_api.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="1102">
               <caret line="921" column="0" lean-forward="true" selection-start-line="921" selection-start-column="0" selection-end-line="921" selection-end-column="0" />
+=======
+            <state relative-caret-position="285">
+              <caret line="562" column="82" lean-forward="false" selection-start-line="562" selection-start-column="82" selection-end-line="562" selection-end-column="82" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
               <folding>
                 <element signature="e#45#64#0" expanded="true" />
                 <element signature="e#269#557#0" expanded="false" />
-                <element signature="e#856#4315#0" expanded="false" />
+                <element signature="e#856#4327#0" expanded="false" />
                 <element signature="e#856#876#1" expanded="false" />
+<<<<<<< HEAD
                 <element signature="e#4340#4441#0" expanded="false" />
                 <element signature="e#4476#4694#0" expanded="false" />
                 <element signature="e#4728#5237#0" expanded="false" />
@@ -83,6 +100,43 @@
                 <element signature="e#36789#38155#0" expanded="false" />
                 <element signature="e#38257#40300#0" expanded="false" />
                 <element signature="e#42560#43761#0" expanded="false" />
+=======
+                <element signature="e#4352#4453#0" expanded="false" />
+                <element signature="e#4488#4706#0" expanded="false" />
+                <element signature="e#4740#5249#0" expanded="false" />
+                <element signature="e#5277#6590#0" expanded="false" />
+                <element signature="e#6620#7499#0" expanded="false" />
+                <element signature="e#7526#8552#0" expanded="false" />
+                <element signature="e#8583#9157#0" expanded="false" />
+                <element signature="e#9189#11095#0" expanded="false" />
+                <element signature="e#11122#12256#0" expanded="false" />
+                <element signature="e#12282#13085#0" expanded="false" />
+                <element signature="e#13117#13274#0" expanded="false" />
+                <element signature="e#13340#14215#0" expanded="false" />
+                <element signature="e#14251#15171#0" expanded="false" />
+                <element signature="e#15217#15577#0" expanded="false" />
+                <element signature="e#15612#15670#0" expanded="false" />
+                <element signature="e#15720#16919#0" expanded="false" />
+                <element signature="e#16978#18245#0" expanded="false" />
+                <element signature="e#18335#19648#0" expanded="false" />
+                <element signature="e#19703#22508#0" expanded="false" />
+                <element signature="e#22564#25297#0" expanded="false" />
+                <element signature="e#25353#28420#0" expanded="false" />
+                <element signature="e#28477#31601#0" expanded="false" />
+                <element signature="e#31662#32045#0" expanded="false" />
+                <element signature="e#32109#32450#0" expanded="false" />
+                <element signature="e#32510#32907#0" expanded="false" />
+                <element signature="e#32970#33329#0" expanded="false" />
+                <element signature="e#33380#33471#0" expanded="false" />
+                <element signature="e#33507#35625#0" expanded="false" />
+                <element signature="e#35648#35682#0" expanded="false" />
+                <element signature="e#35793#36552#0" expanded="false" />
+                <element signature="e#36603#36935#0" expanded="false" />
+                <element signature="e#36978#38344#0" expanded="false" />
+                <element signature="e#38446#40489#0" expanded="false" />
+                <element signature="e#41419#42682#0" expanded="false" />
+                <element signature="e#42749#43950#0" expanded="false" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
               </folding>
             </state>
           </provider>
@@ -101,8 +155,13 @@
       <file leaf-file-name="test_btc_timing.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test_btc_timing.py">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
             <state relative-caret-position="760">
               <caret line="40" column="25" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
+=======
+            <state relative-caret-position="-480">
+              <caret line="93" column="4" lean-forward="true" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
               <folding>
                 <element signature="e#168#187#0" expanded="true" />
               </folding>
@@ -204,6 +263,7 @@
       <replace>myorder</replace>
       <replace>huobipro</replace>
       <replace>last</replace>
+      <replace>N_LONG</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -221,9 +281,10 @@
         <option value="$PROJECT_DIR$/api/tmp.py" />
         <option value="$PROJECT_DIR$/common/HuobiServices.py" />
         <option value="$PROJECT_DIR$/test_data.py" />
-        <option value="$PROJECT_DIR$/test_btc_timing.py" />
         <option value="$PROJECT_DIR$/api/logger.py" />
         <option value="$PROJECT_DIR$/btcquant.py" />
+        <option value="$PROJECT_DIR$/api/quant_api.py" />
+        <option value="$PROJECT_DIR$/test_btc_timing.py" />
         <option value="$PROJECT_DIR$/test_dma.py" />
         <option value="$PROJECT_DIR$/api/quant_api.py" />
       </list>
@@ -258,6 +319,11 @@
             <path>
               <item name="quantbtc" type="b2602c69:ProjectViewProjectNode" />
               <item name="quantbtc" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="quantbtc" type="b2602c69:ProjectViewProjectNode" />
+              <item name="quantbtc" type="462c0819:PsiDirectoryNode" />
+              <item name="api" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="quantbtc" type="b2602c69:ProjectViewProjectNode" />
@@ -420,7 +486,11 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3888889" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+<<<<<<< HEAD
       <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.28032786" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+=======
+      <window_info id="Python Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.09803922" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32843137" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31699347" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -462,47 +532,67 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
-          <line>687</line>
+          <line>698</line>
           <option name="timeStamp" value="35" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+<<<<<<< HEAD
           <line>1098</line>
+=======
+          <line>1111</line>
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+<<<<<<< HEAD
           <line>1097</line>
+=======
+          <line>1110</line>
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+<<<<<<< HEAD
           <line>1124</line>
+=======
+          <line>1137</line>
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
-          <line>740</line>
+          <line>751</line>
           <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
-          <line>807</line>
+          <line>818</line>
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
-          <line>621</line>
+          <line>632</line>
           <option name="timeStamp" value="54" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+<<<<<<< HEAD
           <line>967</line>
+=======
+          <line>980</line>
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           <option name="timeStamp" value="60" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
+<<<<<<< HEAD
           <line>974</line>
+=======
+          <line>987</line>
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           <option name="timeStamp" value="61" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -512,12 +602,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/api/quant_api.py</url>
-          <line>585</line>
+          <line>596</line>
           <option name="timeStamp" value="66" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/test_btc_timing.py</url>
-          <line>50</line>
+          <line>52</line>
           <option name="timeStamp" value="70" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -617,8 +707,9 @@
           <folding>
             <element signature="e#45#64#0" expanded="true" />
             <element signature="e#269#557#0" expanded="false" />
-            <element signature="e#856#4315#0" expanded="false" />
+            <element signature="e#856#4327#0" expanded="false" />
             <element signature="e#856#876#1" expanded="false" />
+<<<<<<< HEAD
             <element signature="e#4340#4441#0" expanded="false" />
             <element signature="e#4476#4694#0" expanded="false" />
             <element signature="e#4728#5237#0" expanded="false" />
@@ -652,6 +743,43 @@
             <element signature="e#36789#38155#0" expanded="false" />
             <element signature="e#38257#40300#0" expanded="false" />
             <element signature="e#42560#43761#0" expanded="false" />
+=======
+            <element signature="e#4352#4453#0" expanded="false" />
+            <element signature="e#4488#4706#0" expanded="false" />
+            <element signature="e#4740#5249#0" expanded="false" />
+            <element signature="e#5277#6590#0" expanded="false" />
+            <element signature="e#6620#7499#0" expanded="false" />
+            <element signature="e#7526#8552#0" expanded="false" />
+            <element signature="e#8583#9157#0" expanded="false" />
+            <element signature="e#9189#11095#0" expanded="false" />
+            <element signature="e#11122#12256#0" expanded="false" />
+            <element signature="e#12282#13085#0" expanded="false" />
+            <element signature="e#13117#13274#0" expanded="false" />
+            <element signature="e#13340#14215#0" expanded="false" />
+            <element signature="e#14251#15171#0" expanded="false" />
+            <element signature="e#15217#15577#0" expanded="false" />
+            <element signature="e#15612#15670#0" expanded="false" />
+            <element signature="e#15720#16919#0" expanded="false" />
+            <element signature="e#16978#18245#0" expanded="false" />
+            <element signature="e#18335#19648#0" expanded="false" />
+            <element signature="e#19703#22508#0" expanded="false" />
+            <element signature="e#22564#25297#0" expanded="false" />
+            <element signature="e#25353#28420#0" expanded="false" />
+            <element signature="e#28477#31601#0" expanded="false" />
+            <element signature="e#31662#32045#0" expanded="false" />
+            <element signature="e#32109#32450#0" expanded="false" />
+            <element signature="e#32510#32907#0" expanded="false" />
+            <element signature="e#32970#33329#0" expanded="false" />
+            <element signature="e#33380#33471#0" expanded="false" />
+            <element signature="e#33507#35625#0" expanded="false" />
+            <element signature="e#35648#35682#0" expanded="false" />
+            <element signature="e#35793#36552#0" expanded="false" />
+            <element signature="e#36603#36935#0" expanded="false" />
+            <element signature="e#36978#38344#0" expanded="false" />
+            <element signature="e#38446#40489#0" expanded="false" />
+            <element signature="e#41419#42682#0" expanded="false" />
+            <element signature="e#42749#43950#0" expanded="false" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           </folding>
         </state>
       </provider>
@@ -821,8 +949,9 @@
           <folding>
             <element signature="e#45#64#0" expanded="true" />
             <element signature="e#269#557#0" expanded="false" />
-            <element signature="e#856#4315#0" expanded="false" />
+            <element signature="e#856#4327#0" expanded="false" />
             <element signature="e#856#876#1" expanded="false" />
+<<<<<<< HEAD
             <element signature="e#4340#4441#0" expanded="false" />
             <element signature="e#4476#4694#0" expanded="false" />
             <element signature="e#4728#5237#0" expanded="false" />
@@ -856,6 +985,43 @@
             <element signature="e#36789#38155#0" expanded="false" />
             <element signature="e#38257#40300#0" expanded="false" />
             <element signature="e#42560#43761#0" expanded="false" />
+=======
+            <element signature="e#4352#4453#0" expanded="false" />
+            <element signature="e#4488#4706#0" expanded="false" />
+            <element signature="e#4740#5249#0" expanded="false" />
+            <element signature="e#5277#6590#0" expanded="false" />
+            <element signature="e#6620#7499#0" expanded="false" />
+            <element signature="e#7526#8552#0" expanded="false" />
+            <element signature="e#8583#9157#0" expanded="false" />
+            <element signature="e#9189#11095#0" expanded="false" />
+            <element signature="e#11122#12256#0" expanded="false" />
+            <element signature="e#12282#13085#0" expanded="false" />
+            <element signature="e#13117#13274#0" expanded="false" />
+            <element signature="e#13340#14215#0" expanded="false" />
+            <element signature="e#14251#15171#0" expanded="false" />
+            <element signature="e#15217#15577#0" expanded="false" />
+            <element signature="e#15612#15670#0" expanded="false" />
+            <element signature="e#15720#16919#0" expanded="false" />
+            <element signature="e#16978#18245#0" expanded="false" />
+            <element signature="e#18335#19648#0" expanded="false" />
+            <element signature="e#19703#22508#0" expanded="false" />
+            <element signature="e#22564#25297#0" expanded="false" />
+            <element signature="e#25353#28420#0" expanded="false" />
+            <element signature="e#28477#31601#0" expanded="false" />
+            <element signature="e#31662#32045#0" expanded="false" />
+            <element signature="e#32109#32450#0" expanded="false" />
+            <element signature="e#32510#32907#0" expanded="false" />
+            <element signature="e#32970#33329#0" expanded="false" />
+            <element signature="e#33380#33471#0" expanded="false" />
+            <element signature="e#33507#35625#0" expanded="false" />
+            <element signature="e#35648#35682#0" expanded="false" />
+            <element signature="e#35793#36552#0" expanded="false" />
+            <element signature="e#36603#36935#0" expanded="false" />
+            <element signature="e#36978#38344#0" expanded="false" />
+            <element signature="e#38446#40489#0" expanded="false" />
+            <element signature="e#41419#42682#0" expanded="false" />
+            <element signature="e#42749#43950#0" expanded="false" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           </folding>
         </state>
       </provider>
@@ -1066,10 +1232,68 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test_btc_timing.py">
+    <entry file="file://$PROJECT_DIR$/api/quant_api.py">
       <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="760">
           <caret line="40" column="25" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="135" selection-end-column="0" />
+=======
+        <state relative-caret-position="285">
+          <caret line="562" column="82" lean-forward="false" selection-start-line="562" selection-start-column="82" selection-end-line="562" selection-end-column="82" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
+          <folding>
+            <element signature="e#45#64#0" expanded="true" />
+            <element signature="e#269#557#0" expanded="false" />
+            <element signature="e#856#4327#0" expanded="false" />
+            <element signature="e#856#876#1" expanded="false" />
+            <element signature="e#4352#4453#0" expanded="false" />
+            <element signature="e#4488#4706#0" expanded="false" />
+            <element signature="e#4740#5249#0" expanded="false" />
+            <element signature="e#5277#6590#0" expanded="false" />
+            <element signature="e#6620#7499#0" expanded="false" />
+            <element signature="e#7526#8552#0" expanded="false" />
+            <element signature="e#8583#9157#0" expanded="false" />
+            <element signature="e#9189#11095#0" expanded="false" />
+            <element signature="e#11122#12256#0" expanded="false" />
+            <element signature="e#12282#13085#0" expanded="false" />
+            <element signature="e#13117#13274#0" expanded="false" />
+            <element signature="e#13340#14215#0" expanded="false" />
+            <element signature="e#14251#15171#0" expanded="false" />
+            <element signature="e#15217#15577#0" expanded="false" />
+            <element signature="e#15612#15670#0" expanded="false" />
+            <element signature="e#15720#16919#0" expanded="false" />
+            <element signature="e#16978#18245#0" expanded="false" />
+            <element signature="e#18335#19648#0" expanded="false" />
+            <element signature="e#19703#22508#0" expanded="false" />
+            <element signature="e#22564#25297#0" expanded="false" />
+            <element signature="e#25353#28420#0" expanded="false" />
+            <element signature="e#28477#31601#0" expanded="false" />
+            <element signature="e#31662#32045#0" expanded="false" />
+            <element signature="e#32109#32450#0" expanded="false" />
+            <element signature="e#32510#32907#0" expanded="false" />
+            <element signature="e#32970#33329#0" expanded="false" />
+            <element signature="e#33380#33471#0" expanded="false" />
+            <element signature="e#33507#35625#0" expanded="false" />
+            <element signature="e#35648#35682#0" expanded="false" />
+            <element signature="e#35793#36552#0" expanded="false" />
+            <element signature="e#36603#36935#0" expanded="false" />
+            <element signature="e#36978#38344#0" expanded="false" />
+            <element signature="e#38446#40489#0" expanded="false" />
+            <element signature="e#41419#42682#0" expanded="false" />
+            <element signature="e#42749#43950#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test_btc_timing.py">
+      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
+        <state relative-caret-position="513">
+          <caret line="31" column="21" lean-forward="false" selection-start-line="31" selection-start-column="18" selection-end-line="31" selection-end-column="26" />
+=======
+        <state relative-caret-position="-480">
+          <caret line="93" column="4" lean-forward="true" selection-start-line="93" selection-start-column="4" selection-end-line="93" selection-end-column="4" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           <folding>
             <element signature="e#168#187#0" expanded="true" />
           </folding>
@@ -1078,16 +1302,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test_dma.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="513">
-          <caret line="31" column="21" lean-forward="false" selection-start-line="31" selection-start-column="18" selection-end-line="31" selection-end-column="26" />
-          <folding>
-            <element signature="e#168#187#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/api/quant_api.py">
-      <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
         <state relative-caret-position="1102">
           <caret line="921" column="0" lean-forward="true" selection-start-line="921" selection-start-column="0" selection-end-line="921" selection-end-column="0" />
           <folding>
@@ -1128,6 +1343,12 @@
             <element signature="e#36789#38155#0" expanded="false" />
             <element signature="e#38257#40300#0" expanded="false" />
             <element signature="e#42560#43761#0" expanded="false" />
+=======
+        <state relative-caret-position="1045">
+          <caret line="103" column="61" lean-forward="false" selection-start-line="103" selection-start-column="61" selection-end-line="103" selection-end-column="61" />
+          <folding>
+            <element signature="e#168#187#0" expanded="true" />
+>>>>>>> 64e03ee3878e4c6fc6d92e1d9d6a2caa96045be0
           </folding>
         </state>
       </provider>
