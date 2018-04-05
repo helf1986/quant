@@ -495,12 +495,14 @@ def get_margin(exchange='huobipro', symbol=None, currency=None, amount=0):
     :return:
     """
     if exchange == 'huobipro':
-        result =  hb.get_margin(symbol=symbol, currency=currency, amount=amount)
-        if result['status'] == 'ok':
-            return  result['data']
-        elif result['status'] == 'error':
-            print(result['err-code'] + ":" + result['err-msg'])
-            return None
+        res =  hb.get_margin(symbol=symbol, currency=currency, amount=amount)
+        if res['status'] == 'ok':
+            margin_order_id = res['data']
+            logger.info('%s 借贷订单号 %s：借入 %f %s' % (exchange, margin_order_id, amount, currency))
+            return margin_order_id
+        elif res['status'] == 'error':
+            print(res['err-code'] + ":" + res['err-msg'])
+            return False
 
 
 def repay_margin(exchange='huobipro', order_id=None, amount=0):
@@ -510,8 +512,15 @@ def repay_margin(exchange='huobipro', order_id=None, amount=0):
     :param amount:
     :return:
     """
+
     if exchange == 'huobipro':
-        return hb.repay_margin(order_id=order_id, amount=amount)
+        res = hb.repay_margin(order_id=order_id, amount=amount)
+        if res['status'] == 'ok':
+            logger.info('%s 借贷订单号 %s：归还 %f' % (exchange, order_id, amount))
+            return True
+        elif res['status'] == 'error':
+            print(res['err-code'] + ":" + res['err-msg'])
+            return False
 
 
 def get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='btc', start_date="", end_date="", start="", direct="", size=0):
@@ -534,18 +543,18 @@ def get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='btc', sta
                 data_df['interest-rate'] = data_df['interest-rate'].astype('float')
                 data_df['loan-amount'] = data_df['loan-amount'].astype('float')
                 data_df['loan-balance'] = data_df['loan-balance'].astype('float')
+                data_df['strtime'] = [time.strftime('%Y-%m-%d %H:%M:%S', each/1000) for each in data_df['accrued-at']]
                 data_df = data_df[data_df['currency'] == currency]
                 data_df.sort_values(by='accrued-at', inplace=True)
 
                 return data_df
             else:
-                print('No histroy orders found!')
+                print('No history orders found!')
                 return None
 
         elif res['status'] == 'error':
             print(res['err-code'] + ":" + res['err-msg'])
             return None
-
 
 
 def get_margin_balance(exchange, symbol):
@@ -848,12 +857,13 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
 
     # 第二步：买入数字货币
     buy_amount = volume + margin_amount
-    long_order_id = open_long(exchange=exchange, source= 'margin-api', sec_id=sec_id, price=price, volume=buy_amount)
-    long_order_id.margin_amount = margin_amount
-    long_order_id.margin_currency = margin_currency
-    long_order_id.margin_order_id = margin_order_id
+    myorder = open_long(exchange=exchange, source='magin-api', sec_id=sec_id, price=price, volume=buy_amount)
 
-    return long_order_id
+    myorder.margin_amount = margin_amount
+    myorder.margin_currency = margin_currency
+    myorder.margin_order_id = margin_order_id
+
+    return myorder
 
 
 def margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
@@ -921,53 +931,7 @@ def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     '''
 
     # 第一步：先买入数字货币
-    myorder = Order()
-    myorder.exchange = exchange
-    myorder.sec_id = sec_id
-    myorder.price = price                ## 委托价
-    myorder.volume = volume              ## 委托量
-    myorder.cl_ord_id = ''
-
-    myorder.position_effect = 1          ## 开平标志，1：开仓，2：平仓
-    myorder.side = 1                     ## 买卖方向，1：多方向，2：空方向
-
-
-    if exchange == 'huobipro':         # 火币网接口
-        if price == 0.0:
-            mtype = 'buy-market'
-        else:
-            mtype = 'buy-limit'
-        source =  'margin-api'
-        myorder.order_type = mtype          ## 订单类型
-        myorder.order_src = source ## 订单来源
-
-        # 买入指定数字货币
-        myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
-        result = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
-
-        if result['status'] == 'ok':
-            myorder.ex_ord_id = result['data']
-
-            time.sleep(2) # 等待3 秒后查询订单
-            # 查询订单信息
-            order_info = hb.order_info(myorder.ex_ord_id)
-            myorder.account_id = order_info['data']['account-id']
-            myorder.status = order_info['data']['state']
-            myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['created-at']/1000))
-            myorder.filled_volume = float(order_info['data']['field-amount'])  ## 已成交量
-            myorder.filled_amount = float(order_info['data']['field-cash-amount'])  ## 已成交额
-            if (myorder.filled_volume > 0):
-                myorder.filled_vwap = round(myorder.filled_amount/myorder.filled_volume,4)  ## 已成交均价
-            myorder.filled_fee = float(order_info['data']['field-fees'])  ## 手续费
-            myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['finished-at']/1000))  ## 最新一次成交时间
-
-        elif result['status'] == 'error':
-            myorder.status = result['status']
-            myorder.ord_rej_reason = result['err-code']  ## 订单拒绝原因
-            myorder.ord_rej_reason_detail = result['err-msg']  ## 订单拒绝原因描述
-            logger.warn('%s 订单号 %s：%s 开多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
-                        (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason, myorder.ord_rej_reason_detail))
-
+    myorder = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=volume)
 
     # 第二步：归还数字货币
     # 获取待还金额
