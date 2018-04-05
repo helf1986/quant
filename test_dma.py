@@ -27,7 +27,7 @@ kline_data = qapi.get_bars(exchange='huobipro', symbol_list=symbol, bar_type='1m
 kline_df = qapi.to_dataframe(kline_data)
 kline_df.index = kline_df['strtime']
 kline_df = kline_df.sort_values(by='utc_time')
-print(kline_df.head())
+# print(kline_df.head())
 data = kline_df[['utc_time', 'close', 'volume']].copy()
 
 # 变量初始化
@@ -39,12 +39,14 @@ data['earning'] = 0
 data['voltility'] = 0
 data['pct_chg'] = 0
 
+time.sleep(60)
+logger.info('Start:')
+logger.send_sms('start btc operation!', '13811892804')
 
 while (1):
 
     time_struct = time.localtime()
     time_str = time.strftime('%Y-%m-%d %H:%M:%S', time_struct)
-    print(time_str)
 
     if time_struct.tm_sec == 0:
 
@@ -52,6 +54,7 @@ while (1):
         bars = qapi.get_last_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='1min')
         bar_df = qapi.to_dataframe(bars)
         bar_df.index = bar_df['strtime']
+
         # 加入到历史数据中
         data = data.iloc[1:].append(bar_df)
 
@@ -86,7 +89,10 @@ while (1):
         # 向上突破，买入
         if (data.loc[last, 'ma'] < data.loc[last, 'ref']) and (data.loc[now, 'ma'] > data.loc[now, 'ref']):
             data.loc[now, 'signal'] = 1
-            logger.info("%s 买入 BTC @ %f." %(now, data.loc[now, 'close']))
+            op_info = "%s 买入 BTC @ %f." %(now, data.loc[now, 'close'])
+            logger.info(op_info)
+            logger.send_sms(op_info, '13811892804')
+
             # 考虑手续费
             data.loc[now, 'account'] = data.loc[now, 'account'] * (1 - trade_fee)
             # 调整参考均线的值
@@ -95,7 +101,10 @@ while (1):
         # 向下突破，卖出
         elif (data.loc[last, 'ma'] > data.loc[last, 'ref']) and (data.loc[now, 'ma'] < data.loc[now, 'ref']):
             data.loc[now, 'signal'] = -1
-            logger.info("%s 卖出 BTC @ %f." % (now, data.loc[now, 'close']))
+            op_info = "%s 卖出 BTC @ %f." %(now, data.loc[now, 'close'])
+            logger.info(op_info)
+            logger.send_sms(op_info, '13811892804')
+
             # 考虑手续费
             data.loc[now, 'account'] = data.loc[now, 'account'] * (1 - trade_fee)
             # 调整参考均线的值
@@ -106,5 +115,5 @@ while (1):
             data.loc[now, 'signal'] = data.loc[last, 'signal']
             data.loc[now, 'account'] = data.loc[now, 'account']
 
-   	time.sleep(50)
+        time.sleep(55)
 
