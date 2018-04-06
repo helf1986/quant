@@ -15,18 +15,18 @@ from api import logger
 
 # 参数设置
 trade_fee = 0.002
-N_volt = 30*10
+N_volt = 24
 volt_mul = 2.0
-N_short = 6*10
-N_long_1 = 48*10
-N_long_2 = 72*10
+N_short = 6
+N_long_1 = 72
+N_long_2 = 144
 
 btc_data = pd.read_csv('btc_data_20171101_20180325.csv', index_col=0)
 btc_data['close'] = btc_data['cp']
 btc_data['strtime'] = btc_data['ts']
 print(btc_data.head())
 
-data = btc_data.iloc[0:N_long_2].copy()
+data = btc_data.iloc[0:60:60*N_long_2].copy()
 
 
 # 变量初始化
@@ -39,7 +39,7 @@ data['voltility'] = 0
 data['pct_chg'] = 0
 
 
-for each in btc_data.index[N_long_2:]:
+for each in btc_data.index[60*N_long_2::60]:
 
     # 获取当前时刻的bar
     
