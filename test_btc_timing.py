@@ -29,7 +29,7 @@ import api.quant_api as qapi
 # print(len(kline_data))
 
 symbol = 'btcusdt'
-kline_data = qapi.get_bars(exchange='huobipro', symbol_list=[symbol], bar_type='60min', size=1000)
+kline_data = qapi.get_bars(exchange='huobipro', symbol_list=symbol, bar_type='60min', size=1000)
 kline_list = [each_bar.__dict__ for each_bar in kline_data]
 kline_df = pd.DataFrame(kline_list)
 kline_df.index = kline_df['strtime']
