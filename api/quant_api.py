@@ -708,6 +708,69 @@ def get_bars(exchange, symbol_list, bar_type, begin_time='', end_time='', size=0
     return bars
 
 
+def get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='', size=0):
+    '''
+    从mongodb 取数
+    :param exchange:
+    :param symbol_list:
+    :param bar_type:
+    :param begin_time:
+    :param end_time:
+    :param size:
+    :return:
+    '''
+    symbol_list = symbol_list.replace(' ', '').split(',')
+    bars = []
+    for each_sec in symbol_list:
+
+        if begin_time == '':
+
+            end_time_ts = int(time.time())
+            end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time_ts))
+            if bar_type == '1min':
+                N_bar = 60
+            elif bar_type == '5min':
+                N_bar = 60*5
+            elif bar_type == '15min':
+                N_bar = 60*15
+            elif bar_type == '30min':
+                N_bar = 60*60
+            elif bar_type == '60min':
+                N_bar = 60*60
+            elif bar_type == '1day':
+                N_bar = 60*60*24
+            begin_time_ts = int(end_time_ts - N_bar * size)
+            begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(begin_time_ts))
+
+        client = MongoClient('47.75.69.176', 28005)
+        coin_db = client['bc_bourse_huobipro']
+        coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
+        collection = coin_db['b_btc_kline']
+
+        data = collection.find({'per': "1", "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})   # , "t": {}
+
+        for each_bar in data:
+            print(each_bar)
+            bar = Bar()
+            bar.exchange = exchange
+            bar.sec_id = each_sec
+            bar.volume = each_bar['amt']
+            bar.amount = each_bar['vol']
+            bar.open = each_bar['op']
+            bar.high = each_bar['hp']
+            bar.low = each_bar['lp']
+            bar.close = each_bar['cp']
+            bar.bar_type = bar_type
+            bar.utc_time = each_bar['t']
+            bar.strtime = each_bar['ts']
+
+            bars = bars + [bar]
+
+    return bars
+
+
+
+
 def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volume=0):
     '''
     异步开多仓，以参数指定的symbol、价和量下单。如果价格为0，为市价单，否则为限价单。
