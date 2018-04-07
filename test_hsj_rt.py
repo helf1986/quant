@@ -3,15 +3,15 @@ import pandas as pd
 import api.quant_api as qapi
 from api import logger
 
-c1 = 1.75  # std 系数
-l1 = 5  # avg追溯时期
-length = 400  # 基准期
+c1 = 1.75               # std 系数
+l1 = 5                  # avg追溯时期
+length = 400            # 基准期
 unit = 1
 most = 2
 # --------------
-MarketPosition = 0  #
+MarketPosition = 0      # 记录当前仓位
 ini_mkp = 0
-lastbatimer = None
+lastbatimer = None      # 上一周期时间
 
 if __name__ == '__main__':
     # -----------初始化----------------------------
