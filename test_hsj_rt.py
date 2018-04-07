@@ -96,33 +96,39 @@ if __name__ == '__main__':
 
             if (incon1):
                 # qapi.margincash_open(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit, leverage=0)
-                logger.info("open long @ %f" % close)
+                logger.info("BTCUSDT 开多仓 @ %f" % close)
+                logger.send_sms("BTCUSDT 开多仓 @ %f" % close, '13811892804')
                 limit = limit + 1
                 MarketPosition = 1
 
             if (incon2):
                 # qapi.marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=unit)
-                logger.info("open short @ % %f" % close)
+                logger.info("BTCUSDT 开空仓 @ % %f" % close)
+                logger.send_sms(" BTCUSDT 开空仓 @ %f" % close, '13811892804')
                 limit = limit + 1
                 MarketPosition = -1
 
             if (outcon):
                 if MarketPosition == 1:
                     # qapi.margincash_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("close long @ % %f" % close)
+                    logger.info("BTCUSDT 平多仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平多仓 @ %f" % close, '13811892804')
                     MarketPosition = 0
                     limit = 0
                 if MarketPosition == -1:
                     # qapi.marginsec_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("close short @ % %f" % close)
+                    logger.info("BTCUSDT 平空仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平空仓 @ %f" % close, '13811892804')
                     MarketPosition = 0
                     limit = 0
             if (outcon1):
                 if MarketPosition == 1:
                     # qapi.margincash_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("close long @ % %f" % close)
+                    logger.info("BTCUSDT 平多仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平多仓 @ %f" % close, '13811892804')
                     MarketPosition = 0
                 if MarketPosition == -1:
                     qapi.marginsec_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("close short @ % %f" % close)
+                    logger.info("BTCUSDT 平空仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平空仓 @ %f" % close, '13811892804')
                     MarketPosition = 0
