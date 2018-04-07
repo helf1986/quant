@@ -3,9 +3,6 @@ from pymongo import MongoClient
 import pandas as pd
 
 
-def get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', begin_time=None, end_time=None)
-
-
 client = MongoClient('47.75.69.176', 28005)
 coin_db = client['bc_bourse_huobipro']
 coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')

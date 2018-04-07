@@ -94,7 +94,7 @@ if __name__ == "__main__":
     print(result_pd)
         '''
 
-    data = qapi.get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', size=1000)
+    data = qapi.get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=100)
     print(data)
 
     '''

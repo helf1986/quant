@@ -747,10 +747,10 @@ def get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', 
         coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
         collection = coin_db['b_btc_kline']
 
-        data = collection.find({'per': "1", "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})   # , "t": {}
+        data = collection.find({'per': str(int(N_bar/60)), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})   # , "t": {}
 
         for each_bar in data:
-            print(each_bar)
+            # print(each_bar)
             bar = Bar()
             bar.exchange = exchange
             bar.sec_id = each_sec
