@@ -47,7 +47,7 @@ kline['pct_chg'] = kline['close'].diff(1)/kline['close']
 kline['voltility'] = kline['chg'].rolling(N_volt).std()
 last_time = kline.index[-1]
 
-logger.inf('DMA 测试开始工作！')
+logger.info('DMA 测试开始工作！')
 while(1):
 
     last_bars = qapi.get_last_bars(exchange='huobipro', symbol_list='btcusdt', bar_type=bar_type)
