@@ -66,7 +66,7 @@ if __name__ == '__main__':
             bar = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=1)
             bar = bar[0]
         except Exception as e:
-            logger.warn('数据接口取数失败，重试中...' + e)
+            logger.warn('数据接口取数失败，重试中...')
             time.sleep(10)
 
         if bar.strtime == lastbartime:

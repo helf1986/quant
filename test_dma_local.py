@@ -16,22 +16,22 @@ from api import logger
 # 参数设置
 trade_fee = 0.002
 N_volt = 24
-volt_mul = 2.0
-N_short = 12
-N_long_1 = 72
-N_long_2 = 144
+volt_mul = 1.5
+N_ma = 6            # 均线平滑周期
+N_short = 24        # 自适应基准线短周期
+N_long = 24*3       # 自适应基准线长周期
 
 btc_data = pd.read_csv('btc_data_20171101_20180325.csv', index_col=0)
 btc_data['close'] = btc_data['cp']
 btc_data['strtime'] = btc_data['ts']
 print(btc_data.head())
 
-data = btc_data.iloc[0:60:60*N_long_2].copy()
+data = btc_data.iloc[0:60:60*N_long].copy()
 
 
 # 变量初始化
-data['ma'] = data['close']
-data['ref'] = data['close']
+data['ma'] = data['close'].copy()
+data['ref'] = data['close'].copy()
 data['signal'] = 0
 data['account'] = 1
 data['earning'] = 0
@@ -39,12 +39,11 @@ data['voltility'] = 0
 data['pct_chg'] = 0
 
 
-for each in btc_data.index[60*N_long_2::60]:
+for each in btc_data.index[60*N_long::60]:
 
     # 获取当前时刻的bar
     
     bar_df = btc_data.loc[each]
-
 
     # 加入到历史数据中
     data = data.append(bar_df)
@@ -68,14 +67,14 @@ for each in btc_data.index[60*N_long_2::60]:
     volt_last = data['chg'].iloc[-N_volt:].std()
     data.loc[now, 'voltility'] = volt_last
 
-    if volt_last > data['voltility'].iloc[-N_long_2:].quantile(0.8):
-        N_LONG = N_long_1
+    if volt_last > data['voltility'].iloc[-N_long:].quantile(0.8):
+        N_ref = N_short
     else:
-        N_LONG = N_long_2
+        N_ref = N_long
 
     # 计算参考均线值
-    data.loc[now, 'ma'] = (data.loc[last, 'ma'] * (N_short - 1) + data.loc[now, 'close'] * 2) / (N_short + 1)
-    data.loc[now, 'ref'] = (data.loc[last, 'ref'] * (N_LONG - 1) + data.loc[now, 'close'] * 2) / (N_LONG + 1)
+    data.loc[now, 'ma'] = (data.loc[last, 'ma'] * (N_ma - 1) + data.loc[now, 'close'] * 2) / (N_ma + 1)
+    data.loc[now, 'ref'] = (data.loc[last, 'ref'] * (N_ref - 1) + data.loc[now, 'close'] * 2) / (N_ref + 1)
 
     # 向上突破，买入
     if (data.loc[last, 'ma'] < data.loc[last, 'ref']) and (data.loc[now, 'ma'] > data.loc[now, 'ref']):
@@ -106,7 +105,7 @@ for each in btc_data.index[60*N_long_2::60]:
         data.loc[now, 'account'] = data.loc[now, 'account']
 
 
-result = data.iloc[N_long_2:].copy()
+result = data.iloc[N_long:].copy()
 result['benchmark'] = result['close']/result['close'].iloc[0]*result['account'].iloc[0]
 fig = plt.figure(figsize=(12,12))
 ax1 = fig.add_subplot(211)

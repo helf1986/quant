@@ -27,6 +27,7 @@ bar_type = '1min'
 # 参数设置
 trade_fee = 0.002
 N_volt = 24
+volt_mul = 1.5
 N_ma = 6
 N_short = 24
 N_long = 24*3
@@ -101,7 +102,7 @@ while(1):
             # 考虑手续费
             data.loc[now, 'account'] = data.loc[last, 'account']  * (1 - trade_fee)
             # 调整参考均线的值
-            data.loc[now, 'ref'] = data.loc[now, 'ref'] - 1.5 * data.loc[now, 'voltility']
+            data.loc[now, 'ref'] = data.loc[now, 'ref'] - volt_mul * data.loc[now, 'voltility']
             logger.info('%s 做多 btcusdt @ %f' % (now, data.loc[now, 'close']))
             logger.send_sms('%s 做多 btcusdt @ %f' % (now, data.loc[now, 'close']), '13811892804')
 
@@ -112,7 +113,7 @@ while(1):
             # 考虑手续费
             data.loc[now, 'account'] = data.loc[now, 'account'] * (1 - trade_fee)
             # 调整参考均线的值
-            data.loc[now, 'ref'] = data.loc[now, 'ref'] + 1.5 * data.loc[now, 'voltility']
+            data.loc[now, 'ref'] = data.loc[now, 'ref'] + volt_mul * data.loc[now, 'voltility']
             logger.info('%s 做空 btcusdt @ %f' % (now, data.loc[now, 'close']))
             logger.send_sms('%s 做空 btcusdt @ %f' % (now, data.loc[now, 'close']), '13811892804')
 

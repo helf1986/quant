@@ -1,100 +1,184 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import api.quant_api as qapi
 from api import logger
 
-Vars = []
+# 定义参数
 correct = 4
-c1 = 1.751      # std 系数
-l1 = 5          # avg追溯时期
-length = 100    # 基准期
-length2 = 1        # 基准期
+c1 = 1.75  # std 系数
+l1 = 5  # avg追溯时期
+length = 100  # 基准期
+length2 = 1  # 基准期
 
-hp = [0]*length
-lp = [0]*length
-tot = [0]*length
-net = [0]*length
-nt = [0]*length
+btc_data = pd.read_csv('btc_data_20171101_20180325.csv')
+print(btc_data.head())
 
-hp2 = [0]*length
-lp2 = [0]*length
-tot2 = [0]*length
-net2 = [0]*length
-nt2 = [0]*length
+df = btc_data[['ts', 'op', 'lp', 'hp', 'cp']].iloc[0:2000].copy()
+df.columns = ['time', 'open', 'low', 'high', 'close']
+df.index = df['time']
+
+df['hp'] = df['close']
+df['lp'] = df['close']
+df['tot'] = 0
+df['net'] = 0
+df['nt'] = 0
+
+df['hp2'] = 0
+df['lp2'] = 0
+df['tot2'] = 0
+df['net2'] = 0
+df['nt2'] = 0
+
 incon1 = False
 incon2 = False
 outcon = False
 
-move = [0]*length
-avg = [0]*length
-std = [0]*length
-move2 = [0]*length
-avg2 = [0]*length
-std2 = [0]*length
+df['move'] = 0
+df['avg'] = 0
+df['std'] = 0
+df['move2'] = 0
+df['avg2'] = 0
+df['std2'] = 0
 money = 0
-unit = [0]*length
+df['unit'] = 0
 volstd = 0
 i = 0
 b1 = 0
 b0 = 0
 var1 = 0
 var0 = 0
-position = [0]*length
-limit = [0]*length
+
 most = 2
 outcon1 = False
+MarketPosition = 0
 
-
-length = length * correct
+# length = length * correct
 
 money = 200000
 unit = 0
 
-while(1):
-    bars = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', size=length + 100)
-    if len(bars) > 0:
-        mk_data = qapi.to_dataframe(bars)
-        mk_data = mk_data[mk_data['sec_id'] == ' btcusdt']
-        mk_data = mk_data.sort_values(by='time')
-        hp = hp[1:] + [np.max(mk_data['close'].iloc[-length:])]
-        lp = lp[1:] + [np.min(mk_data['close'].iloc[-length:])]
-        tot = tot[1:] + tot [np.sum(np.abs(np.log(mk_data['close'].diff(1).iloc[-length:])))]
-        net = net[1:] + [np.log(hp) - np.log(lp)]
-        nt = nt[1:] + [net / tot * 100]
-        move = move[1:] + [(mk_data['close'].iloc[-1]/mk_data['close'].iloc[-length] - 1)*100]
-        avg = avg[1:] + [np.mean(nt.iloc[-length * l1:])]
-        std = std[1:] + [np.std(nt.iloc[-length * l1:])]
+df['position'] = 0
+df['Market_Position'] = 0
+df['limit'] = 0
+df['netvalue'] = 1
 
-        incon1 = (mk_data['close'].iloc[-1] >= hp[-1]) or ( (hp[-1] - mk_data['close'].iloc[-1]) / (mk_data['close'].iloc[-1] - lp[-1]) <= 0.2 and (hp[1] - mk_data['close'].iloc[-1]) / (mk_data['close'].iloc[-1] - lp[1]) >= 0 )
-        incon2 = (mk_data['close'].iloc[-1] <= lp[-1]) or ( (hp[-1] - mk_data['close'].iloc[-1]) / (mk_data['close'].iloc[-1] - lp[-1]) >= 1 / 0.2 and (hp[-1] - mk_data['close'].iloc[-1]) / (mk_data['close'].iloc[-1] - lp[-1]) >= 0 )
+for nn in range(length * l1, len(df)):
 
-        if (incon1):
-            position = 1
-        elif (incon2):
-            position = -1
-        else:
-            position = 0
-        print("position=" + str(position))
+    rt_data = df.iloc[nn - length * l1:nn].copy()
+    rt_data = rt_data.sort_values(by='time')
 
-        incon1 = (position == 1) and (nt[1] >= avg + c1 * std) and (limit <= most) and (MarketPosition != 1)
-        incon2 = (position == -1) and (nt[1] >= avg + c1 * std) and (limit <= most) and (MarketPosition != -1)
-        outcon = (nt[1] < avg)
-        outcon1 = (nt[1] >= avg + c1 * std) and (limit >= most + 1) and (MarketPosition != 0)
+    now = rt_data.index[-1]
+    last = rt_data.index[-2]
 
+    close_now = rt_data['close'].iloc[-1]
+    close_last = rt_data['close'].iloc[-2]
 
-        if (incon1):
-            qapi.open_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-            limit = limit + 1
+    hp_now = np.max(rt_data['close'].iloc[-length:])
+    df.loc[now, 'hp'] = hp_now
 
-        if (incon2):
-            qapi.marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=unit)
-            limit = limit + 1
+    lp_now = np.min(rt_data['close'].iloc[-length:])
+    df.loc[now, 'lp'] = lp_now
 
-        if (outcon):
-            qapi.close_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-            BuyToCover(unit, open)
-            limit = 0
+    # 最近L天的涨跌幅绝对值之和
+    tot_now = np.sum(np.abs(np.log(rt_data['close']) - np.log(rt_data['close'].shift(1))).iloc[-length:].dropna())
+    df.loc[now, 'tot'] = tot_now
 
-        if (outcon1):
-            sell(unit, open);
-            BuyToCover(unit, open)
+    # 最高价最低价的振幅百分比
+    net_now = np.log(hp_now) - np.log(lp_now)
+    df.loc[now, 'net'] = net_now
+
+    # 理解为最近的振幅与过去L天振幅的比例
+    nt_now = net_now / tot_now * 100
+    df.loc[now, 'nt'] = nt_now
+
+    # 过去L天的涨跌幅
+    move_now = (rt_data['close'].iloc[-1] / rt_data['close'].iloc[-length] - 1) * 100
+    df.loc[now, 'move'] = move_now
+
+    avg_now = np.mean(df['nt'].iloc[nn - length * l1:nn])
+    df.loc[now, 'avg'] = avg_now
+
+    std_now = np.std(df['nt'].iloc[nn - length * l1:nn])
+    df.loc[now, 'std'] = std_now
+
+    close_now = rt_data['close'].iloc[-1]
+    df.loc[now, 'close'] = close_now
+
+    # 做多信号
+    incon1 = (close_now >= hp_now) or (
+    (hp_now - close_now) / (close_now - lp_now) <= 0.2 and (hp_now - close_now) / (close_now - lp_now) >= 0)
+
+    # 做空信号
+    incon2 = (close_now <= lp_now) or (
+    (hp_now - close_now) / (close_now - lp_now) >= 1 / 0.2 and (hp_now - close_now) / (close_now - lp_now) >= 0)
+
+    if (incon1):
+        position_now = 1
+    elif (incon2):
+        position_now = -1
+    else:
+        position_now = 0
+    df.loc[now, 'position'] = position_now
+
+    # 增加额外条件
+    Market_Position_last = df['Market_Position'].iloc[nn - 1]
+    limit_last = df['limit'].iloc[nn - 1]
+
+    # 开多仓信号
+    incon1 = (position_now == 1) and (nt_now >= avg_now + c1 * std_now) and (limit_last <= most) and (
+    Market_Position_last != 1)
+
+    # 开空仓信号
+    incon2 = (position_now == -1) and (nt_now >= avg_now + c1 * std_now) and (limit_last <= most) and (
+    Market_Position_last != -1)
+
+    # 平仓信号
+    outcon = (nt_now < avg_now)
+
+    outcon1 = (nt_now >= avg_now + c1 * std_now) and (limit_last >= most + 1) and (Market_Position_last != 0)
+
+    Market_Position_now = Market_Position_last
+    limit_now = limit_last
+
+    if (incon1):  # 开多仓
+        print('%s : 开多仓 @ %f' % (now, close_now))
+        Market_Position_now = 1
+        limit_now = limit_now + 1
+
+    if (incon2):  # 开空仓
+        print('%s : 开空仓 @ %f' % (now, close_now))
+        Market_Position_now = -1
+        limit_now = limit_now + 1
+
+    if (outcon):  # 开空仓
+        print('%s : 平多仓 @ %f' % (now, close_now))
+        print('%s : 平空仓 @ %f' % (now, close_now))
+        Market_Position_now = 0
+        limit_now = 0
+
+    if (outcon1):  # 平空仓
+        print('%s : 平空仓 @ %f' % (now, close_now))
+        Market_Position_now = 0
+        limit_now = limit_now - 1
+
+    df.loc[now, 'Market_Position'] = Market_Position_now
+    df.loc[now, 'limit'] = limit_now
+    # print("%s : market position = %s " % (now, str(Market_Position_now)))
+
+df['nt_range'] = df['avg'] + c1 * df['std']
+
+plt.figure(1)
+df[['hp', 'lp', 'close']].iloc[length:].plot()
+
+plt.figure(2)
+df[['nt', 'avg', 'nt_range']].plot()
+
+plt.figure(3)
+df[['move']].plot()
+
+plt.figure(4)
+df['benchmark'] = df['close'] / df['close'].iloc[0]
+df[['netvalue', 'benchmark']].plot()
+
+df.to_csv('test_result.csv')

@@ -1,186 +1,141 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+import time
 import api.quant_api as qapi
 from api import logger
 
-# 定义参数
-correct = 4
-c1 = 1.75              # std 系数
+c1 = 1.75               # std 系数
 l1 = 5                  # avg追溯时期
-length = 100            # 基准期
-length2 = 1             # 基准期
-
-
-btc_data = pd.read_csv('btc_data_20171101_20180325.csv')
-print(btc_data.head())
-
-df = btc_data[['ts', 'op', 'lp', 'hp', 'cp']].iloc[0:2000].copy()
-df.columns = ['time', 'open', 'low', 'high', 'close']
-df.index = df['time']
-
-df['hp'] = df['close']
-df['lp'] = df['close']
-df['tot'] = 0
-df['net'] = 0
-df['nt'] = 0
-
-
-df['hp2'] = 0
-df['lp2'] = 0
-df['tot2'] = 0
-df['net2'] = 0
-df['nt2'] = 0
-
-incon1 = False
-incon2 = False
-outcon = False
-
-df['move'] = 0
-df['avg'] = 0
-df['std'] = 0
-df['move2'] = 0
-df['avg2'] = 0
-df['std2'] = 0
-money = 0
-df['unit'] = 0
-volstd = 0
-i = 0
-b1 = 0
-b0 = 0
-var1 = 0
-var0 = 0
-
+length = 400            # 基准期
+unit = 1
 most = 2
-outcon1 = False
-MarketPosition = 0
+# --------------
+MarketPosition = 0      # 记录当前仓位
+ini_mkp = 0
+lastbatimer = None      # 上一周期时间
 
-# length = length * correct
+if __name__ == '__main__':
+    # -----------初始化----------------------------
+    # ------------取数据-------
+    bars = qapi.get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='',
+                               size=5000)
+    data = qapi.to_dataframe(bars)[-5000:]
+    # -------------------
+    data['hp'] = data['close'].rolling(length).max()
+    data['lp'] = data['close'].rolling(length).min()
+    data['temp'] = data['close'].apply(np.log) - data['close'].shift().apply(np.log)
+    data['tot'] = (data['temp'].apply(np.abs)).rolling(length).sum()
+    data['net'] = data['hp'].apply(np.log) - data['lp'].apply(np.log)
+    data['nt'] = data['net'] / data['tot']
+    data['move'] = (data['close'] / data['close'].shift(length) - 1) * 100
+    data['avg'] = data['nt'].rolling(length * l1).mean()
+    data['std'] = data['nt'].rolling(length * l1).std()
+    # -------------------
+    for i in range(len(data)):
+        close = data.iloc[i]['close']
+        hp = data.iloc[i]['hp']
+        lp = data.iloc[i]['lp']
+        nt = data.iloc[i]['nt']
+        move = data.iloc[i]['move']
+        avg = data.iloc[i]['avg']
+        std = data.iloc[i]['std']
+        incon1 = ((close - lp) / (hp - lp) >= 0.8) and (nt >= avg + c1 * std) and (ini_mkp != 1)
+        incon2 = ((close - lp) / (hp - lp) <= 0.2) and (nt >= avg + c1 * std) and (ini_mkp != -1)
+        outcon = nt <= avg
+        if incon1: ini_mkp = 1
+        if incon2: ini_mkp = -1
+        if outcon: ini_mkp = 0
+    # ---------------------------------------
+    close_ = list(data['close'][-length * l1:].values)
+    hp_ = list(data['hp'][-2000:].values)
+    lp_ = list(data['lp'][-2000:].values)
+    tot_ = list(data['tot'][-2000:].values)
+    net_ = list(data['net'][-2000:].values)
+    nt_ = list(data['nt'][-2000:].values)
 
-money = 200000
-unit = 0
+    # ===================
+    MarketPosition = ini_mkp
+    lastbartime = data.iloc[-1]['strtime']
+    limit = 0
+    print("initiation success！！！！！！！！！！！")
+    # -----------初始化完成----------------------------
+    # --------------------------------------循环计算
+    while (1):
 
-df['position'] = 0
-df['Market_Position'] = 0
-df['limit'] = 0
-df['netvalue'] = 1
+        try:
+            bar = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=1)
+            bar = bar[0]
+        except Exception as e:
+            logger.warn('数据接口取数失败，重试中...')
+            time.sleep(10)
 
+        if bar.strtime == lastbartime:
+            continue
+        else:
+            lastbartime = bar.strtime
+            close_.append(bar.close)
+            close_.pop(0)
+            close = close_[-1]
+            move = (close_[-1] / close_[-length] - 1) * 100
+            hp = np.max(close_[-length:])
+            lp = np.min(close_[-length:])
+            hp_.append(hp)
+            hp_.pop(0)
+            lp_.append(lp)
+            lp_.pop(0)
+            temp = [np.log(x) for x in close_[-length:]]
+            tot_.append(np.sum(np.abs(np.diff(temp))))
+            tot_.pop(0)
+            net_.append(np.log(hp_[-1]) - np.log(lp_[-1]))
+            net_.pop(0)
+            nt = net_[-1] / tot_[-1]
+            nt_.append(nt)
+            nt_.pop(0)
+            avg = np.mean(nt_[-length * l1])
+            std = np.std(nt_[-length * l1])
 
-for nn in range(length*l1, len(df)) :
+            incon1 = ((close - lp) / (hp - lp) >= 0.8) and (nt >= avg + c1 * std) and (
+            MarketPosition != 1) and limit <= most
+            incon2 = ((close - lp) / (hp - lp) <= 0.2) and (nt >= avg + c1 * std) and (
+            MarketPosition != -1) and limit <= most
+            outcon = (nt < avg) and MarketPosition != 0
+            outcon1 = (nt >= avg + c1 * std) and (limit >= most + 1) and MarketPosition != 0
 
-    rt_data = df.iloc[nn-length*l1:nn].copy()
-    rt_data = rt_data.sort_values(by='time')
-    
-    now = rt_data.index[-1]
-    last = rt_data.index[-2]    
+            if (incon1):
+                # qapi.margincash_open(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit, leverage=0)
+                logger.info("BTCUSDT 开多仓 @ %f" % close)
+                logger.send_sms("BTCUSDT 开多仓 @ %f" % close, '13811892804')
+                limit = limit + 1
+                MarketPosition = 1
 
-    close_now = rt_data['close'].iloc[-1]
-    close_last = rt_data['close'].iloc[-2]
-    
-    hp_now = np.max(rt_data['close'].iloc[-length:])
-    df.loc[now, 'hp'] = hp_now
+            if (incon2):
+                # qapi.marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=unit)
+                logger.info("BTCUSDT 开空仓 @ % %f" % close)
+                logger.send_sms(" BTCUSDT 开空仓 @ %f" % close, '13811892804')
+                limit = limit + 1
+                MarketPosition = -1
 
-
-    lp_now = np.min(rt_data['close'].iloc[-length:])
-    df.loc[now, 'lp'] = lp_now
-    
-    # 最近L天的涨跌幅绝对值之和
-    tot_now = np.sum(np.abs(np.log(rt_data['close'])-np.log(rt_data['close'].shift(1))).iloc[-length:].dropna())
-    df.loc[now, 'tot'] = tot_now
-
-    # 最高价最低价的振幅百分比
-    net_now = np.log(hp_now) - np.log(lp_now)   
-    df.loc[now, 'net'] = net_now
-
-    # 理解为最近的振幅与过去L天振幅的比例
-    nt_now = net_now / tot_now * 100
-    df.loc[now, 'nt'] = nt_now
-
-    # 过去L天的涨跌幅
-    move_now = (rt_data['close'].iloc[-1]/rt_data['close'].iloc[-length] - 1)*100
-    df.loc[now, 'move'] = move_now
-
-    avg_now = np.mean(df['nt'].iloc[nn-length * l1:nn])
-    df.loc[now, 'avg'] = avg_now
-
-    std_now = np.std(df['nt'].iloc[nn-length * l1:nn])
-    df.loc[now, 'std'] = std_now
-
-    close_now = rt_data['close'].iloc[-1]
-    df.loc[now, 'close'] = close_now
-
-    # 做多信号
-    incon1 = (close_now >= hp_now) or ( (hp_now - close_now) / (close_now - lp_now) <= 0.2 and (hp_now - close_now) / (close_now - lp_now) >= 0 )
-    
-    # 做空信号
-    incon2 = (close_now <= lp_now) or ( (hp_now - close_now) / (close_now - lp_now) >= 1 / 0.2 and (hp_now - close_now) / (close_now - lp_now) >= 0 )
-
-    if (incon1):
-        position_now = 1
-    elif (incon2):
-        position_now = -1
-    else:
-        position_now = 0    
-    df.loc[now, 'position'] = position_now        
-
-    # 增加额外条件
-    Market_Position_last = df['Market_Position'].iloc[nn-1]
-    limit_last = df['limit'].iloc[nn-1]
-    
-    # 开多仓信号
-    incon1 = (position_now == 1) and (nt_now >= avg_now + c1 * std_now) and (limit_last <= most) and (Market_Position_last != 1)
-    
-    # 开空仓信号
-    incon2 = (position_now == -1) and (nt_now >= avg_now + c1 * std_now) and (limit_last <= most) and (Market_Position_last != -1)
-    
-    # 平仓信号
-    outcon = (nt_now < avg_now)
-    
-    outcon1 = (nt_now >= avg_now + c1 * std_now) and (limit_last >= most + 1) and (Market_Position_last != 0)
-
-    
-    Market_Position_now = Market_Position_last
-    limit_now = limit_last
-    
-    if (incon1):    # 开多仓
-        print('%s : 开多仓 @ %f' % (now, close_now))
-        Market_Position_now = 1
-        limit_now = limit_now + 1
-
-    if (incon2):    # 开空仓
-        print('%s : 开空仓 @ %f' % (now, close_now))
-        Market_Position_now = -1
-        limit_now = limit_now + 1
-
-    if (outcon):    # 开空仓
-        print('%s : 平多仓 @ %f' % (now, close_now))
-        print('%s : 平空仓 @ %f' % (now, close_now))
-        Market_Position_now = 0
-        limit_now = 0
-
-    if (outcon1):   # 平空仓
-        print('%s : 平空仓 @ %f' % (now, close_now))
-        Market_Position_now = 0
-        limit_now = limit_now - 1
-    
-    df.loc[now, 'Market_Position'] = Market_Position_now
-    df.loc[now, 'limit'] = limit_now
-    # print("%s : market position = %s " % (now, str(Market_Position_now)))
-    
-
-df['nt_range'] = df['avg'] + c1*df['std']
-
-plt.figure(1)
-df[['hp', 'lp', 'close']].iloc[length:].plot()
-
-plt.figure(2)
-df[['nt', 'avg', 'nt_range']].plot()
-
-plt.figure(3)
-df[['move']].plot()
-
-plt.figure(4)
-df['benchmark'] = df['close']/df['close'].iloc[0]
-df[['netvalue', 'benchmark']].plot()
-
-df.to_csv('test_result.csv')
+            if (outcon):
+                if MarketPosition == 1:
+                    # qapi.margincash_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                    logger.info("BTCUSDT 平多仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平多仓 @ %f" % close, '13811892804')
+                    MarketPosition = 0
+                    limit = 0
+                if MarketPosition == -1:
+                    # qapi.marginsec_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                    logger.info("BTCUSDT 平空仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平空仓 @ %f" % close, '13811892804')
+                    MarketPosition = 0
+                    limit = 0
+            if (outcon1):
+                if MarketPosition == 1:
+                    # qapi.margincash_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                    logger.info("BTCUSDT 平多仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平多仓 @ %f" % close, '13811892804')
+                    MarketPosition = 0
+                if MarketPosition == -1:
+                    qapi.marginsec_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                    logger.info("BTCUSDT 平空仓 @ % %f" % close)
+                    logger.send_sms(" BTCUSDT 平空仓 @ %f" % close, '13811892804')
+                    MarketPosition = 0
