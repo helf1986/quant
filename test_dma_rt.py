@@ -84,10 +84,10 @@ while(1):
         if data.loc[now, 'signal'] == 1:      # 买入状态，做多
             data.loc[now, 'account'] = data.loc[last, 'account']*(1 - data.loc[now, 'pct_chg'])
 
-        elif data[now, 'signal'] == -1:    # 卖出状态，做空
+        elif data.loc[now, 'signal'] == -1:    # 卖出状态，做空
             data.loc[now, 'account'] = data.loc[last, 'account'] * (1 + data.loc[now, 'pct_chg'])
 
-        elif data[now, 'signal'] == 0:     # 空仓
+        elif data.loc[now, 'signal'] == 0:     # 空仓
             data.loc[now, 'account'] = data.loc[last, 'account']
 
         # 计算参考均线值

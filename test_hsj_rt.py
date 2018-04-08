@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import time
 import api.quant_api as qapi
 from api import logger
 
@@ -60,8 +61,14 @@ if __name__ == '__main__':
     # -----------初始化完成----------------------------
     # --------------------------------------循环计算
     while (1):
-        bar = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=1)
-        bar = bar[0]
+
+        try:
+            bar = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=1)
+            bar = bar[0]
+        except Exception as e:
+            logger.warn('数据接口取数失败，重试中...' + e)
+            time.sleep(10)
+
         if bar.strtime == lastbartime:
             continue
         else:
