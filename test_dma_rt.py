@@ -22,7 +22,7 @@ from api import logger
 
 exchange = 'huobipro'
 symbol = 'btcusdt'
-bar_type = '1min'
+bar_type = '60min'
 
 # 参数设置
 trade_fee = 0.002
@@ -48,14 +48,14 @@ data['pct_chg'] = data['close'].diff(1)/data['close']
 data['voltility'] = data['chg'].rolling(N_volt).std()
 last_time = data.index[-1]
 
-logger.info('DMA 测试开始工作！')
+logger.info('Q-BTC数字货币量化交易系统模拟交易开始工作...')
 while(1):
 
     try:
         last_bars = qapi.get_last_bars(exchange='huobipro', symbol_list='btcusdt', bar_type=bar_type)
         current = last_bars[0].strtime
     except Exception as e:
-        logger.warn('获取实时数据失败：' + e)
+        logger.warn('获取实时数据失败，重试中...')
         time.sleep(10)
 
     if current != last_time:      # 每隔1小时判断一次
