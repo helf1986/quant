@@ -981,7 +981,7 @@ def marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     return margin_order_id
 
 
-def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
+def marginsec_close(exchange='huobipro', margin_order_id = '', sec_id='btcusdt', price=0, volume=0):
     '''
     卖券归还
     :param exchange:
@@ -997,11 +997,15 @@ def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     # 第二步：归还数字货币
     # 获取待还金额
     currency = 'btc'
-    today = time.strftime('%Y-%m-%d', time.localtime())
-    margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
-    unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
-    margin_order_id = unpaid_orders.iloc[-1]['id']
-    unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
+
+    if margin_order_id == '' or margin_order_id == None:
+        today = time.strftime('%Y-%m-%d', time.localtime())
+        margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
+        unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
+        margin_order_id = unpaid_orders.iloc[-1]['id']
+        unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
+    else:
+        unpaid_volume = 0
 
     if volume < unpaid_volume:
         paid_volume = volume
@@ -1033,7 +1037,7 @@ def get_position(exchange, sec_id, side):
 
 def get_positions(exchange='huobipro'):
     '''
-
+    获得所有账户持仓情况
     :param exchange:
     :return:
     '''
@@ -1053,18 +1057,13 @@ def get_positions(exchange='huobipro'):
             account_status = account_info['state']
             account_balance = account_info['list']
 
-            data_df = pd.DataFrame(data=account_balance)
-            data_df.index = data_df['currency']
-            data_new = pd.DataFrame([], index=np.unique(data_df['currency']), columns=['trade', 'frozen', 'loan', 'interest'])
-            data_new['trade'] = data_df[data_df['type']=='trade']['balance']
-            data_new['frozen'] = data_df[data_df['type'] == 'frozen']['balance']
-            data_new['loan'] = data_df[data_df['type'] == 'loan']['balance']
-            data_new['interest'] = data_df[data_df['type'] == 'interest']['balance']
-            data_new = data_new.astype('float')
-            tmp = data_new.apply(lambda x: sum(np.abs(x)), axis=1)
-            data_selected = data_new.loc[tmp[tmp>0].index]
+            balance_dict = {}
+            for each in account_balance:
+                balance_dict[each['currency']] = {}
+            for each in account_balance:
+                balance_dict[each['currency']][each['type']] = each['balance']
 
-            for each in data_selected.index:
+            for each in balance_dict.keys():
                 position = Position()
                 position.exchange = exchange
                 position.account_id = account_id
@@ -1072,11 +1071,44 @@ def get_positions(exchange='huobipro'):
                 position.account_status = account_status
 
                 position.sec_id = each
-                position.available = float(data_selected.loc[each]['trade'])
-                position.order_frozen = float(data_selected.loc[each]['frozen'])
+                position.available = float(balance_dict[each]['trade'])
+                position.order_frozen = float(balance_dict.loc[each]['frozen'])
                 position.amount = position.available + position.order_frozen
-                position.loan = data_selected.loc[each]['loan']
-                position.interest = data_selected.loc[each]['interest']
+                position.loan = float(balance_dict.loc[each]['loan'])
+                position.interest = float(balance_dict.loc[each]['interest'])
+
+                positions = positions + [position]
+        else:
+            logger.warn(res['err-code'] + ':' + res['err-msg'])
+
+        # 获取借贷账户资金情况
+        margin_account = accounts['margin']['id']
+        res = hb.get_balance(acct_id=margin_account)
+        if res['status'] == 'ok':
+            account_info = res['data']
+            account_id = account_info['id']
+            account_type = account_info['type']
+            account_status = account_info['state']
+            account_balance = account_info['list']
+
+            balance_dict = {}
+            for each in account_balance:
+                balance_dict[each['currency']] = {}
+            for each in account_balance:
+                balance_dict[each['currency']][each['type']] = each['balance']
+            for each in balance_dict.keys():
+                position = Position()
+                position.exchange       = exchange
+                position.account_id     = account_id
+                position.account_type   = account_type
+                position.account_status = account_status
+
+                position.sec_id         = each
+                position.available      = float(balance_dict[each]['trade'])
+                position.order_frozen   = float(balance_dict[each]['frozen'])
+                position.amount         = position.available + position.order_frozen
+                position.loan           = float(balance_dict[each]['loan'])
+                position.interest       = float(balance_dict[each]['interest'])
 
                 positions = positions + [position]
         else:
@@ -1087,7 +1119,7 @@ def get_positions(exchange='huobipro'):
 
 def get_margin_positions(exchange='huobipro'):
     '''
-
+    获取融资融券账户持仓情况
     :param exchange:
     :return:
     '''
@@ -1097,9 +1129,9 @@ def get_margin_positions(exchange='huobipro'):
 
         accounts = get_accounts(exchange=exchange)
 
-        # 获取普通账户资金情况
-        spot_account = accounts['spot']['id']
-        res = hb.get_balance(acct_id=spot_account)
+        # 获取借贷账户资金情况
+        margin_account = accounts['margin']['id']
+        res = hb.get_balance(acct_id=margin_account)
         if res['status'] == 'ok':
             account_info = res['data']
             account_id = account_info['id']
@@ -1107,18 +1139,12 @@ def get_margin_positions(exchange='huobipro'):
             account_status = account_info['state']
             account_balance = account_info['list']
 
-            data_df = pd.DataFrame(data=account_balance)
-            data_df.index = data_df['currency']
-            data_new = pd.DataFrame([], index=np.unique(data_df['currency']), columns=['trade', 'frozen', 'loan', 'interest'])
-            data_new['trade'] = data_df[data_df['type']=='trade']['balance']
-            data_new['frozen'] = data_df[data_df['type'] == 'frozen']['balance']
-            data_new['loan'] = data_df[data_df['type'] == 'loan']['balance']
-            data_new['interest'] = data_df[data_df['type'] == 'interest']['balance']
-            data_new = data_new.astype('float')
-            tmp = data_new.apply(lambda x: sum(np.abs(x)), axis=1)
-            data_selected = data_new.loc[tmp[tmp>0].index]
-
-            for each in data_selected.index:
+            balance_dict = {}
+            for each in account_balance:
+                balance_dict[each['currency']] = {}
+            for each in account_balance:
+                balance_dict[each['currency']][each['type']] = each['balance']
+            for each in balance_dict.keys():
                 position = Position()
                 position.exchange = exchange
                 position.account_id = account_id
@@ -1126,11 +1152,11 @@ def get_margin_positions(exchange='huobipro'):
                 position.account_status = account_status
 
                 position.sec_id = each
-                position.available = float(data_selected.loc[each]['trade'])
-                position.order_frozen = float(data_selected.loc[each]['frozen'])
+                position.available = float(balance_dict[each]['trade'])
+                position.order_frozen = float(balance_dict[each]['frozen'])
                 position.amount = position.available + position.order_frozen
-                position.loan = data_selected.loc[each]['loan']
-                position.interest = data_selected.loc[each]['interest']
+                position.loan = float(balance_dict[each]['loan'])
+                position.interest = float(balance_dict[each]['interest'])
 
                 positions = positions + [position]
         else:

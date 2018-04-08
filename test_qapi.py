@@ -102,7 +102,10 @@ if __name__ == "__main__":
 
     myorder = qapi.close_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=0.002)
 
-    margin_orders = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='btc', start="2018-04-06", direct="prev", size=10)
+    next_day = time.strftime('%Y-%m-%d', time.localtime(time.time() + 60*60*24))
+    margin_orders = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='usdt', start=next_day, direct="prev", size=10)
+
+    margin_orders = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='usdt', start_date='2018-04-05', end_date='2018-04-09')
 
     result = qapi.apply_margin(exchange='huobipro', symbol='btcusdt', currency='btc', amount=0.001)
 
@@ -111,7 +114,6 @@ if __name__ == "__main__":
     result = qapi.repay_margin(exchange='huobipro', order_id=676027, amount=0.15)
 
     myaccount = qapi.get_positions(exchange='huobipro')
-
 
     myorder = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.01, leverage=1)
 
@@ -125,3 +127,5 @@ if __name__ == "__main__":
 
     last_tick = qapi.get_last_ticks(exchange='huobipro', symbol_list='btcusdt')
     last_price = last_tick[0].last_price
+
+    orders = hb.loan_orders(symbol='btcusdt', currency='usdt', start="2018-04-09", direct="prev", size=10)
