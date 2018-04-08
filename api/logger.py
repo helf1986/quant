@@ -3,6 +3,7 @@
 # create date = 2016/12/12
 
 import datetime
+import time
 import os
 import traceback
 import json
@@ -85,6 +86,12 @@ def send_sms(message, phone):
             warn("httpPost failed, detail is:%s \n" % response.text)
             return False
 
+        time.sleep(2)
+
 
 if __name__ == '__main__':
-    info('asdf','qwerqwer')
+    # info('asdf','qwerqwer')
+
+    msg = 'hello Q-BTC'
+    phone = '13811892804, 18600575531'
+    send_sms(msg, phone)
