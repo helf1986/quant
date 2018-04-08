@@ -48,7 +48,7 @@ data['pct_chg'] = data['close'].diff(1)/data['close']
 data['voltility'] = data['chg'].rolling(N_volt).std()
 last_time = data.index[-1]
 
-logger.info('Q-BTC数字货币量化交易系统模拟交易开始工作...')
+logger.info('Q-BTC 数字货币量化交易系统模拟交易开始工作...')
 while(1):
 
     try:

@@ -52,7 +52,7 @@ def error(*error1):
     try:
         exec_info = str(datetime.datetime.now())+'\tERROR\t'+get_vals(error1) + '\n'
         raise Exception(exec_info)
-        logfile = logfile = LOGFILE
+        logfile = LOGFILE
         f = open(logfile, "a")
         f.write(exec_info)
     except Exception as e:
