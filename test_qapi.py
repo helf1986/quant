@@ -110,7 +110,7 @@ if __name__ == "__main__":
 
     result = qapi.repay_margin(exchange='huobipro', order_id=676027, amount=0.15)
 
-    myorder = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=50, leverage=2)
+    myorder = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.01, leverage=2)
 
     myorder = qapi.margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.02)
 

@@ -488,7 +488,7 @@ def apply_margin(exchange='huobipro', symbol='btcusdt', currency='btc', amount=0
             logger.info('%s 借贷订单号 %s：借入 %f %s' % (exchange, margin_order_id, amount, currency))
             return margin_order_id
         elif res['status'] == 'error':
-            print(res['err-code'] + ":" + res['err-msg'])
+            logger.warn(res['err-code'] + ":" + res['err-msg'])
             return False
 
 
@@ -506,7 +506,7 @@ def repay_margin(exchange='huobipro', order_id=None, amount=0):
             logger.info('%s 借贷订单号 %s：归还 %f' % (exchange, order_id, amount))
             return True
         elif res['status'] == 'error':
-            print(res['err-code'] + ":" + res['err-msg'])
+            logger.warn(res['err-code'] + ":" + res['err-msg'])
             return False
 
 
@@ -821,7 +821,7 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
             myorder.filled_fee = float(order_info['data']['field-fees']) * last_price  ## 手续费
             myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['finished-at']/1000))  ## 最新一次成交时间
 
-            logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f。' % \
+            logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f usdt。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume, myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
         elif res['status'] == 'error':
@@ -918,7 +918,7 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     margin_order_id = apply_margin(exchange=exchange, symbol=sec_id, currency=margin_currency, amount=margin_amount)
 
     # 第二步：买入数字货币
-    buy_volume = volume + margin_amount
+    buy_volume = volume * leverage
     myorder = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=buy_volume)
 
     myorder.margin_amount = margin_amount
