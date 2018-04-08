@@ -63,21 +63,27 @@ def error(*error1):
 sms_send_url = "https://feed.shangtalk.com:8443/twilio"
 
 def send_sms(message, phone):
-    params = {"region": "86", "phone": phone, "message": message}
 
-    url = sms_send_url
-    headers = {'Content-Type': 'application/json'}
-    postdata = json.dumps(params)
-    response = requests.post(url, postdata, headers=headers, timeout=10)
-    try:
+    # 分解号码列表
+    phone_list = phone.replace(' ', '').split(',')
 
-        if response.status_code == 200:
-            return response.content
-        else:
-            return
-    except BaseException as e:
-        print("httpPost failed, detail is:%s,%s \n" % (response.text, e))
-        return
+    # 依次发送短信通知
+    for each_phone in phone_list:
+        params = {"region": "86", "phone": each_phone, "message": message}
+
+        url = sms_send_url
+        headers = {'Content-Type': 'application/json'}
+        postdata = json.dumps(params)
+        response = requests.post(url, postdata, headers=headers, timeout=10)
+        try:
+
+            if response.status_code == 200:
+                return response.content
+            else:
+                return False
+        except BaseException as e:
+            warn("httpPost failed, detail is:%s \n" % response.text)
+            return False
 
 
 if __name__ == '__main__':

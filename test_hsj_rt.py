@@ -1,24 +1,27 @@
 import numpy as np
 import pandas as pd
-import time
+import os
+
 import api.quant_api as qapi
 from api import logger
 
-c1 = 1.75               # std 系数
-l1 = 5                  # avg追溯时期
-length = 400            # 基准期
+c1 = 1.75  # std 系数
+l1 = 5  # avg追溯时期
+length = 400  # 基准期
 unit = 1
 most = 2
+bar_type = '5min'
 # --------------
-MarketPosition = 0      # 记录当前仓位
+MarketPosition = 0  #
 ini_mkp = 0
-lastbatimer = None      # 上一周期时间
+lastbatimer = None
+
+phone_list =  "13811892804, 18512101480"
 
 if __name__ == '__main__':
     # -----------初始化----------------------------
     # ------------取数据-------
-    bars = qapi.get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='',
-                               size=5000)
+    bars = qapi.get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type=bar_type, size=5000)
     data = qapi.to_dataframe(bars)[-5000:]
     # -------------------
     data['hp'] = data['close'].rolling(length).max()
@@ -41,10 +44,16 @@ if __name__ == '__main__':
         std = data.iloc[i]['std']
         incon1 = ((close - lp) / (hp - lp) >= 0.8) and (nt >= avg + c1 * std) and (ini_mkp != 1)
         incon2 = ((close - lp) / (hp - lp) <= 0.2) and (nt >= avg + c1 * std) and (ini_mkp != -1)
-        outcon = nt <= avg
-        if incon1: ini_mkp = 1
-        if incon2: ini_mkp = -1
-        if outcon: ini_mkp = 0
+        outcon = nt <= avg and ini_mkp != 0
+        if incon1:
+            ini_mkp = 1
+            print(data.iloc[i]['strtime'], "Buy 1")
+        if incon2:
+            ini_mkp = -1
+            print(data.iloc[i]['strtime'], "Sellshort 1")
+        if outcon:
+            ini_mkp = 0
+            print(data.iloc[i]['strtime'], "Buytocover||Sell 1")
     # ---------------------------------------
     close_ = list(data['close'][-length * l1:].values)
     hp_ = list(data['hp'][-2000:].values)
@@ -57,18 +66,16 @@ if __name__ == '__main__':
     MarketPosition = ini_mkp
     lastbartime = data.iloc[-1]['strtime']
     limit = 0
-    print("initiation success！！！！！！！！！！！")
+
+    msg = "Q-BTC initiation succeed！"
+    logger.info(msg)
+    logger.send_sms(msg, phone_list)
+
     # -----------初始化完成----------------------------
     # --------------------------------------循环计算
     while (1):
-
-        try:
-            bar = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=1)
-            bar = bar[0]
-        except Exception as e:
-            logger.warn('数据接口取数失败，重试中...')
-            time.sleep(10)
-
+        bar = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type=bar_type, size=1)
+        bar = bar[0]
         if bar.strtime == lastbartime:
             continue
         else:
@@ -79,9 +86,9 @@ if __name__ == '__main__':
             move = (close_[-1] / close_[-length] - 1) * 100
             hp = np.max(close_[-length:])
             lp = np.min(close_[-length:])
-            hp_.append(hp)
+            hp_.append(hp);
             hp_.pop(0)
-            lp_.append(lp)
+            lp_.append(lp);
             lp_.pop(0)
             temp = [np.log(x) for x in close_[-length:]]
             tot_.append(np.sum(np.abs(np.diff(temp))))
@@ -102,40 +109,46 @@ if __name__ == '__main__':
             outcon1 = (nt >= avg + c1 * std) and (limit >= most + 1) and MarketPosition != 0
 
             if (incon1):
-                # qapi.margincash_open(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit, leverage=0)
-                logger.info("BTCUSDT 开多仓 @ %f" % close)
-                logger.send_sms("BTCUSDT 开多仓 @ %f" % close, '13811892804')
+                # qapi.open_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                msg = "%s 开多仓 btcusdt @ %f" % (bar.strtime, bar.close)
+                logger.info(msg)
+                logger.send_sms(msg, phone_list)
                 limit = limit + 1
                 MarketPosition = 1
 
             if (incon2):
                 # qapi.marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=unit)
-                logger.info("BTCUSDT 开空仓 @ % %f" % close)
-                logger.send_sms(" BTCUSDT 开空仓 @ %f" % close, '13811892804')
+                msg = "%s 开空仓 btcusdt @ %f" % (bar.strtime, bar.close)
+                logger.info(msg)
+                logger.send_sms(msg, phone_list)
                 limit = limit + 1
                 MarketPosition = -1
 
             if (outcon):
                 if MarketPosition == 1:
-                    # qapi.margincash_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("BTCUSDT 平多仓 @ % %f" % close)
-                    logger.send_sms(" BTCUSDT 平多仓 @ %f" % close, '13811892804')
-                    MarketPosition = 0
+                    # qapi.close_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                    msg = "%s 平多仓 btcusdt @ %f" % (bar.strtime, bar.close)
+                    logger.info(msg)
+                    logger.send_sms(msg, phone_list)
                     limit = 0
+                    MarketPosition = 0
                 if MarketPosition == -1:
                     # qapi.marginsec_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("BTCUSDT 平空仓 @ % %f" % close)
-                    logger.send_sms(" BTCUSDT 平空仓 @ %f" % close, '13811892804')
-                    MarketPosition = 0
+                    msg = "%s 平空仓 btcusdt @ %f" % (bar.strtime, bar.close)
+                    logger.info(msg)
+                    logger.send_sms(msg, phone_list)
                     limit = 0
+                    MarketPosition = 0
             if (outcon1):
                 if MarketPosition == 1:
-                    # qapi.margincash_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("BTCUSDT 平多仓 @ % %f" % close)
-                    logger.send_sms(" BTCUSDT 平多仓 @ %f" % close, '13811892804')
+                    # qapi.close_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                    msg = "%s 平多仓 btcusdt @ %f" % (bar.strtime, bar.close)
+                    logger.info(msg)
+                    logger.send_sms(msg, phone_list)
                     MarketPosition = 0
                 if MarketPosition == -1:
-                    qapi.marginsec_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
-                    logger.info("BTCUSDT 平空仓 @ % %f" % close)
-                    logger.send_sms(" BTCUSDT 平空仓 @ %f" % close, '13811892804')
+                    # qapi.marginsec_close(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=unit)
+                    msg = "%s 平空仓 btcusdt @ %f" % (bar.strtime, bar.close)
+                    logger.info(msg)
+                    logger.send_sms(msg, phone_list)
                     MarketPosition = 0

@@ -1052,6 +1052,8 @@ def get_positions(exchange='huobipro', source='api'):
         elif source == 'margin-api':
             # 获取融资融券账户资金情况
             account = accounts['margin']['id']
+        else:
+            logger.error('No accounts found from %s!' % source)
 
         res = hb.get_balance(acct_id=account)
         if res['status'] == 'ok':
@@ -1078,8 +1080,9 @@ def get_positions(exchange='huobipro', source='api'):
                 position.available = float(balance_dict[each]['trade'])
                 position.order_frozen = float(balance_dict[each]['frozen'])
                 position.amount = position.available + position.order_frozen
-                position.loan = float(balance_dict[each]['loan'])
-                position.interest = float(balance_dict[each]['interest'])
+                if source == 'margin-api':
+                    position.loan = float(balance_dict[each]['loan'])
+                    position.interest = float(balance_dict[each]['interest'])
 
                 positions = positions + [position]
         else:
@@ -1088,12 +1091,21 @@ def get_positions(exchange='huobipro', source='api'):
     return positions
 
 
-def get_cash():
+def get_cash(exchange='huobipro', source='api'):
+    '''
+    获取账户中的现金资产（usdt），包括可交易的、冻结的、借贷的
+    :return: Position 对象
     '''
 
-    :return:
-    '''
-    pass
+    cash_position = Position()
+    if exchange == 'huobipro':
+        positions = get_positions(exchange=exchange, source=source)
+
+        cash_position = [each for each in positions if each.sec_id == 'usdt']
+        if len(cash_position) > 0:
+            cash_position = cash_position[0]
+
+    return cash_position
 
 
 def send_order(exchange='huobipro', symbol='btcusdt', amount=0, margin=0, mtype='buy-market', price=0):
