@@ -482,6 +482,8 @@ def apply_margin(exchange='huobipro', symbol='btcusdt', currency='btc', amount=0
     :return:
     """
     if exchange == 'huobipro':
+
+        amount = round(amount, 3)
         res =  hb.get_margin(symbol=symbol, currency=currency, amount=amount)
         if res['status'] == 'ok':
             margin_order_id = res['data']
