@@ -22,7 +22,7 @@ from api import logger
 
 exchange = 'huobipro'
 symbol = 'btcusdt'
-bar_type = '60min'
+bar_type = '1min'
 
 # 参数设置
 trade_fee = 0.002
@@ -31,38 +31,43 @@ N_ma = 6
 N_short = 24
 N_long = 24*3
 
-kline_data = qapi.get_bars(exchange=exchange, symbol_list=symbol, bar_type=bar_type, size=2*N_long)
-kline =  qapi.to_dataframe(kline_data)
-kline.index = kline['strtime']
-kline = kline.sort_values(by='strtime')
+bars_data = qapi.get_bars(exchange=exchange, symbol_list=symbol, bar_type=bar_type, size=2*N_long)
+data =  qapi.to_dataframe(bars_data)
+data.index = data['strtime']
+data = data.sort_values(by='strtime')
 
 # 变量初始化
-kline['ma'] = kline['close'].copy()
-kline['ref'] = kline['close'].copy()
-kline['signal'] = 0
-kline['account'] = 1
-kline['earning'] = 0
-kline['chg'] = kline['close'].diff(1)
-kline['pct_chg'] = kline['close'].diff(1)/kline['close']
-kline['voltility'] = kline['chg'].rolling(N_volt).std()
-last_time = kline.index[-1]
+data['ma'] = data['close'].copy()
+data['ref'] = data['close'].copy()
+data['signal'] = 0
+data['account'] = 1
+data['earning'] = 0
+data['chg'] = data['close'].diff(1)
+data['pct_chg'] = data['close'].diff(1)/data['close']
+data['voltility'] = data['chg'].rolling(N_volt).std()
+last_time = data.index[-1]
 
 logger.info('DMA 测试开始工作！')
 while(1):
 
-    last_bars = qapi.get_last_bars(exchange='huobipro', symbol_list='btcusdt', bar_type=bar_type)
-    current = last_bars[0].strtime
+    try:
+        last_bars = qapi.get_last_bars(exchange='huobipro', symbol_list='btcusdt', bar_type=bar_type)
+        current = last_bars[0].strtime
+    except Exception as e:
+        logger.warn('获取实时数据失败：' + e)
+        time.sleep(10)
+
     if current != last_time:      # 每隔1小时判断一次
 
         logger.info(current)
         last_time = current
 
-        data = qapi.to_dataframe(last_bars)
-        data.index = data['strtime']
-        kline = kline.iloc[1:].append(data)
+        bar_df = qapi.to_dataframe(last_bars)
+        bar_df.index = bar_df['strtime']
+        data = data.iloc[1:].append(bar_df)
 
-        now = kline.index[-1]
-        last = kline.index[-2]
+        now = data.index[-1]
+        last = data.index[-2]
 
         # 按收盘价交易，先计算账户每日涨跌
         data.loc[now, 'chg'] = data['close'].iloc[-1] - data['close'].iloc[-2]
@@ -116,4 +121,9 @@ while(1):
             data.loc[now, 'signal'] = data.loc[last, 'signal']
 
     # 休眠59分钟
-    time.sleep(60*59)
+    if bar_type == '1min':
+        time.sleep(50)
+    elif bar_type == '5min':
+        time.sleep(60*4 + 50)
+    elif bar_type == '60min':
+        time.sleep(59*60 + 50)
