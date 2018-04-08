@@ -71,19 +71,13 @@ def send_sms(message, phone):
     # 依次发送短信通知
     for each_phone in phone_list:
         params = {"region": "86", "phone": each_phone, "message": message}
-
         url = sms_send_url
         headers = {'Content-Type': 'application/json'}
         postdata = json.dumps(params)
-        response = requests.post(url, postdata, headers=headers, timeout=10)
         try:
-            if response.status_code == 200:
-                info(each_phone + ":" + response.content)
-            else:
-                warn(each_phone + ":send message error!")
+            response = requests.post(url, postdata, headers=headers, timeout=10)
         except BaseException as e:
             warn("httpPost failed, detail is:%s \n" % response.text)
-
 
 
 if __name__ == '__main__':
