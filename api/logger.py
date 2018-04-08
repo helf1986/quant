@@ -77,16 +77,13 @@ def send_sms(message, phone):
         postdata = json.dumps(params)
         response = requests.post(url, postdata, headers=headers, timeout=10)
         try:
-
             if response.status_code == 200:
-                return response.content
+                info(each_phone + ":" + response.content)
             else:
-                return False
+                warn(each_phone + ":send message error!")
         except BaseException as e:
             warn("httpPost failed, detail is:%s \n" % response.text)
-            return False
 
-        time.sleep(2)
 
 
 if __name__ == '__main__':
