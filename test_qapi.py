@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     result = qapi.repay_margin(exchange='huobipro', order_id=676027, amount=0.15)
 
-    mybalance = qapi.get_margin_positions(exchange='huobipro')
+    mybalance = qapi.get_margin_positions(exchange='huobipro', source='magin-api')
     mybal_df = qapi.to_dataframe(mybalance)
 
     myorder = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.01, leverage=1)

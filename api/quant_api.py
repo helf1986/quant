@@ -1051,7 +1051,7 @@ def get_positions(exchange='huobipro', source='api'):
             account = accounts['spot']['id']
         elif source == 'margin-api':
             # 获取融资融券账户资金情况
-            account = accounts['magin']['id']
+            account = accounts['margin']['id']
 
         res = hb.get_balance(acct_id=account)
         if res['status'] == 'ok':
