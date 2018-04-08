@@ -1035,7 +1035,7 @@ def get_position(exchange, sec_id, side):
     pass
 
 
-def get_positions(exchange='huobipro'):
+def get_positions(exchange='huobipro', source='api'):
     '''
     获得所有账户持仓情况
     :param exchange:
@@ -1044,12 +1044,16 @@ def get_positions(exchange='huobipro'):
 
     positions = []
     if exchange == 'huobipro':
-
         accounts = get_accounts(exchange=exchange)
 
-        # 获取普通账户资金情况
-        spot_account = accounts['spot']['id']
-        res = hb.get_balance(acct_id=spot_account)
+        if source == 'api':
+            # 获取普通账户资金情况
+            account = accounts['spot']['id']
+        elif source == 'margin-api':
+            # 获取融资融券账户资金情况
+            account = accounts['magin']['id']
+
+        res = hb.get_balance(acct_id=account)
         if res['status'] == 'ok':
             account_info = res['data']
             account_id = account_info['id']
@@ -1063,87 +1067,6 @@ def get_positions(exchange='huobipro'):
             for each in account_balance:
                 balance_dict[each['currency']][each['type']] = each['balance']
 
-            for each in balance_dict.keys():
-                position = Position()
-                position.exchange = exchange
-                position.account_id = account_id
-                position.account_type = account_type
-                position.account_status = account_status
-
-                position.sec_id = each
-                position.available = float(balance_dict[each]['trade'])
-                position.order_frozen = float(balance_dict.loc[each]['frozen'])
-                position.amount = position.available + position.order_frozen
-                position.loan = float(balance_dict.loc[each]['loan'])
-                position.interest = float(balance_dict.loc[each]['interest'])
-
-                positions = positions + [position]
-        else:
-            logger.warn(res['err-code'] + ':' + res['err-msg'])
-
-        # 获取借贷账户资金情况
-        margin_account = accounts['margin']['id']
-        res = hb.get_balance(acct_id=margin_account)
-        if res['status'] == 'ok':
-            account_info = res['data']
-            account_id = account_info['id']
-            account_type = account_info['type']
-            account_status = account_info['state']
-            account_balance = account_info['list']
-
-            balance_dict = {}
-            for each in account_balance:
-                balance_dict[each['currency']] = {}
-            for each in account_balance:
-                balance_dict[each['currency']][each['type']] = each['balance']
-            for each in balance_dict.keys():
-                position = Position()
-                position.exchange       = exchange
-                position.account_id     = account_id
-                position.account_type   = account_type
-                position.account_status = account_status
-
-                position.sec_id         = each
-                position.available      = float(balance_dict[each]['trade'])
-                position.order_frozen   = float(balance_dict[each]['frozen'])
-                position.amount         = position.available + position.order_frozen
-                position.loan           = float(balance_dict[each]['loan'])
-                position.interest       = float(balance_dict[each]['interest'])
-
-                positions = positions + [position]
-        else:
-            logger.warn(res['err-code'] + ':' + res['err-msg'])
-
-    return positions
-
-
-def get_margin_positions(exchange='huobipro'):
-    '''
-    获取融资融券账户持仓情况
-    :param exchange:
-    :return:
-    '''
-
-    positions = []
-    if exchange == 'huobipro':
-
-        accounts = get_accounts(exchange=exchange)
-
-        # 获取借贷账户资金情况
-        margin_account = accounts['margin']['id']
-        res = hb.get_balance(acct_id=margin_account)
-        if res['status'] == 'ok':
-            account_info = res['data']
-            account_id = account_info['id']
-            account_type = account_info['type']
-            account_status = account_info['state']
-            account_balance = account_info['list']
-
-            balance_dict = {}
-            for each in account_balance:
-                balance_dict[each['currency']] = {}
-            for each in account_balance:
-                balance_dict[each['currency']][each['type']] = each['balance']
             for each in balance_dict.keys():
                 position = Position()
                 position.exchange = exchange
