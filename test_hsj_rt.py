@@ -17,8 +17,8 @@ MarketPosition = 0  #
 ini_mkp = 0
 lastbatimer = None
 
-phone_list =  "13811892804"
-# phone_list =  "13811892804, 18512101480, 13910993289, 15818535870, 13911217190"
+# phone_list =  "13811892804"
+phone_list =  "13811892804, 18512101480, 13910993289, 15818535870, 13911217190"
 
 if __name__ == '__main__':
     # -----------初始化----------------------------
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     lastbartime = data.iloc[-1]['strtime']
     limit = 0
 
-    msg = "Q-BTC 数字货币量化交易系统实盘交易开始工作..."
+    msg = "Q-BTC 数字货币量化交易系统开始工作..."
     logger.info(msg)
     logger.send_sms(msg, phone_list)
 
@@ -90,9 +90,9 @@ if __name__ == '__main__':
                 move = (close_[-1] / close_[-length] - 1) * 100
                 hp = np.max(close_[-length:])
                 lp = np.min(close_[-length:])
-                hp_.append(hp);
+                hp_.append(hp)
                 hp_.pop(0)
-                lp_.append(lp);
+                lp_.append(lp)
                 lp_.pop(0)
                 temp = [np.log(x) for x in close_[-length:]]
                 tot_.append(np.sum(np.abs(np.diff(temp))))
