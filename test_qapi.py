@@ -98,7 +98,7 @@ if __name__ == "__main__":
     data_df = qapi.to_dataframe(data)
     print(data_df)
 
-    myorder = qapi.open_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=20)
+    myorder = qapi.open_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=0.001)
 
     myorder = qapi.close_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=0.01)
 

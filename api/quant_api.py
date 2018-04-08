@@ -102,19 +102,10 @@ class StrategyBase(object):
         return open_long(exchange=exchange, sec_id=sec_id, price=price, volume=0)
 
 
-    def close_short(self, exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
+    def close_long(self, exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
 
-        return close_short(exchange=exchange, sec_id=sec_id, price=price, volume=0)
+        return close_long(exchange=exchange, sec_id=sec_id, price=price, volume=0)
 
-
-    def open_short(self, exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
-
-        return open_short(exchange=exchange, sec_id=sec_id, price=price, volume=volume)
-
-
-    def close_short(self, exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
-
-        return close_short(exchange=exchange, sec_id=sec_id, price=price, volume=volume)
 
 
     def cancel_order(self, exchange='huobipro', cl_ord_id=''):
@@ -815,7 +806,7 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
             res = hb.send_margin_order(amount=amount, source=source, symbol=sec_id, _type=mtype, price=price)
 
         if res['status'] == 'ok':
-            myorder.ex_ord_id = res['data']
+            myorder.ex_ord_id = int(res['data'])
 
             time.sleep(2) # 等待3 秒后查询订单
             # 查询订单信息
@@ -827,10 +818,10 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
             myorder.filled_amount = float(order_info['data']['field-cash-amount'])  ## 已成交额
             if (myorder.filled_volume > 0):
                 myorder.filled_vwap = round(myorder.filled_amount/myorder.filled_volume,4)  ## 已成交均价
-            myorder.filled_fee = float(order_info['data']['field-fees'])  ## 手续费
+            myorder.filled_fee = float(order_info['data']['field-fees']) * last_price  ## 手续费
             myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order_info['data']['finished-at']/1000))  ## 最新一次成交时间
 
-            logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f usdt。' % \
+            logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f。' % \
                         (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume, myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
         elif res['status'] == 'error':
@@ -881,7 +872,7 @@ def close_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, vol
             res = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
 
         if res['status'] == 'ok':
-            myorder.ex_ord_id = res['data']
+            myorder.ex_ord_id = int(res['data'])
 
             time.sleep(2)  # 等待3 秒后查询订单
             # 查询订单信息
