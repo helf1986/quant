@@ -25,7 +25,7 @@ def get_vals(vs):
 
 
 def info(*info1):
-    exec_info = str(datetime.datetime.now())+'\tINFO\t'+get_vals(info1)
+    exec_info = str(datetime.datetime.now())+'\tINFO\t'+get_vals(info1) + '\n'
     print (exec_info)
     logfile = LOGFILE
     f = open(logfile, "a")
@@ -33,7 +33,7 @@ def info(*info1):
 
 
 def debug(*debug1):
-    exec_info = str(datetime.datetime.now())+'\tDEBUG\t'+get_vals(debug1)
+    exec_info = str(datetime.datetime.now())+'\tDEBUG\t'+get_vals(debug1) + '\n'
     print (exec_info)
     logfile = logfile = LOGFILE
     f = open(logfile, "a")
@@ -41,7 +41,7 @@ def debug(*debug1):
 
 
 def warn(*warn1):
-    exec_info = str(datetime.datetime.now())+'\tWARN\t'+get_vals(warn1)
+    exec_info = str(datetime.datetime.now())+'\tWARN\t'+get_vals(warn1) + '\n'
     print (exec_info)
     logfile = logfile = LOGFILE
     f = open(logfile, "a")
@@ -50,7 +50,7 @@ def warn(*warn1):
 
 def error(*error1):
     try:
-        exec_info = str(datetime.datetime.now())+'\tERROR\t'+get_vals(error1)
+        exec_info = str(datetime.datetime.now())+'\tERROR\t'+get_vals(error1) + '\n'
         raise Exception(exec_info)
         logfile = logfile = LOGFILE
         f = open(logfile, "a")
@@ -76,7 +76,7 @@ def send_sms(message, phone):
         else:
             return
     except BaseException as e:
-        print("httpPost failed, detail is:%s,%s" % (response.text, e))
+        print("httpPost failed, detail is:%s,%s \n" % (response.text, e))
         return
 
 

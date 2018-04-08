@@ -95,9 +95,9 @@ if __name__ == "__main__":
         '''
 
     data = qapi.get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=100)
-    print(data)
+    data_df = qapi.to_dataframe(data)
+    print(data_df)
 
-    '''
     myorder = qapi.open_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=20)
 
     myorder = qapi.close_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=0.01)
@@ -119,4 +119,3 @@ if __name__ == "__main__":
     last_tick = qapi.get_last_ticks(exchange='huobipro', symbol_list='btcusdt')
     last_price = last_tick[0].last_price
     result= qapi.marginsec_close(exchange='huobipro', sec_id='btcusdt', price=last_price, volume=0.001)
-    '''

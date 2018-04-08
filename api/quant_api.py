@@ -65,7 +65,7 @@ class StrategyBase(object):
                         commission_ratio=0,
                         slippage_ratio=0,
                         price_type=1,
-                        bench_symbol='SHSE.000300',
+                        bench_symbol='btcusdt',
                         check_cache=1):
         pass
 
@@ -75,10 +75,6 @@ class StrategyBase(object):
 
     def stop(self):
         pass
-
-
-    def get_ticks(self, exchange='huobipro', symbol_list='btcusdt', begin_time='', end_time=''):
-        return get_ticks(exchange=exchange, symbol_list=symbol_list, begin_time=begin_time, end_time=end_time)
 
 
     def get_bars(self, exchange='huobipro', symbol_list='btcusdt', bar_type='1min', begin_time='', end_time=''):
@@ -729,16 +725,22 @@ def get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', 
             end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time_ts))
             if bar_type == '1min':
                 N_bar = 60
+                per = 1
             elif bar_type == '5min':
                 N_bar = 60*5
+                per = 3
             elif bar_type == '15min':
                 N_bar = 60*15
+                per = 4
             elif bar_type == '30min':
                 N_bar = 60*60
+                per = 5
             elif bar_type == '60min':
                 N_bar = 60*60
+                per = 6
             elif bar_type == '1day':
                 N_bar = 60*60*24
+                per = 14
             begin_time_ts = int(end_time_ts - N_bar * size)
             begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(begin_time_ts))
 
@@ -747,7 +749,7 @@ def get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', 
         coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
         collection = coin_db['b_btc_kline']
 
-        data = collection.find({'per': str(int(N_bar/60)), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})   # , "t": {}
+        data = collection.find({'per': str(per), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})
 
         for each_bar in data:
             # print(each_bar)
@@ -795,17 +797,22 @@ def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volu
     if exchange == 'huobipro':         # 火币网接口
         if price == 0.0:
             mtype = 'buy-market'
+            last_tick = get_last_ticks(exchange=exchange, symbol_list=sec_id)
+            last_price = last_tick[0].last_price
+            amount = volume * last_price
         else:
             mtype = 'buy-limit'
+            amount = volume
+
         myorder.order_type = mtype          ## 订单类型
-        myorder.order_src = source  ## 订单来源
+        myorder.order_src = source          ## 订单来源
 
         # 买入指定数字货币
         myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
         if source == 'api':
-            res = hb.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+            res = hb.send_order(amount=amount, source=source, symbol=sec_id, _type=mtype, price=price)
         elif source == 'margin-api':
-            res = hb.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+            res = hb.send_margin_order(amount=amount, source=source, symbol=sec_id, _type=mtype, price=price)
 
         if res['status'] == 'ok':
             myorder.ex_ord_id = res['data']
@@ -908,18 +915,20 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     :param sec_id:
     :param price:
     :param volume: 本金数量
-    :param leverage: 杠杆比例
+    :param leverage: 杠杆比例，杠杆比例 = 0 时，不借贷，大于0是，先借贷，然后和本金一期买入，实际买入金额为 volume * leverage
     :return: Order 对象
     '''
 
+    last_tick = get_last_ticks(exchange=exchange, symbol_list=sec_id)
+    last_price = last_tick[0].last_price
     # 第一步：先融资
     margin_currency = 'usdt'
-    margin_amount = volume * leverage
+    margin_amount = last_price*volume * leverage
     margin_order_id = apply_margin(exchange=exchange, symbol=sec_id, currency=margin_currency, amount=margin_amount)
 
     # 第二步：买入数字货币
-    buy_amount = volume + margin_amount
-    myorder = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=buy_amount)
+    buy_volume = volume + margin_amount
+    myorder = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=buy_volume)
 
     myorder.margin_amount = margin_amount
     myorder.margin_currency = margin_currency
