@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     '''
 
-    result = qapi.get_bars(exchange='huobipro', symbol_list=['btcusdt', 'ethusdt'], bar_type='1min', begin_time='', end_time='', size=50)
+    result = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='60min', size=24*7)
     result_dict = [each.__dict__ for each in result]
     result_pd = pd.DataFrame(result_dict)
     print(result_pd)
