@@ -930,7 +930,7 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     return myorder
 
 
-def margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
+def margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, margin_order_id=''):
     '''
     卖出还贷
     :param exchange:
@@ -946,12 +946,13 @@ def margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     # 第二步：归还USDT
     # 获取待还金额
     currency = 'usdt'
-    currency_volume = close_order.filled_amount
-    today = time.strftime('%Y-%m-%d', time.localtime())
-    margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
-    unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
-    margin_order_id = unpaid_orders.iloc[-1]['id']
-    unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
+    if margin_order_id == '' or margin_order_id == None:
+        currency_volume = close_order.filled_amount
+        today = time.strftime('%Y-%m-%d', time.localtime())
+        margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
+        unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
+        margin_order_id = unpaid_orders.iloc[-1]['id']
+        unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
 
     # 偿还借贷
     repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=unpaid_volume)
@@ -981,7 +982,7 @@ def marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     return margin_order_id
 
 
-def marginsec_close(exchange='huobipro', margin_order_id = '', sec_id='btcusdt', price=0, volume=0):
+def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, margin_order_id=''):
     '''
     卖券归还
     :param exchange:
