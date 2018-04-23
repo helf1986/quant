@@ -69,9 +69,11 @@ if __name__ == '__main__':
     lastbartime = data.iloc[-1]['strtime']
     limit = 0
 
+    '''
     msg = "Q-BTC 数字货币量化交易系统开始工作..."
     logger.info(msg)
     logger.send_sms(msg, phone_list)
+    '''
 
     # -----------初始化完成----------------------------
     # --------------------------------------循环计算
