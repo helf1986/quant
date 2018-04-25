@@ -974,12 +974,16 @@ def marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0):
     '''
 
     # 第一步，先借入数字货币
-    margin_order_id = apply_margin(exchange=exchange, symbol=sec_id, currency='btc', amount=volume)
+    margin_currency = 'btc'
+    margin_order_id = apply_margin(exchange=exchange, symbol=sec_id, currency=margin_currency, amount=volume)
 
     # 第二步，卖出数字货币
-    short_order_id = close_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=volume)
+    my_order = close_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=volume)
+    my_order.margin_order_id = margin_order_id
+    my_order.margin_currency = margin_currency
+    my_order.margin_amount = volume
 
-    return margin_order_id
+    return my_order
 
 
 def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, margin_order_id=''):
