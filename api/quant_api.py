@@ -1017,7 +1017,7 @@ def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, ma
     else:
         paid_volume = unpaid_volume
 
-    repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=paid_volume)
+    repay_status = repay_margin(exchange=exchange, order_id=margin_order_id, amount=paid_volume)
     myorder.margin_order_id = margin_order_id
     myorder.margin_currency = currency
     myorder.margin_amount = -paid_volume
