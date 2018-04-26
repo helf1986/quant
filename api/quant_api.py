@@ -1005,12 +1005,15 @@ def marginsec_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, ma
 
     if margin_order_id == '' or margin_order_id == None:
         today = time.strftime('%Y-%m-%d', time.localtime())
-        margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=10)
+        margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=100)
         unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
         margin_order_id = unpaid_orders.iloc[-1]['id']
         unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
     else:
-        unpaid_volume = 0
+        today = time.strftime('%Y-%m-%d', time.localtime())
+        margin_orders = get_margin_orders(exchange=exchange, symbol=sec_id, currency=currency, start=today, direct="prev", size=100)
+        unpaid_orders = margin_orders[(margin_orders['currency'] == currency) & (margin_orders['state'] == 'accrual')]
+        unpaid_volume = unpaid_orders.loc[margin_order_id]['loan-balance'] + unpaid_orders.loc[margin_order_id]['interest-balance']
 
     if volume < unpaid_volume:
         paid_volume = volume
