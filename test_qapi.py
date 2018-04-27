@@ -86,7 +86,47 @@ if __name__ == "__main__":
 
     # result = qapi.get_positions(exchange='huobipro')
 
-    result = qapi.get_bars(exchange='huobipro', symbol_list=['btcusdt', 'ethusdt'], bar_type='1min', begin_time='', end_time='', size=50)
+    '''
+
+    result = qapi.get_bars(exchange='huobipro', symbol_list='btcusdt', bar_type='60min', size=24*7)
     result_dict = [each.__dict__ for each in result]
     result_pd = pd.DataFrame(result_dict)
     print(result_pd)
+        '''
+
+    data = qapi.get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='5min', size=100)
+    data_df = qapi.to_dataframe(data)
+    print(data_df)
+
+    myorder = qapi.open_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=0.001)
+
+    myorder = qapi.close_long(exchange='huobipro', source='margin-api', sec_id='btcusdt', price=0, volume=0.002)
+
+    next_day = time.strftime('%Y-%m-%d', time.localtime(time.time() + 60*60*24))
+    margin_orders = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='usdt', start=next_day, direct="prev", size=10)
+
+    margin_orders = qapi.get_margin_orders(exchange='huobipro', symbol='btcusdt', currency='usdt', start_date='2018-04-05', end_date='2018-04-09')
+
+    result = qapi.apply_margin(exchange='huobipro', symbol='btcusdt', currency='btc', amount=0.001)
+
+    result = qapi.apply_margin(exchange='huobipro', symbol='btcusdt', currency='usdt', amount=0.001)
+
+    result = qapi.repay_margin(exchange='huobipro', order_id=676027, amount=0.15)
+
+    mybalance = qapi.get_positions(exchange='huobipro', source='api')
+    mybal_df = qapi.to_dataframe(mybalance)
+
+    myorder = qapi.margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.01, leverage=1)
+
+    myorder = qapi.margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.02)
+
+    myorder = qapi.marginsec_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0.001)
+
+    last_tick = qapi.get_last_ticks(exchange='huobipro', symbol_list='btcusdt')
+    last_price = last_tick[0].last_price
+    result= qapi.marginsec_close(exchange='huobipro', sec_id='btcusdt', price=last_price, volume=0.001)
+
+    last_tick = qapi.get_last_ticks(exchange='huobipro', symbol_list='btcusdt')
+    last_price = last_tick[0].last_price
+
+    orders = hb.loan_orders(symbol='btcusdt', currency='usdt', start="2018-04-09", direct="prev", size=10)
