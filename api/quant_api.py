@@ -908,7 +908,7 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     :param sec_id:
     :param price:
     :param volume: 本金数量
-    :param leverage: 杠杆比例，杠杆比例 = 0 时，不借贷，大于0是，先借贷，然后和本金一期买入，实际买入金额为 volume * leverage
+    :param leverage: 杠杆比例，杠杆比例 = 0 时，不借贷，大于0是，先借贷，然后和本金一期买入，实际买入金额为 volume * (1+leverage)
     :return: Order 对象
     '''
 
@@ -917,10 +917,15 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     # 第一步：先融资
     margin_currency = 'usdt'
     margin_amount = last_price*volume * leverage
-    margin_order_id = apply_margin(exchange=exchange, symbol=sec_id, currency=margin_currency, amount=margin_amount)
+    if margin_amount >= 0.001:
+        margin_order_id = apply_margin(exchange=exchange, symbol=sec_id, currency=margin_currency, amount=margin_amount)
+    elif margin_amount == 0:
+        pass
+    else:
+        logger.warn('当前借贷金额 %f USDT,不满足最低100 USDT的 要求！'% margin_amount)
 
     # 第二步：买入数字货币
-    buy_volume = volume * leverage
+    buy_volume = volume * (1+leverage)
     myorder = open_long(exchange=exchange, source='margin-api', sec_id=sec_id, price=price, volume=buy_volume)
 
     myorder.margin_amount = margin_amount
