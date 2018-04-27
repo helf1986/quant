@@ -17,9 +17,11 @@ import requests
 
 # 此处填写APIKEY
 
-ACCESS_KEY = "a4594cdd-75b0037b-003d37ea-528bd"
-SECRET_KEY = "5f0ea6d5-a4ff1afc-9c04e15a-9e3ba"
+# ACCESS_KEY = "a4594cdd-75b0037b-003d37ea-528bd"
+# SECRET_KEY = "5f0ea6d5-a4ff1afc-9c04e15a-9e3ba"
 
+ACCESS_KEY = "866bc1c0-dd974b4d-b6876119-95089"
+SECRET_KEY = "a6558ee4-735bf5f7-67c97d3a-b4afc"
 
 
 # API 请求地址
