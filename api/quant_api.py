@@ -917,6 +917,7 @@ def margincash_open(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, le
     # 第一步：先融资
     margin_currency = 'usdt'
     margin_amount = last_price*volume * leverage
+    margin_order_id = 0
     if margin_amount >= 0.001:
         margin_order_id = apply_margin(exchange=exchange, symbol=sec_id, currency=margin_currency, amount=margin_amount)
     elif margin_amount == 0:
@@ -960,10 +961,11 @@ def margincash_close(exchange='huobipro', sec_id='btcusdt', price=0, volume=0, m
         unpaid_volume = unpaid_orders.iloc[-1]['loan-balance'] + unpaid_orders.iloc[-1]['interest-balance']
 
     # 偿还借贷
-    repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=unpaid_volume)
-    close_order.margin_order_id = margin_order_id
-    close_order.margin_currency = currency
-    close_order.margin_amount = -unpaid_volume
+    if margin_order_id > 0:
+        repay_status = repay_margin(exchange=exchange, margin_order_id=margin_order_id, amount=unpaid_volume)
+        close_order.margin_order_id = margin_order_id
+        close_order.margin_currency = currency
+        close_order.margin_amount = -unpaid_volume
 
     return close_order
 
