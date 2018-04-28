@@ -180,14 +180,12 @@ class Order(object):
     def __init__(self):
         self.strategy_id = ''                 ## 策略ID
         self.account_id = ''                  ## 交易账号
-
-        self.cl_ord_id = ''                   ## 客户端订单ID
-        self.order_id = ''                    ## 柜台订单ID
-        self.ex_ord_id = ''                   ## 交易所订单ID
-
+        self.currency = ''                    ## 计价货币
         self.exchange = ''                    ## 交易所代码
-        self.sec_id = ''                      ## 证券ID
+        self.user_id = ''                     ## 交易所用户ID
 
+        self.order_id = ''                    ## 交易所订单ID
+        self.sec_id = ''                      ## 证券ID
         self.position_effect = 0              ## 开平标志
         self.side = 0                         ## 买卖方向
         self.order_type = 0                   ## 订单类型
@@ -209,7 +207,7 @@ class Order(object):
 
         self.margin_order_id = ''             ### 融资融券订单号
         self.margin_currency = ''             ### 融资融券品种
-        self.margin_amount = 0                 ### 融资融券金额
+        self.margin_vol = 0                   ### 融资融券金额
 
 
 class ExecRpt(object):
@@ -277,16 +275,17 @@ class Position(object):
     def __init__(self):
         self.strategy_id = ''           ## 策略ID
         self.account_id = ''            ## 账户id
+        self.currency = ''              ## 计价货币
         self.exchange = ''              ## 交易所代码
         self.sec_id = ''                ## 证券ID
-
         self.side = 0                   ## 买卖方向，side=1：持有该资产，side =-1：持有该资产的借贷
         self.volume = 0.0               ## 持仓量
         self.order_frozen = 0.0         ## 挂单冻结仓位
         self.available = 0.0            ## 可平仓位
-        self.loan = 0.0
+        self.loanvol = 0.0
         self.interest = 0.0
         self.loan_order_id = ''         # 仅对借贷资产有效，用于偿还借贷资产
+        self.update_time = ''           ## 持仓更新时间
 
 
 class Indicator(object):
@@ -296,13 +295,17 @@ class Indicator(object):
     def __init__(self):
         self.strategy_id = ''                       ## 策略ID
         self.account_id = ''                        ## 账号ID
+        self.currency = ''                          ## 账户计价货币
+
+        self.init = 0.0                             ## 账户初始资金
+        self.total_amt = 0.0                        ## 当前账户总金额
 
         self.nav = 0.0                              ## 净值(cum_inout + cum_pnl + fpnl - cum_commission)
         self.pnl = 0.0                              ## 净收益(nav-cum_inout)
         self.profit_ratio = 0.0                     ## 收益率(pnl/cum_inout)
         self.profit_ratio_bench = 0.0               ## 基准收益率
         self.sharp_ratio = 0.0                      ## 夏普比率
-        self.risk_ratio = 0.0                       ## 风险比率
+        self.risk_ratio = 0.0                       ## 风险比率，波动率
         self.trade_count = 0                        ## 交易次数
         self.win_count = 0                          ## 盈利次数
         self.lose_count = 0                         ## 亏损次数
@@ -318,6 +321,7 @@ class Indicator(object):
         self.max_drawdown = 0.0                     ## 最大回撤
         self.daily_pnl = 0.0                        ## 今日收益
         self.daily_return = 0.0                     ## 今日收益率
+        self.total_return = 0.0                     ## 累计收益率
         self.annual_return = 0.0                    ## 年化收益率
 
         self.cum_inout = 0.0                        ## 累计出入金
