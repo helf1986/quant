@@ -5,6 +5,8 @@ import time
 # MONGO_IP    = 'localhost'
 MONGO_IP    =  '47.75.172.148'
 MONGO_PORT  = '27017'
+MONGO_USER  = 'admin'
+MONGO_PWD   = 'test123'
 
 def connect_mongo(ip=None, port=None):
     '''
@@ -56,6 +58,7 @@ def order2db(order):
     try:
         client = connect_mongo()
         dbbtcaccount = client['dbbtcaccount']
+        dbbtcaccount.authenticate(MONGO_USER, MONGO_PWD)
         tbtradeorder = dbbtcaccount['tbtradeorder']
         tbtradeorder.insert_one(data)
         return True
@@ -91,12 +94,12 @@ def position2db(positions):
 
         data_list = data_list + [data]
 
-    # 把持仓数据写入数据库
-    client = connect_mongo()
-    dbaccount = client['dbbtcaccount']
-    tbposition = dbaccount['tbposition']
-
     try:
+        # 把持仓数据写入数据库
+        client = connect_mongo()
+        dbaccount = client['dbbtcaccount']
+        dbaccount.authenticate(MONGO_USER, MONGO_PWD)
+        tbposition = dbaccount['tbposition']
         tbposition.insert_many(data_list)
         return True
     except Exception as e:
