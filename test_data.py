@@ -8,7 +8,7 @@ coin_db = client['bc_bourse_huobipro']
 coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
 collection = coin_db['b_bch_kline']
 
-data = collection.find({'per': "3", "ts": {"$gt": "2018-05-01 19:50:00"}})
+data = collection.find({'per': "3", "ts": {"$gt": "2017-05-01 19:50:00"}})
 
 hist_data = {}
 for each in data:
