@@ -9,6 +9,7 @@ from twisted.internet import reactor, ssl
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.internet.error import ReactorAlreadyRunning
 
+from common.BinanceClient import BinanceClient
 
 SYMBOL_TYPE_SPOT = 'SPOT'
 
@@ -272,7 +273,7 @@ class BinanceSocketManager(threading.Thread):
             socket_name = '{}{}'.format(socket_name, depth)
         return self._start_socket(socket_name, callback)
 
-    def start_kline_socket(self, symbol, callback, interval=Client.KLINE_INTERVAL_1MINUTE):
+    def start_kline_socket(self, symbol, callback, interval=BinanceClient.KLINE_INTERVAL_1MINUTE):
         """Start a websocket for symbol kline data
 
         https://github.com/binance-exchange/binance-official-api-docs/blob/master/web-socket-streams.md#klinecandlestick-streams
