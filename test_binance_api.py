@@ -20,7 +20,7 @@ order = Mybnb.create_order(
     quantity=100)
 
 
-myaccount = Mybnb.get_account('')
+myaccount = Mybnb.get_account()
 
 print (myaccount)
 
@@ -68,7 +68,7 @@ def process_message(msg):
     print(msg)
     # do something
 
-from common.BinanceUtils import BinanceSocketManager
+from common.BinanceWebSockets import BinanceSocketManager
 bm = BinanceSocketManager(Mybnb)
 bm.start_aggtrade_socket(symbol='BNBBTC')
 bm.start()
