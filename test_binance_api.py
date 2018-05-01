@@ -9,27 +9,32 @@ from api import logger
 BNB_API_KEY = 'ayeGIEt9ojK3qhWcYNWrm4QZnDPzDqOdRObg4FaBSMrupw7X6j8e2nwS9x62gbJZ'
 BNB_SECRET_KEY = 'mfz7XH3KpSg1q5Ag8aVJOP8Lh9vlFYEqURqfCH3NfRLuh3siTvv2yMkAyNQ9B4YA'
 
-Mybnb = BinanceClient(api_key= BNB_API_KEY, api_secret= BNB_SECRET_KEY)
+mybnb = BinanceClient(api_key= BNB_API_KEY, api_secret= BNB_SECRET_KEY)
 
-depth = Mybnb.get_order_book(symbol='BNBBTC')
+print(mybnb.API_KEY)
 
-order = Mybnb.create_order(
+depth = mybnb.get_order_book(symbol='BNBBTC')
+print(depth)
+
+'''
+
+order = mybnb.create_order(
     symbol='BNBBTC',
     side=BinanceClient.SIDE_BUY,
     type=BinanceClient.ORDER_TYPE_MARKET,
     quantity=100)
 
 
-myaccount = Mybnb.get_account()
+myaccount = mybnb.get_account()
 
 print (myaccount)
 
 
 # get market depth
-depth = Mybnb.get_order_book(symbol='BNBBTC')
+depth = mybnb.get_order_book(symbol='BNBBTC')
 
 # place market buy order
-order = Mybnb.create_order(
+order = mybnb.create_order(
     symbol='BNBBTC',
     side=BinanceClient.SIDE_BUY,
     type=BinanceClient.ORDER_TYPE_MARKET,
@@ -42,7 +47,7 @@ prices = BinanceClient.get_all_tickers()
 # check docs for assumptions around withdrawals
 from common.BinanceUtils import BinanceAPIException, BinanceWithdrawException
 try:
-    result = Mybnb.withdraw(
+    result = mybnb.withdraw(
         asset='ETH',
         address='<eth_address>',
         amount=100)
@@ -54,13 +59,13 @@ else:
     print("Success")
 
 # fetch list of withdrawals
-withdraws = Mybnb.get_withdraw_history()
+withdraws = mybnb.get_withdraw_history()
 
 # fetch list of ETH withdrawals
-eth_withdraws = Mybnb.get_withdraw_history('ETH')
+eth_withdraws = mybnb.get_withdraw_history('ETH')
 
 # get a deposit address
-address = Mybnb.get_deposit_address('BTC')
+address = mybnb.get_deposit_address('BTC')
 
 # start trade websocket
 def process_message(msg):
@@ -69,6 +74,8 @@ def process_message(msg):
     # do something
 
 from common.BinanceClient import BinanceSocketManager
-bm = BinanceSocketManager(Mybnb)
+bm = BinanceSocketManager(mybnb)
 bm.start_aggtrade_socket(symbol='BNBBTC')
 bm.start()
+
+'''
