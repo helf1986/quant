@@ -4,7 +4,7 @@ import time
 
 # MONGO_IP    = 'localhost'
 MONGO_IP    =  '47.75.172.148'
-MONGO_PORT  = '27017'
+MONGO_PORT  = 27017
 MONGO_USER  = 'admin'
 MONGO_PWD   = 'test123'
 
@@ -58,7 +58,7 @@ def order2db(order):
     try:
         client = connect_mongo()
         dbbtcaccount = client['dbbtcaccount']
-        dbbtcaccount.authenticate(MONGO_USER, MONGO_PWD)
+        # dbbtcaccount.authenticate(MONGO_USER, MONGO_PWD)
         tbtradeorder = dbbtcaccount['tbtradeorder']
         tbtradeorder.insert_one(data)
         return True
@@ -98,7 +98,7 @@ def position2db(positions):
         # 把持仓数据写入数据库
         client = connect_mongo()
         dbaccount = client['dbbtcaccount']
-        dbaccount.authenticate(MONGO_USER, MONGO_PWD)
+        # dbaccount.authenticate(MONGO_USER, MONGO_PWD)
         tbposition = dbaccount['tbposition']
         tbposition.insert_many(data_list)
         return True
@@ -131,7 +131,17 @@ def perform2db(indicator):
     data['sharpe'] = indicator.sharp_ratio
     data['retvsdd'] = indicator.annual_return/indicator.max_drawdown
 
-    client = connect_mongo()
+    try:
+        # 把持仓数据写入数据库
+        client = connect_mongo()
+        dbaccount = client['dbbtcaccount']
+        # dbaccount.authenticate(MONGO_USER, MONGO_PWD)
+        tbposition = dbaccount['tbperform']
+        tbposition.insert_one(data)
+        return True
+    except Exception as e:
+        logger.warn('业绩数据插入数据库失败！')
+        return False
 
 
 def syslog2db(syslog):
@@ -156,7 +166,7 @@ def syslog2db(syslog):
         return True
 
     except Exception as e:
-        logger.warn('交易数据插入数据库失败！')
+        logger.warn('系统日志插入数据库失败！')
         return False
 
 
@@ -182,7 +192,7 @@ def tradelog2db(tradelog):
         return True
 
     except Exception as e:
-        logger.warn('交易数据插入数据库失败！')
+        logger.warn('交易日志插入数据库失败！')
         return False
 
 

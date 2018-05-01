@@ -4,7 +4,7 @@ import pandas as pd
 import time
 
 import matplotlib.pyplot as plt
-import common.Utils as ut
+import common.HuobiUtils as ut
 
 
 if __name__ == "__main__":
