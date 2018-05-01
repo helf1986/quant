@@ -11,10 +11,16 @@ BNB_SECRET_KEY = 'mfz7XH3KpSg1q5Ag8aVJOP8Lh9vlFYEqURqfCH3NfRLuh3siTvv2yMkAyNQ9B4
 
 mybnb = BinanceClient(api_key= BNB_API_KEY, api_secret= BNB_SECRET_KEY)
 
-print(mybnb.API_KEY)
+# print(mybnb.API_KEY)
 
+'''
 depth = mybnb.get_order_book(symbol='BNBBTC')
 print(depth)
+'''
+
+myaccount = mybnb.get_account()
+print (myaccount)
+
 
 '''
 
@@ -23,11 +29,6 @@ order = mybnb.create_order(
     side=BinanceClient.SIDE_BUY,
     type=BinanceClient.ORDER_TYPE_MARKET,
     quantity=100)
-
-
-myaccount = mybnb.get_account()
-
-print (myaccount)
 
 
 # get market depth

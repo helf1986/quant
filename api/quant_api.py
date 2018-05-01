@@ -9,6 +9,7 @@ import datetime
 
 from pymongo import MongoClient
 import common.HuobiServices as hb
+import common.BinanceClient as bnb
 from api import logger
 
 
@@ -768,7 +769,22 @@ def get_bars_local(exchange='huobipro', symbol_list='btcusdt', bar_type='1min', 
     return bars
 
 
+def get_depth(exchange='huobipro', symbol='btcusdt', type='step1'):
+    '''
+    获取盘口深度数据
+    :param exchange:
+    :param symbol:
+    :param type:
+    :return:
+    '''
+    if exchange == 'huobipro':
+        depth_res = hb.get_depth(symbol=symbol, type='step5')
 
+    elif exchange == 'binance':
+        cilent = bnb.BinanceClient()
+        depth_res = cilent.get_order_book(symbol=symbol)
+
+    return depth_res
 
 def open_long(exchange='huobipro', source='api', sec_id='btcusdt', price=0, volume=0):
     '''
