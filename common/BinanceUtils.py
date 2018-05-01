@@ -4,14 +4,10 @@
 import json
 import threading
 
-from autobahn.twisted.websocket import WebSocketClientFactory, \
-    WebSocketClientProtocol, \
-    connectWS
+from autobahn.twisted.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 from twisted.internet import reactor, ssl
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.internet.error import ReactorAlreadyRunning
-
-from .BinanceClient import BinanceClient
 
 
 SYMBOL_TYPE_SPOT = 'SPOT'
