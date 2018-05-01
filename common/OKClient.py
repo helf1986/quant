@@ -3,8 +3,8 @@
 # encoding: utf-8
 #客户端调用，用于查看API返回结果
 
-from OkcoinSpotAPI import OKCoinSpot
-from OkcoinFutureAPI import OKCoinFuture
+from .OkcoinSpotAPI import OKCoinSpot
+from .OkcoinFutureAPI import OKCoinFuture
 
 #初始化apikey，secretkey,url
 apikey = 'XXXX'
