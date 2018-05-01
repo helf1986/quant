@@ -68,7 +68,7 @@ def process_message(msg):
     print(msg)
     # do something
 
-from common.BinanceWebSockets import BinanceSocketManager
+from common.BinanceClient import BinanceSocketManager
 bm = BinanceSocketManager(Mybnb)
 bm.start_aggtrade_socket(symbol='BNBBTC')
 bm.start()
