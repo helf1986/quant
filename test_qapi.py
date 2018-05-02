@@ -1,5 +1,5 @@
 import api.quant_api as qapi
-import common.HuobiServices as hb
+import common.HuobiClient as hb
 import pandas as pd
 import time
 

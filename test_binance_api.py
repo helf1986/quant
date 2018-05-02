@@ -16,13 +16,16 @@ mybnb = BinanceClient(api_key= BNB_API_KEY, api_secret= BNB_SECRET_KEY)
 '''
 depth = mybnb.get_order_book(symbol='BNBBTC')
 print(depth)
-'''
+
 
 myaccount = mybnb.get_account()
 print (myaccount)
-
-
 '''
+
+res = mybnb.get_klines(symbol='BTCUSDT', interval='1d', startTime=1507725176000, endTime=1512995576000)
+
+res = mybnb.get_ticker(symbol='BTCUSDT')
+
 
 order = mybnb.create_order(
     symbol='BNBBTC',
@@ -30,9 +33,8 @@ order = mybnb.create_order(
     type=BinanceClient.ORDER_TYPE_MARKET,
     quantity=100)
 
+'''
 
-# get market depth
-depth = mybnb.get_order_book(symbol='BNBBTC')
 
 # place market buy order
 order = mybnb.create_order(

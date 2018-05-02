@@ -6,7 +6,6 @@ import hmac
 import requests
 import six
 import time
-from common.BinanceUtils import BinanceAPIException, BinanceRequestException, BinanceWithdrawException
 
 from operator import itemgetter
 
@@ -24,59 +23,76 @@ elif six.PY3:
     from urllib.parse import urlencode
 
 
+import json
+import threading
+
+from autobahn.twisted.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
+from twisted.internet import reactor, ssl
+from twisted.internet.protocol import ReconnectingClientFactory
+from twisted.internet.error import ReactorAlreadyRunning
+
+API_URL = 'https://api.binance.com/api'
+WITHDRAW_API_URL = 'https://api.binance.com/wapi'
+WEBSITE_URL = 'https://www.binance.com'
+STREAM_URL = 'wss://stream.binance.com:9443/'
+
+PUBLIC_API_VERSION = 'v1'
+PRIVATE_API_VERSION = 'v3'
+WITHDRAW_API_VERSION = 'v3'
+
+SYMBOL_TYPE_SPOT = 'SPOT'
+
+ORDER_STATUS_NEW = 'NEW'
+ORDER_STATUS_PARTIALLY_FILLED = 'PARTIALLY_FILLED'
+ORDER_STATUS_FILLED = 'FILLED'
+ORDER_STATUS_CANCELED = 'CANCELED'
+ORDER_STATUS_PENDING_CANCEL = 'PENDING_CANCEL'
+ORDER_STATUS_REJECTED = 'REJECTED'
+ORDER_STATUS_EXPIRED = 'EXPIRED'
+
+KLINE_INTERVAL_1MINUTE = '1m'
+KLINE_INTERVAL_3MINUTE = '3m'
+KLINE_INTERVAL_5MINUTE = '5m'
+KLINE_INTERVAL_15MINUTE = '15m'
+KLINE_INTERVAL_30MINUTE = '30m'
+KLINE_INTERVAL_1HOUR = '1h'
+KLINE_INTERVAL_2HOUR = '2h'
+KLINE_INTERVAL_4HOUR = '4h'
+KLINE_INTERVAL_6HOUR = '6h'
+KLINE_INTERVAL_8HOUR = '8h'
+KLINE_INTERVAL_12HOUR = '12h'
+KLINE_INTERVAL_1DAY = '1d'
+KLINE_INTERVAL_3DAY = '3d'
+KLINE_INTERVAL_1WEEK = '1w'
+KLINE_INTERVAL_1MONTH = '1M'
+
+SIDE_BUY = 'BUY'
+SIDE_SELL = 'SELL'
+
+ORDER_TYPE_LIMIT = 'LIMIT'
+ORDER_TYPE_MARKET = 'MARKET'
+ORDER_TYPE_STOP_LOSS = 'STOP_LOSS'
+ORDER_TYPE_STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT'
+ORDER_TYPE_TAKE_PROFIT = 'TAKE_PROFIT'
+ORDER_TYPE_TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT'
+ORDER_TYPE_LIMIT_MAKER = 'LIMIT_MAKER'
+
+TIME_IN_FORCE_GTC = 'GTC'  # Good till cancelled
+TIME_IN_FORCE_IOC = 'IOC'  # Immediate or cancel
+TIME_IN_FORCE_FOK = 'FOK'  # Fill or kill
+
+ORDER_RESP_TYPE_ACK = 'ACK'
+ORDER_RESP_TYPE_RESULT = 'RESULT'
+ORDER_RESP_TYPE_FULL = 'FULL'
+
+WEBSOCKET_DEPTH_1 = '1'
+WEBSOCKET_DEPTH_5 = '5'
+WEBSOCKET_DEPTH_10 = '10'
+WEBSOCKET_DEPTH_20 = '20'
+
+
 class BinanceClient(object):
 
-    API_URL = 'https://api.binance.com/api'
-    WITHDRAW_API_URL = 'https://api.binance.com/wapi'
-    WEBSITE_URL = 'https://www.binance.com'
-    PUBLIC_API_VERSION = 'v1'
-    PRIVATE_API_VERSION = 'v3'
-    WITHDRAW_API_VERSION = 'v3'
-
-    SYMBOL_TYPE_SPOT = 'SPOT'
-
-    ORDER_STATUS_NEW = 'NEW'
-    ORDER_STATUS_PARTIALLY_FILLED = 'PARTIALLY_FILLED'
-    ORDER_STATUS_FILLED = 'FILLED'
-    ORDER_STATUS_CANCELED = 'CANCELED'
-    ORDER_STATUS_PENDING_CANCEL = 'PENDING_CANCEL'
-    ORDER_STATUS_REJECTED = 'REJECTED'
-    ORDER_STATUS_EXPIRED = 'EXPIRED'
-
-    KLINE_INTERVAL_1MINUTE = '1m'
-    KLINE_INTERVAL_3MINUTE = '3m'
-    KLINE_INTERVAL_5MINUTE = '5m'
-    KLINE_INTERVAL_15MINUTE = '15m'
-    KLINE_INTERVAL_30MINUTE = '30m'
-    KLINE_INTERVAL_1HOUR = '1h'
-    KLINE_INTERVAL_2HOUR = '2h'
-    KLINE_INTERVAL_4HOUR = '4h'
-    KLINE_INTERVAL_6HOUR = '6h'
-    KLINE_INTERVAL_8HOUR = '8h'
-    KLINE_INTERVAL_12HOUR = '12h'
-    KLINE_INTERVAL_1DAY = '1d'
-    KLINE_INTERVAL_3DAY = '3d'
-    KLINE_INTERVAL_1WEEK = '1w'
-    KLINE_INTERVAL_1MONTH = '1M'
-
-    SIDE_BUY = 'BUY'
-    SIDE_SELL = 'SELL'
-
-    ORDER_TYPE_LIMIT = 'LIMIT'
-    ORDER_TYPE_MARKET = 'MARKET'
-    ORDER_TYPE_STOP_LOSS = 'STOP_LOSS'
-    ORDER_TYPE_STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT'
-    ORDER_TYPE_TAKE_PROFIT = 'TAKE_PROFIT'
-    ORDER_TYPE_TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT'
-    ORDER_TYPE_LIMIT_MAKER = 'LIMIT_MAKER'
-
-    TIME_IN_FORCE_GTC = 'GTC'  # Good till cancelled
-    TIME_IN_FORCE_IOC = 'IOC'  # Immediate or cancel
-    TIME_IN_FORCE_FOK = 'FOK'  # Fill or kill
-
-    ORDER_RESP_TYPE_ACK = 'ACK'
-    ORDER_RESP_TYPE_RESULT = 'RESULT'
-    ORDER_RESP_TYPE_FULL = 'FULL'
 
     def __init__(self, api_key, api_secret):
         """Binance API Client constructor
@@ -104,14 +120,14 @@ class BinanceClient(object):
         return session
 
     def _create_api_uri(self, path, signed=True, version=PUBLIC_API_VERSION):
-        v = self.PRIVATE_API_VERSION if signed else version
-        return self.API_URL + '/' + v + '/' + path
+        v = PRIVATE_API_VERSION if signed else version
+        return API_URL + '/' + v + '/' + path
 
     def _create_withdraw_api_uri(self, path):
-        return self.WITHDRAW_API_URL + '/' + self.WITHDRAW_API_VERSION + '/' + path
+        return WITHDRAW_API_URL + '/' + WITHDRAW_API_VERSION + '/' + path
 
     def _create_website_uri(self, path):
-        return self.WEBSITE_URL + '/' + path
+        return WEBSITE_URL + '/' + path
 
     def _generate_signature(self, data):
 
@@ -693,7 +709,7 @@ class BinanceClient(object):
         :raises: BinanceResponseException, BinanceAPIException
 
         """
-        return self._get('ticker/price', data=params, version=self.PRIVATE_API_VERSION)
+        return self._get('ticker/price', data=params, version=PRIVATE_API_VERSION)
 
     def get_orderbook_ticker(self, **params):
         """Latest price for a symbol or symbols.
@@ -739,7 +755,7 @@ class BinanceClient(object):
         :raises: BinanceResponseException, BinanceAPIException
 
         """
-        return self._get('ticker/bookTicker', data=params, version=self.PRIVATE_API_VERSION)
+        return self._get('ticker/bookTicker', data=params, version=PRIVATE_API_VERSION)
 
     # Account Endpoints
 
@@ -885,10 +901,11 @@ class BinanceClient(object):
 
         """
         params.update({
-            'type': self.ORDER_TYPE_LIMIT,
+            'type': ORDER_TYPE_LIMIT,
             'timeInForce': timeInForce
         })
         return self.create_order(**params)
+
 
     def order_limit_buy(self, timeInForce=TIME_IN_FORCE_GTC, **params):
         """Send in a new limit buy order
@@ -920,9 +937,10 @@ class BinanceClient(object):
 
         """
         params.update({
-            'side': self.SIDE_BUY,
+            'side': SIDE_BUY,
         })
         return self.order_limit(timeInForce=timeInForce, **params)
+
 
     def order_limit_sell(self, timeInForce=TIME_IN_FORCE_GTC, **params):
         """Send in a new limit sell order
@@ -950,9 +968,10 @@ class BinanceClient(object):
 
         """
         params.update({
-            'side': self.SIDE_SELL
+            'side': SIDE_SELL
         })
         return self.order_limit(timeInForce=timeInForce, **params)
+
 
     def order_market(self, **params):
         """Send in a new market order
@@ -976,9 +995,10 @@ class BinanceClient(object):
 
         """
         params.update({
-            'type': self.ORDER_TYPE_MARKET
+            'type': ORDER_TYPE_MARKET
         })
         return self.create_order(**params)
+
 
     def order_market_buy(self, **params):
         """Send in a new market buy order
@@ -1000,9 +1020,10 @@ class BinanceClient(object):
 
         """
         params.update({
-            'side': self.SIDE_BUY
+            'side': SIDE_BUY
         })
         return self.order_market(**params)
+
 
     def order_market_sell(self, **params):
         """Send in a new market sell order
@@ -1024,9 +1045,10 @@ class BinanceClient(object):
 
         """
         params.update({
-            'side': self.SIDE_SELL
+            'side': SIDE_SELL
         })
         return self.order_market(**params)
+
 
     def create_test_order(self, **params):
         """Test new order creation and signature/recvWindow long. Creates and validates a new order but does not send it into the matching engine.
@@ -1066,6 +1088,7 @@ class BinanceClient(object):
         """
         return self._post('order/test', True, data=params)
 
+
     def get_order(self, **params):
         """Check an order's status. Either orderId or origClientOrderId must be sent.
 
@@ -1104,6 +1127,7 @@ class BinanceClient(object):
 
         """
         return self._get('order', True, data=params)
+
 
     def get_all_orders(self, **params):
         """Get all account orders; active, canceled, or filled.
@@ -1145,6 +1169,7 @@ class BinanceClient(object):
 
         """
         return self._get('allOrders', True, data=params)
+
 
     def cancel_order(self, **params):
         """Cancel an active order. Either orderId or origClientOrderId must be sent.
@@ -1217,7 +1242,7 @@ class BinanceClient(object):
 
     # User Stream Endpoints
     def get_account(self, **params):
-        """Get current account information.
+        """Get current account information. 账户持仓情况
 
         https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md#account-information-user_data
 
@@ -1729,13 +1754,6 @@ class BinanceClientFactory(WebSocketClientFactory, BinanceReconnectingClientFact
 
 class BinanceSocketManager(threading.Thread):
 
-    STREAM_URL = 'wss://stream.binance.com:9443/'
-
-    WEBSOCKET_DEPTH_1 = '1'
-    WEBSOCKET_DEPTH_5 = '5'
-    WEBSOCKET_DEPTH_10 = '10'
-    WEBSOCKET_DEPTH_20 = '20'
-
     _user_timeout = 30 * 60  # 30 minutes
 
     def __init__(self, client):
@@ -1756,7 +1774,7 @@ class BinanceSocketManager(threading.Thread):
         if path in self._conns:
             return False
 
-        factory_url = self.STREAM_URL + prefix + path
+        factory_url = STREAM_URL + prefix + path
         factory = BinanceClientFactory(factory_url)
         factory.protocol = BinanceClientProtocol
         factory.callback = callback
@@ -1815,7 +1833,7 @@ class BinanceSocketManager(threading.Thread):
             }
         """
         socket_name = symbol.lower() + '@depth'
-        if depth != self.WEBSOCKET_DEPTH_1:
+        if depth != WEBSOCKET_DEPTH_1:
             socket_name = '{}{}'.format(socket_name, depth)
         return self._start_socket(socket_name, callback)
 
@@ -2126,3 +2144,83 @@ class BinanceSocketManager(threading.Thread):
             self.stop_socket(key)
 
         self._conns = {}
+
+
+
+class BinanceAPIException(Exception):
+
+    LISTENKEY_NOT_EXIST = '-1125'
+
+    def __init__(self, response):
+        json_res = response.json()
+        self.status_code = response.status_code
+        self.response = response
+        self.code = json_res['code']
+        self.message = json_res['msg']
+        self.request = getattr(response, 'request', None)
+
+    def __str__(self):  # pragma: no cover
+        return 'APIError(code=%s): %s' % (self.code, self.message)
+
+
+class BinanceRequestException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return 'BinanceRequestException: %s' % self.message
+
+
+class BinanceOrderException(Exception):
+
+    def __init__(self, code, message):
+        self.code = code
+        self.message = message
+
+    def __str__(self):
+        return 'BinanceOrderException(code=%s): %s' % (self.code, self.message)
+
+
+class BinanceOrderMinAmountException(BinanceOrderException):
+
+    def __init__(self, value):
+        message = "Amount must be a multiple of %s" % value
+        super(BinanceOrderMinAmountException, self).__init__(-1013, message)
+
+
+class BinanceOrderMinPriceException(BinanceOrderException):
+
+    def __init__(self, value):
+        message = "Price must be at least %s" % value
+        super(BinanceOrderMinPriceException, self).__init__(-1013, message)
+
+
+class BinanceOrderMinTotalException(BinanceOrderException):
+
+    def __init__(self, value):
+        message = "Total must be at least %s" % value
+        super(BinanceOrderMinTotalException, self).__init__(-1013, message)
+
+
+class BinanceOrderUnknownSymbolException(BinanceOrderException):
+
+    def __init__(self, value):
+        message = "Unknown symbol %s" % value
+        super(BinanceOrderUnknownSymbolException, self).__init__(-1013, message)
+
+
+class BinanceOrderInactiveSymbolException(BinanceOrderException):
+
+    def __init__(self, value):
+        message = "Attempting to trade an inactive symbol %s" % value
+        super(BinanceOrderInactiveSymbolException, self).__init__(-1013, message)
+
+
+class BinanceWithdrawException(Exception):
+    def __init__(self, message):
+        if message == u'参数异常':
+            message = 'Withdraw to this address through the website first'
+        self.message = message
+
+    def __str__(self):
+        return 'BinanceWithdrawException: %s' % self.message
