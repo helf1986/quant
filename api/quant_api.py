@@ -13,17 +13,6 @@ import common.BinanceClient as bnb
 from api import logger
 
 
-class BrokerAccount(object):
-    '''
-    柜台账户
-    '''
-    def __init__(self):
-        self.account_id = ''                         # 柜台账号ID
-        self.username = ''                           # 柜台账号
-        self.permissible = 0                         # 允许交易
-        self.status = 0                              # 账号当前状态
-
-
 class ExSymbol(object):
     '''
     交易所数字货币符号
