@@ -242,6 +242,7 @@ class TradeAccount(object):
         bars = []
         if self.exchange == 'hbp':
             for each in symbol_list:
+                each = each.upper()     # 币安只支持大写字母
                 bar_res = self.client.get_kline(symbol=each, period=bar_type, size=1)
                 if bar_res['status'] == 'ok':
                     data = bar_res['data'][0]
@@ -811,6 +812,27 @@ class TradeAccount(object):
             pass
 
 
+    def get_margin_volume(self, margin_order_id='', symbol='', currency=''):
+        '''
+        查询指定订单里未偿还的金额
+        :param margin_order_id:
+        :param symbol:
+        :param currency:
+        :return:
+        '''
+
+        start = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        margin_orders = self.get_margin_orders(symbol=symbol, currency=currency, start="", direct="prev", size=100)
+        if margin_order_id in margin_orders.index:
+            myorder = margin_orders.loc[margin_order_id]
+            unpaid_volume = myorder['loan-balance'] + myorder['interest-balance']
+        else:
+            logger.warn('Margin order ID %d is not found!' % margin_order_id)
+            unpaid_volume = 0
+
+        return unpaid_volume
+
+
     def get_accounts(self):
         '''
         获取账户基本信息
@@ -833,7 +855,7 @@ class TradeAccount(object):
 
     def get_position(self, sec_id='btcusdt', side=0):
 
-        return get_position(exchange=self.exchange, sec_id=sec_id, side=side)
+        pass
 
 
     def get_positions(self, source='api'):

@@ -12,7 +12,7 @@ bars_df = to_dataframe(bars)
 
 # 创建币安交易账户
 bnbaccount = TradeAccount(exchange='bnb', api_key=BNB_ACCESS_KEY, api_secret=BNB_SECRET_KEY, currency='USDT')
-bars = bnbaccount.get_last_bars(symbol_list='btcusdt, ethusdt', bar_type='5min')
+bars = bnbaccount.get_last_bars(symbol_list='BTCUSDT', bar_type='5min')
 # 通过账户访问行情数据
 bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
