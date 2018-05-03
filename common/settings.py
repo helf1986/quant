@@ -7,3 +7,10 @@ HBP_SECRET_KEY = "5f0ea6d5-a4ff1afc-9c04e15a-9e3ba"
 # 币安API_KEY
 BNB_ACCESS_KEY = "ayeGIEt9ojK3qhWcYNWrm4QZnDPzDqOdRObg4FaBSMrupw7X6j8e2nwS9x62gbJZ"
 BNB_SECRET_KEY = "mfz7XH3KpSg1q5Ag8aVJOP8Lh9vlFYEqURqfCH3NfRLuh3siTvv2yMkAyNQ9B4YA"
+
+
+# MONGO_IP    = 'localhost'
+MONGO_IP    =  '47.75.172.148'
+MONGO_PORT  = 27017
+MONGO_USER  = 'admin'
+MONGO_PWD   = 'test123'

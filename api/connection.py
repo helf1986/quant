@@ -1,12 +1,7 @@
 from pymongo import MongoClient
 from api.quant_api import *
 import time
-
-# MONGO_IP    = 'localhost'
-MONGO_IP    =  '47.75.172.148'
-MONGO_PORT  = 27017
-MONGO_USER  = 'admin'
-MONGO_PWD   = 'test123'
+from common.settings import MONGO_IP, MONGO_PORT, MONGO_PWD, MONGO_USER
 
 def connect_mongo(ip=None, port=None):
     '''
