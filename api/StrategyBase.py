@@ -14,6 +14,7 @@ import os
 from queue import Queue, Empty
 import threading
 
+
 #-----交易的基类---------
 class Strategy(object):
     def __init__(self,module='usdt',api=qapi,exchange='huobipro',symbol_list='btcusdt',bar_type='1min' ):

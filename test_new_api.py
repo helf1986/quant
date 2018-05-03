@@ -1,23 +1,19 @@
 
+# 从api接口导入TradeAccount 交易类
 from api.quant_api import TradeAccount, to_dataframe, to_dict
+from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
 
-# 此处填写APIKEY
-
-HBP_ACCESS_KEY = "a4594cdd-75b0037b-003d37ea-528bd"
-HBP_SECRET_KEY = "5f0ea6d5-a4ff1afc-9c04e15a-9e3ba"
-
-BNB_ACCESS_KEY = "ayeGIEt9ojK3qhWcYNWrm4QZnDPzDqOdRObg4FaBSMrupw7X6j8e2nwS9x62gbJZ"
-BNB_SECRET_KEY = "mfz7XH3KpSg1q5Ag8aVJOP8Lh9vlFYEqURqfCH3NfRLuh3siTvv2yMkAyNQ9B4YA"
-
+# 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
-
+# 通过账户访问行情数据
 bars = hbaccount.get_last_bars(symbol_list='btcusdt, ethusdt', bar_type='5min')
 bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
 
+# 创建币安交易账户
 bnbaccount = TradeAccount(exchange='bnb', api_key=BNB_ACCESS_KEY, api_secret=BNB_SECRET_KEY, currency='USDT')
-
-bars = bnbaccount.get_last_bars(symbol_list='BTCUSDT', bar_type='5min')
+bars = bnbaccount.get_last_bars(symbol_list='btcusdt, ethusdt', bar_type='5min')
+# 通过账户访问行情数据
 bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
 
