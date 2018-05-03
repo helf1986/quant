@@ -292,7 +292,7 @@ class TradeAccount(object):
                 startTime = endTime - 7*24 * 60 * 60
 
             for each_sec in symbol_list:
-                res = self.client.get_klines(symbol=each_sec, interval=interval, startTime=startTime, endTime=endTime)
+                res = self.client.get_klines(symbol=each_sec, interval=interval, startTime=int(startTime*1000), endTime=int(endTime*1000))
                 for each_bar in res:
                     bar = Bar()
                     bar.exchange = self.exchange
