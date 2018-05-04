@@ -997,7 +997,8 @@ class Order(object):
         self.exchange = ''                    ## 交易所代码
         self.user_id = ''                     ## 交易所用户ID
 
-        self.order_id = ''                    ## 交易所订单ID
+        self.order_id = ''                    ## 策略订单ID
+        self.ex_ord_id = ''                   ## 交易所订单ID
         self.sec_id = ''                      ## 证券ID
         self.position_effect = 0              ## 开平标志
         self.side = 0                         ## 买卖方向
