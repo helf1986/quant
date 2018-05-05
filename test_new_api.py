@@ -15,8 +15,9 @@ import common.HuobiClient as hb
 api_key = HBP_ACCESS_KEY
 api_secret = HBP_SECRET_KEY
 client = hb.HuobiClient(api_key, api_secret)
-res = client.get_kline(symbol='btcusdt', period='1min', size=20)
+res = client.get_kline(symbol='btcusdt', period='1min', size=2)
 
+res = client.get_kline(symbol='BTCUSDT', period='1min', size=2)
 
 # 创建币安交易账户
 bnbaccount = TradeAccount(exchange='bnb', api_key=BNB_ACCESS_KEY, api_secret=BNB_SECRET_KEY, currency='USDT')

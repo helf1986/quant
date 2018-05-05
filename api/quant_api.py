@@ -46,7 +46,7 @@ class TradeAccount(object):
         self.exchange = exchange
         self.api_key = api_key
         self.api_secret = api_secret
-        self.currency = currency
+        self.currency = currency.upper()
 
         if self.exchange == 'hbp':
             self.client = hb.HuobiClient(self.api_key, self.api_secret)
@@ -104,7 +104,7 @@ class TradeAccount(object):
 
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
-
+                each_sec = each_sec.lower()         # 注意火币只支持小写字母
                 size = 2000
                 if begin_time != '':
                     size = 2000
@@ -151,6 +151,7 @@ class TradeAccount(object):
             endTime = time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S'))
 
             for each_sec in symbol_list:
+                each_sec = each_sec.upper()         # 币安支持大写字母
                 res = self.client.get_klines(symbol=each_sec, interval=interval, startTime=startTime, endTime=endTime)
                 for each_bar in res:
                     bar = Bar()
@@ -180,14 +181,15 @@ class TradeAccount(object):
         ticks = []
 
         if self.exchange == 'hbp':
-            for each in symbol_list:
-                tick_res = self.client.get_ticker(symbol=each)
+            for each_sec in symbol_list:
+                each_sec = each.lower()
+                tick_res = self.client.get_ticker(symbol=each_sec)
                 # depth_res = hb.get_depth(symbol=each, type='step5')
                 if tick_res['status'] == 'ok':
                     data = tick_res['tick']
                     tick = Tick()
                     tick.exchange = self.exchange
-                    tick.sec_id = each
+                    tick.sec_id = each_sec
                     tick.utc_time = tick_res['ts']
                     tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tick_res['ts'] / 1000))
                     tick.open = data['open']
@@ -207,6 +209,7 @@ class TradeAccount(object):
         elif self.exchange == 'bnb':
 
             for each_sec in symbol_list:
+                each_sec = each_sec.upper()
                 res = self.client.get_ticker(symbol=each_sec)
                 tick = Tick()
                 tick.exchange = self.exchange
@@ -241,14 +244,14 @@ class TradeAccount(object):
         symbol_list = symbol_list.replace(' ', '').split(',')
         bars = []
         if self.exchange == 'hbp':
-            for each in symbol_list:
-
-                bar_res = self.client.get_kline(symbol=each, period=bar_type, size=1)
+            for each_sec in symbol_list:
+                each_sec = each_sec.lower()
+                bar_res = self.client.get_kline(symbol=each_sec, period=bar_type, size=1)
                 if bar_res['status'] == 'ok':
                     data = bar_res['data'][0]
                     bar = Bar()
                     bar.exchange = self.exchange
-                    bar.sec_id = each
+                    bar.sec_id = each_sec
                     bar.bar_type = bar_type
                     bar.utc_time = data['id']
                     bar.strtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(data['id']))
@@ -300,7 +303,6 @@ class TradeAccount(object):
                     bar = Bar()
                     bar.exchange = self.exchange
                     bar.sec_id = each_sec
-
                     bar.utc_time = int(each_bar[0])
                     bar.strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bar.utc_time / 1000))
                     bar.open = each_bar[1]
@@ -327,9 +329,11 @@ class TradeAccount(object):
         :return:
         '''
         if self.exchange == 'hbp':
+            symbol = symbol.lower()
             depth_res = self.client.get_depth(symbol=symbol, type=type)
 
         elif self.exchange == 'binance':
+            symbol = symbol.upper()
             depth_res = self.cilent.get_order_book(symbol=symbol)
 
         return depth_res
@@ -357,6 +361,8 @@ class TradeAccount(object):
         myorder.side = 1  ## 买卖方向，1：多方向，2：空方向
 
         if self.exchange == 'hbp':  # 火币网接口
+
+            sec_id = sec_id.lower()
             if price == 0.0:
                 mtype = 'buy-market'
                 last_tick = self.get_last_ticks(symbol_list=sec_id)
@@ -408,7 +414,8 @@ class TradeAccount(object):
                             myorder.ord_rej_reason_detail))
 
         elif self.exchange == 'bnb':
-            client = bnb.BinanceClient
+
+            sec_id = sec_id.upper()
             if price == 0:
                 order_type = 'MARKET'
                 myorder.order_type = 'market'
@@ -416,7 +423,7 @@ class TradeAccount(object):
                 order_type = 'LIMIT'
                 myorder.order_type = 'limit'
 
-            order = client.create_order(symbol=sec_id,
+            order = self.client.create_order(symbol=sec_id,
                                         side='BUY',
                                         type=order_type,
                                         quantity=volume,
@@ -456,7 +463,7 @@ class TradeAccount(object):
         myorder.order_src = 0  ## 订单来源
 
         if self.exchange == 'hbp':  # 火币网接口
-
+            sec_id = sec_id.lower()
             if price == 0.0:
                 mtype = 'sell-market'
             else:
@@ -499,7 +506,8 @@ class TradeAccount(object):
                             myorder.ord_rej_reason_detail))
 
         elif self.exchange == 'bnb':
-            client = bnb.BinanceClient
+
+            sec_id = sec_id.upper()
             if price == 0:
                 order_type = 'MARKET'
                 myorder.order_type = 'market'
@@ -507,7 +515,12 @@ class TradeAccount(object):
                 order_type = 'LIMIT'
                 myorder.order_type = 'limit'
 
-            order = client.create_order(symbol=sec_id, type=order_type, quantity=volume, price=price)
+            if myorder.side == 1:
+                side = 'SIDE_BUY'
+            else:
+                side = 'SIDE_SELL'
+
+            order = self.client.create_order(symbol=sec_id, side=side, type=order_type, quantity=volume, price=price)
 
             myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order['transactTime'] / 1000))
             myorder.order_id = order['orderId']
@@ -536,6 +549,7 @@ class TradeAccount(object):
                 return None
 
         elif self.exchange == 'binance':
+            sec_id = sec_id.upper()
             res = self.client.cancel_order(symbol=sec_id, orderId=order_id)
             return res['orderId']
 
@@ -550,8 +564,12 @@ class TradeAccount(object):
         '''
 
         if self.exchange == 'hbp':
+            symbol = symbol.lower()
+            if currency == 'usdt':
+                amount = round(amount, 2)
+            elif currency == 'btc':
+                amount = round(amount, 3)
 
-            amount = round(amount, 3)
             res = self.client.get_margin(symbol=symbol, currency=currency, amount=amount)
             if res['status'] == 'ok':
                 margin_order_id = res['data']
@@ -625,7 +643,7 @@ class TradeAccount(object):
                 return None
 
         elif self.exchange == 'bnb':
-
+            sec_id = sec_id.upper()
             res = self.client.get_all_orders(symbol=sec_id, orderId=cl_ord_id)
             order_list = []
             for each in res:
@@ -668,7 +686,7 @@ class TradeAccount(object):
 
         order_list = []
         if self.exchange == 'huobipro':
-
+            sec_id = sec_id.lower()
             if states == 'all':
                 states = 'pre-submitted,submitted,partial-filled,partial-canceled,filled,canceled'
             if types == 'all':
@@ -705,6 +723,7 @@ class TradeAccount(object):
 
         elif self.exchange == 'bnb':
 
+            sec_id = sec_id.upper()
             if states == 'all':
                 states = ['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PENDING_CANCEL', 'REJECTED', 'EXPIRED']
             else:
@@ -754,6 +773,9 @@ class TradeAccount(object):
         :return:
         """
         if self.exchange == 'hbp':
+
+            symbol = symbol.lower()
+            currency = currency.lower()
             res = self.client.loan_orders(symbol=symbol, currency=currency, start_date=start_date, end_date=end_date,
                                  start=start, direct=direct, size=str(size))
             if res['status'] == 'ok':
@@ -792,6 +814,7 @@ class TradeAccount(object):
 
         # 借贷账户详情,支持查询单个币种
         if self.exchange == 'hbp':
+            symbol = symbol.lower()
             res = self.cleient.margin_balance(symbol=symbol)
             if res['status'] == 'ok':
                 balance = res['data']['list']
@@ -823,14 +846,22 @@ class TradeAccount(object):
         :return:
         '''
 
-        start = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-        margin_orders = self.get_margin_orders(symbol=symbol, currency=currency, start="", direct="prev", size=100)
-        if margin_order_id in margin_orders.index:
-            myorder = margin_orders.loc[margin_order_id]
-            unpaid_volume = myorder['loan-balance'] + myorder['interest-balance']
-        else:
-            logger.warn('Margin order ID %d is not found!' % margin_order_id)
-            unpaid_volume = 0
+        unpaid_volume = 0
+
+        if self.exchange == 'hbp':
+
+            symbol = symbol.lower()
+            currency = currency.lower()
+            start = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+            margin_orders = self.get_margin_orders(symbol=symbol, currency=currency, start=start, direct="prev", size=100)
+            if margin_order_id in margin_orders.index:
+                myorder = margin_orders.loc[margin_order_id]
+                unpaid_volume = myorder['loan-balance'] + myorder['interest-balance']
+            else:
+                logger.warn('Margin order ID %d is not found!' % margin_order_id)
+
+        elif self.exchange == 'bnb':
+            pass
 
         return unpaid_volume
 
@@ -856,8 +887,18 @@ class TradeAccount(object):
 
 
     def get_position(self, sec_id='btcusdt', side=0):
+        '''
 
-        pass
+        :param sec_id:
+        :param side:
+        :return:
+        '''
+        positions = self.get_positions()
+        position = Position()
+        if self.exchange == 'hbp':
+            sec_id = sec_id.lower()
+            
+
 
 
     def get_positions(self, source='api'):
@@ -952,14 +993,21 @@ class TradeAccount(object):
         return cash_position
 
 
-
 def to_dict(obj):
     '''
     把对象转换成字典
     :param obj:
     :return: keys 为对象的属性，values 为属性值
     '''
-    return obj.__dict__
+
+    if isinstance(obj, object):
+        return obj.__dict__
+
+    elif isinstance(obj, list):
+        obj_list = []
+        for each in obj:
+            obj_list = obj_list + [each.__dict__]
+        return obj_list
 
 
 def to_dataframe(obj_list):
