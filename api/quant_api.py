@@ -690,7 +690,7 @@ class TradeAccount(object):
             if states == 'all':
                 states = 'pre-submitted,submitted,partial-filled,partial-canceled,filled,canceled'
             if types == 'all':
-                types = 'buy-market,sell-market,buy-limit,sell-limit'
+                types = 'buy-maret,sell-market,buy-limit,sell-limit'
 
             start_date = time.strftime('%Y-%m-%d', time.strptime(begin_time, '%Y-%m-%d %H:%M:%S'))
             end_date = time.strftime('%Y-%m-%d', time.strptime(end_time, '%Y-%m-%d %H:%M:%S'))
@@ -908,7 +908,7 @@ class TradeAccount(object):
 
         positions = []
         if self.exchange == 'hbp':
-            accounts = self.client.get_accounts()
+            accounts = self.get_accounts()
 
             if source == 'spot':
                 # 获取普通账户资金情况

@@ -24,6 +24,7 @@ accounts
 account_id = accounts['margin']['id']
 balance = hbaccount.get_positions(source='margin')
 
+order = hbaccount.open_long(source='margin')
 
 ## 直接测试火币原始接口
 import common.HuobiClient as hb
@@ -35,6 +36,7 @@ res = client.get_kline(symbol='btcusdt', period='1min', size=2)
 res = client.get_kline(symbol='BTCUSDT', period='1min', size=2)
 
 res = client.get_symbols()
+res = client.get_accounts()
 
 # 创建币安交易账户
 bnbaccount = TradeAccount(exchange='bnb', api_key=BNB_ACCESS_KEY, api_secret=BNB_SECRET_KEY, currency='USDT')
