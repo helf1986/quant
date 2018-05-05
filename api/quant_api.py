@@ -908,7 +908,7 @@ class TradeAccount(object):
 
         positions = []
         if self.exchange == 'hbp':
-            accounts = self.get_accounts()
+            accounts = self.client.get_accounts()
 
             if source == 'spot':
                 # 获取普通账户资金情况
@@ -951,7 +951,6 @@ class TradeAccount(object):
                     positions = positions + [position]
             else:
                 logger.warn(res['err-code'] + ':' + res['err-msg'])
-
 
         elif self.exchange == 'bnb':
             

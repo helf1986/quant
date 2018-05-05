@@ -22,7 +22,7 @@ accounts = hbaccount.get_accounts()
 accounts
 
 account_id = accounts['margin']['id']
-balance = hbaccount.get_positions(source='margin-api')
+balance = hbaccount.get_positions(source='margin')
 
 
 ## 直接测试火币原始接口
