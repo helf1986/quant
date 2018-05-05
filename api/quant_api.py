@@ -899,10 +899,10 @@ class TradeAccount(object):
             sec_id = sec_id.lower()
 
 
-    def get_positions(self, source='api'):
+    def get_positions(self, source='spot'):
         '''
         获得所有账户持仓情况
-        :param exchange:
+        :param source: spot: 普通账户，marign：借贷账户
         :return:
         '''
 
@@ -910,16 +910,16 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             accounts = self.get_accounts()
 
-            if source == 'api':
+            if source == 'spot':
                 # 获取普通账户资金情况
                 account = accounts['spot']['id']
-            elif source == 'margin-api':
+            elif source == 'margin':
                 # 获取融资融券账户资金情况
                 account = accounts['margin']['id']
             else:
                 logger.error('No accounts found from %s!' % source)
 
-            res = hb.get_balance(acct_id=account)
+            res = self.client.get_balance(acct_id=account)
             if res['status'] == 'ok':
                 account_info = res['data']
                 account_id = account_info['id']
@@ -944,7 +944,7 @@ class TradeAccount(object):
                     position.available = float(balance_dict[each]['trade'])
                     position.order_frozen = float(balance_dict[each]['frozen'])
                     position.amount = position.available + position.order_frozen
-                    if source == 'margin-api':
+                    if source == 'margin':
                         position.loan = float(balance_dict[each]['loan'])
                         position.interest = float(balance_dict[each]['interest'])
 
@@ -954,16 +954,18 @@ class TradeAccount(object):
 
 
         elif self.exchange == 'bnb':
-            res = self.client.get_account()
-            balance = res['balance']
-            for each in balance:
-                if each['free'] > 0 or each['locked'] > 0:
-                    position = Position()
-                    position.exchange = self.exchange
-                    position.available = each['free']
-                    position.order_frozen = each['locked']
-                    position.volume = each['free'] + each['locked']
-                    positions = positions + [position]
+            
+            if source == 'spot':
+                res = self.client.get_account()
+                balance = res['balance']
+                for each in balance:
+                    if each['free'] > 0 or each['locked'] > 0:
+                        position = Position()
+                        position.exchange = self.exchange
+                        position.available = each['free']
+                        position.order_frozen = each['locked']
+                        position.volume = each['free'] + each['locked']
+                        positions = positions + [position]
 
         return positions
 

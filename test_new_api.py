@@ -14,13 +14,27 @@ ticks = hbaccount.get_last_ticks(symbol_list='btcusdt, ethusdt')
 ticks_dict = to_dict(ticks[0])
 ticks_df = to_dataframe(ticks)
 
+symbols = hbaccount.get_instruments()
+symbols_df = to_dataframe(symbols)
+symbols_df.to_csv('huobi_symbols.csv')
+
+accounts = hbaccount.get_accounts()
+accounts
+
+account_id = accounts['margin']['id']
+balance = hbaccount.get_positions(source='margin-api')
+
+
+## 直接测试火币原始接口
 import common.HuobiClient as hb
 api_key = HBP_ACCESS_KEY
 api_secret = HBP_SECRET_KEY
 client = hb.HuobiClient(api_key, api_secret)
 res = client.get_kline(symbol='btcusdt', period='1min', size=2)
-
+# 大写输入不行
 res = client.get_kline(symbol='BTCUSDT', period='1min', size=2)
+
+res = client.get_symbols()
 
 # 创建币安交易账户
 bnbaccount = TradeAccount(exchange='bnb', api_key=BNB_ACCESS_KEY, api_secret=BNB_SECRET_KEY, currency='USDT')
