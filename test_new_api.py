@@ -10,6 +10,14 @@ bars = hbaccount.get_last_bars(symbol_list='btcusdt, ethusdt', bar_type='1min')
 bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
 
+
+import common.HuobiClient as hb
+api_key = HBP_ACCESS_KEY
+api_secret = HBP_SECRET_KEY
+client = hb.HuobiClient(api_key, api_secret)
+res = client.get_kline(symbol='btcusdt', period='1min', size=20)
+
+
 # 创建币安交易账户
 bnbaccount = TradeAccount(exchange='bnb', api_key=BNB_ACCESS_KEY, api_secret=BNB_SECRET_KEY, currency='USDT')
 bars = bnbaccount.get_last_bars(symbol_list='BTCUSDT', bar_type='5min')

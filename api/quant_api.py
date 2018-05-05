@@ -242,7 +242,7 @@ class TradeAccount(object):
         bars = []
         if self.exchange == 'hbp':
             for each in symbol_list:
-                each = each.upper()     # 币安只支持大写字母
+
                 bar_res = self.client.get_kline(symbol=each, period=bar_type, size=1)
                 if bar_res['status'] == 'ok':
                     data = bar_res['data'][0]
@@ -265,6 +265,7 @@ class TradeAccount(object):
                     bars = bars + [bar]
                 else:
                     logger.warn('No bar data fetched!')
+
         elif self.exchange == 'bnb':
 
             endTime = time.mktime(time.localtime())
@@ -293,6 +294,7 @@ class TradeAccount(object):
                 startTime = endTime - 7*24 * 60 * 60
 
             for each_sec in symbol_list:
+                each_sec = each_sec.upper()  # 币安只支持大写字母
                 res = self.client.get_klines(symbol=each_sec, interval=interval, startTime=int(startTime*1000), endTime=int(endTime*1000))
                 for each_bar in res:
                     bar = Bar()
