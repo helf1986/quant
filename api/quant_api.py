@@ -343,7 +343,7 @@ class TradeAccount(object):
         '''
         异步开多仓，以参数指定的symbol、价和量下单。如果价格为0，为市价单，否则为限价单。
         :param exchange: string	交易所代码，如火币网：huobipro，OKCoin: okcoin
-        :param source: string   订单接口源，api：普通订单，margin-api：融资融券订单
+        :param source: string   订单接口源，api：普通订单，margin：融资融券订单
         :param sec_id: string   证券代码
         :param price: float     委托价，如果price=0,为市价单，否则为限价单
         :param volume: float	委托量
@@ -378,9 +378,11 @@ class TradeAccount(object):
             # 买入指定数字货币
             myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
             if source == 'api':
-                res = self.cilent.send_order(amount=amount, source=source, symbol=sec_id, _type=mtype, price=price)
-            elif source == 'margin-api':
-                res = self.client.send_margin_order(amount=amount, source=source, symbol=sec_id, _type=mtype, price=price)
+                hb_source = 'api'
+                res = self.cilent.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+            elif source == 'margin':
+                hb_source = 'margin-api'
+                res = self.client.send_margin_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
 
             if res['status'] == 'ok':
                 myorder.ex_ord_id = int(res['data'])
@@ -409,8 +411,7 @@ class TradeAccount(object):
                 myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
                 myorder.ord_rej_reason_detail = res['err-msg']  ## 订单拒绝原因描述
                 logger.warn('%s 订单号 %s：%s 开多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
-                            (
-                            myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason,
+                            (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason,
                             myorder.ord_rej_reason_detail))
 
         elif self.exchange == 'bnb':
@@ -472,9 +473,11 @@ class TradeAccount(object):
             myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
             if source == 'api':
-                res = self.client.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
-            elif source == 'margin-api':
-                res = self.client.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+                hb_source = 'api'
+                res = self.client.send_order(amount=volume, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+            elif source == 'margin':
+                hb_source = 'margin-api'
+                res = self.client.send_margin_order(amount=volume, source=hb_source, symbol=sec_id, _type=mtype, price=price)
 
             if res['status'] == 'ok':
                 myorder.ex_ord_id = int(res['data'])
