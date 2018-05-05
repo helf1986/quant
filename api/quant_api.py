@@ -182,7 +182,7 @@ class TradeAccount(object):
 
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
-                each_sec = each.lower()
+                each_sec = each_sec.lower()
                 tick_res = self.client.get_ticker(symbol=each_sec)
                 # depth_res = hb.get_depth(symbol=each, type='step5')
                 if tick_res['status'] == 'ok':
@@ -897,8 +897,6 @@ class TradeAccount(object):
         position = Position()
         if self.exchange == 'hbp':
             sec_id = sec_id.lower()
-            
-
 
 
     def get_positions(self, source='api'):

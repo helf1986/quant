@@ -10,6 +10,9 @@ bars = hbaccount.get_last_bars(symbol_list='btcusdt, ethusdt', bar_type='1min')
 bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
 
+ticks = hbaccount.get_last_ticks(symbol_list='btcusdt, ethusdt')
+ticks_dict = to_dict(ticks[0])
+ticks_df = to_dataframe(ticks)
 
 import common.HuobiClient as hb
 api_key = HBP_ACCESS_KEY
