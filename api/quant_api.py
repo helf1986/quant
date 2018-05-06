@@ -95,7 +95,8 @@ class TradeAccount(object):
         :param bar_type: bar周期，1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
         :param begin_time: 开始时间, 如2015-10-30 09:30:00
         :param end_time: 结束时间, 如2015-10-30 15:00:00
-        :param size: 取数数量，[1,2000]
+        :param size: 取数数量，[1,2000], 如果size=0，按照begin_time 和end_time 返回
+                由于火币没有现成的按照begin_time、end_time获取bars的接口，只能从历史2000个bars筛选
         :return:
         '''
 
