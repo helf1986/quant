@@ -88,7 +88,7 @@ class TradeAccount(object):
         return instrus
 
 
-    def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time=''):
+    def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='', size=0):
         '''
         提取指定时间段的历史Bar数据，支持单个代码提取或多个代码组合提取。
         :param symbol_list: 证券代码, 带交易所代码以确保唯一，如SHSE.600000，同时支持多只代码
@@ -105,10 +105,11 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
                 each_sec = each_sec.lower()         # 注意火币只支持小写字母
-                size = 2000
-                if begin_time != '':
-                    size = 2000
-                res = self.client.get_kline(symbol=each_sec, period=bar_type, size=size)
+
+                inner_size = size
+                if size == 0:
+                    inner_size = 2000
+                res = self.client.get_kline(symbol=each_sec, period=bar_type, size=inner_size)
                 if res['status'] == 'ok':
                     data = res['data']
                     for each_bar in data:
@@ -124,7 +125,10 @@ class TradeAccount(object):
                         bar.bar_type = bar_type
                         bar.utc_time = each_bar['id']
                         bar.strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(each_bar['id']))
-                        if bar.strtime >= begin_time and bar.strtime <= end_time:
+                        if size == 0:
+                            if bar.strtime >= begin_time and bar.strtime <= end_time:
+                                bars = bars + [bar]
+                        else:
                             bars = bars + [bar]
                 else:
                     logger.warn(res['err-code'] + ":" + res['error-msg'])
@@ -563,6 +567,9 @@ class TradeAccount(object):
         :param symbol: 数字货币代码
         :param currency: 现金种类
         :param amount: 借贷额度
+                 借贷最小额度：
+                    usdt : 100
+                    btc : 0.001
         :return:
         '''
 
@@ -855,7 +862,7 @@ class TradeAccount(object):
 
             symbol = symbol.lower()
             currency = currency.lower()
-            start = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+            start = time.strftime('%Y-%m-%d', time.localtime(time.time()))
             margin_orders = self.get_margin_orders(symbol=symbol, currency=currency, start=start, direct="prev", size=100)
             if margin_order_id in margin_orders.index:
                 myorder = margin_orders.loc[margin_order_id]

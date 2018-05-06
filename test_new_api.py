@@ -6,13 +6,20 @@ from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
-'''
+
 # 通过账户访问行情数据
 bars = hbaccount.get_last_bars(symbol_list='btcusdt, ethusdt', bar_type='1min')
 bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
 print(bars_df)
 
+bars = hbaccount.get_bars(symbol_list='btcusdt', bar_type='1min', size=30)
+bars_dict = to_dict(bars[0])
+bars_df = to_dataframe(bars)
+print(bars_df)
+
+
+'''
 ticks = hbaccount.get_last_ticks(symbol_list='btcusdt, ethusdt')
 ticks_dict = to_dict(ticks[0])
 ticks_df = to_dataframe(ticks)
@@ -34,11 +41,20 @@ print(to_dict(order))
 
 order2 = hbaccount.close_long(source='margin', sec_id='btcusdt', price=0, volume=0.001)
 print(to_dict(order2))
-'''
+
 
 order3 = hbaccount.apply_margin(symbol='btcusdt', currency='usdt', amount=100)
-print(to_dict(order3))
+print(order3)
 
+'''
+
+
+import time
+now = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+hbaccount.get_margin_orders(symbol='btcusdt', currency='btc', start=now, direct='prev', size=100)
+
+unpaid_amount = hbaccount.get_margin_volume(margin_order_id=942857, symbol='btcusdt', currency='btc')
+result = hbaccount.repay_margin(order_id=942857, amount=unpaid_amount)
 
 '''
 ## 直接测试火币原始接口
