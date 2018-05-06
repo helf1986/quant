@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from api.quant_api import StrategyBase
+from api.StrategyBase import Strategy
 
-class Mystrategy(StrategyBase):
-    def __init__(self, *args, **kwargs):
-        super(Mystrategy, self).__init__(*args, **kwargs)
+class Mystrategy(Strategy):
+
+
 
 
 

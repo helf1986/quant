@@ -1061,10 +1061,10 @@ class Order(object):
         self.ex_ord_id = ''                   ## 交易所订单ID
         self.sec_id = ''                      ## 证券ID
         self.position_effect = 0              ## 开平标志
-        self.side = 0                         ## 买卖方向
-        self.order_type = 0                   ## 订单类型
-        self.order_src = 0                    ## 订单来源
-        self.status = 0                       ## 订单状态
+        self.side = 0                         ## 买卖方向，1：买，0：卖
+        self.order_type = 0                   ## 订单类型，market: 市价，limit: 限价
+        self.order_src = 0                    ## 订单来源， 'api': 普通账户， 'margin': 杠杆账户
+        self.status = 0                       ## 订单状态，'ok': 正常，'error': 错误
         self.ord_rej_reason = 0               ## 订单拒绝原因
         self.ord_rej_reason_detail = ''       ## 订单拒绝原因描述
 
@@ -1079,12 +1079,39 @@ class Order(object):
         self.sending_time = 0.0               ## 委托下单时间
         self.transact_time = 0.0              ## 最新一次成交时间
 
-        self.margin_order_id = ''             ### 融资融券订单号
-        self.margin_currency = ''             ### 融资融券品种
-        self.margin_vol = 0                   ### 融资融券金额
+
+class MarginOrder(object):
+    '''
+    借贷（融资融券）订单对象
+    '''
+
+    def __init__(self):
+        self.strategy_id = ''                 ## 策略ID
+        self.account_id = ''                  ## 交易账号
+        self.currency = ''                    ## 计价货币
+        self.exchange = ''                    ## 交易所代码
+        self.user_id = ''                     ## 交易所用户ID
+
+        self.margin_order_id = ''             ### 借贷订单号
+        self.margin_symbol = ''               ### 借贷交易对，火币接口要求的，实际没什么用
+        self.margin_currency = ''             ### 借贷品种
+        self.margin_volume = 0                ### 借贷下单金额
+        self.filled_volume = 0.0              ## 实际借贷金额
+        self.unpaid_volume = 0.0              ## 未归还金额
+
+        self.total_interest = 0.0             ### 总利息
+        self.unpaid_interest = 0.0            ### 未偿还利息
+
+        self.sending_time = 0.0               ## 委托下单时间
+        self.filled_time = 0.0                ## 借贷成交时间
+        self.transact_time = 0.0              ## 最新一次成交时间
+
+        self.status = 0                       ## 订单状态
+        self.ord_rej_reason = 0               ## 订单拒绝原因
+        self.ord_rej_reason_detail = ''       ## 订单拒绝原因描述
 
 
-class ExecRpt(object):
+class OrderExecRpt(object):
     '''
     订单执行结果
     '''
