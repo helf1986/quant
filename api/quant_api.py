@@ -376,6 +376,7 @@ class TradeAccount(object):
             else:
                 mtype = 'buy-limit'
                 amount = volume
+                last_price = price
 
             myorder.order_type = mtype  ## 订单类型
             myorder.order_src = source  ## 订单来源
