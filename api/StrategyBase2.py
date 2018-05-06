@@ -4,8 +4,7 @@ Created on Wed Apr 25 16:02:09 2018
 
 @author: ShuangJi.He
 """
-# from gmsdk import to_dict,md
-# md.init('18512101480', 'Hsj123')
+
 import os
 import api.quant_api as qapi
 from api import logger
@@ -14,20 +13,18 @@ from queue import Queue
 import threading
 import json
 
-import api.connection as conn
-
-
 # -------------------------------
-phone_list = "13811892804, 18512101480, 13910993289, 15818535870, 13911217190"
-phone_list = "18512101480"
+# phone_list = "13811892804, 18512101480, 13910993289, 15818535870, 13911217190"
+phone_list = "13811892804"
 
 
 # -----交易的基类---------
 class Strategy(object):
-    def __init__(self, name="straname", module=['usdt', 'btc'], api=qapi, exchange='huobipro', symbol_list='btcusdt',
+    def __init__(self, name="straname", module=['usdt', 'btc'], api=qapi, exchange='hbp', symbol_list='btcusdt',
                  bar_type='1min'):
-        #    def __init__(self,module='usdt',api=md,exchange='SHSE',symbol_list='600000',bar_type=60 ):
+
         self.prt = True  # 是否启动基类中的打印
+
         '''
         交易模式module：module[0]用于标记模式，module[1]用于指示融券种类
             1、['usdt','btc']：现金计价，即绝对收益型
@@ -40,6 +37,7 @@ class Strategy(object):
         self.module = module[0]
         self.margin_currency = module[1]
         self.api = api
+
         '''
         实时监控文件名
         监控数据格式
@@ -55,12 +53,14 @@ class Strategy(object):
         self.bar_type = bar_type
         #
         self.backbarnum = 20  # 追溯历史回测bar数
+
         '''
         __barcount#记录当前推送bar数
         __type=数据状态,用以区分历史数据还是实时数据。默认'history'，满足条件后赋值为'realtime'        
         '''
         self.__barcount = 0  # 记录当前推送bar数
         self.__type = 'history'
+
         '''
         不同事件类型分别记录
         __barqueue=bar记录队列，对应处理函数on_bar
@@ -70,6 +70,13 @@ class Strategy(object):
         self.__barqueue = Queue()
         self.__lastquebar = None
         self.__orderqueue = Queue()
+
+        # 记录交易和持仓历史
+        self.positions = []         # 记录本策略当前持仓明细
+        self.position_records = []  # 记录历史持仓记录，每发生一次交易，历史持仓和净值变更一次。每日24:00:00，历史持仓和净值更新一次
+        self.order_records = []     # 记录历史交易记录
+        self.margin_records = []    # 记录历史融资融券订单
+
 
     # -----------------eventprocess函数-----------------
     '''
@@ -81,7 +88,7 @@ class Strategy(object):
         分原来是否持仓，是则先平后进
         '''
         if self.MarketPosition == -1:
-            self.MarketPosition = 0;
+            self.MarketPosition = 0
             print(self.name + "pre_buytocover(%s,%s)" % (unit, price))
             if self.__type == 'realtime':
                 if self.module == 'usdt':
@@ -201,11 +208,7 @@ class Strategy(object):
         '''
         此处处理输出order到数据库，包括历史表和实时表
         '''
-        try:
-            conn.order2db(order)
-        except:
-            logger.warn('订单号 %d 写入数据库失败！'% order.order_id)
-
+        order
 
     # -------------------- -----更新事件队列-------------------------------------------
     def __sendevent_bar(self):
