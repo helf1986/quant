@@ -328,7 +328,6 @@ class TradeAccount(object):
     def get_depth(self, symbol='btcusdt', type='step1'):
         '''
         获取盘口深度数据
-        :param exchange:
         :param symbol:
         :param type:
         :return:
@@ -347,7 +346,6 @@ class TradeAccount(object):
     def open_long(self, source='api', sec_id='btcusdt', price=0, volume=0):
         '''
         异步开多仓，以参数指定的symbol、价和量下单。如果价格为0，为市价单，否则为限价单。
-        :param exchange: string	交易所代码，如火币网：huobipro，OKCoin: okcoin
         :param source: string   订单接口源，api：普通订单，margin：融资融券订单
         :param sec_id: string   证券代码
         :param price: float     委托价，如果price=0,为市价单，否则为限价单
@@ -392,6 +390,7 @@ class TradeAccount(object):
 
             if res['status'] == 'ok':
                 myorder.ex_ord_id = int(res['data'])
+                myorder.order_id = int(res['data'])
 
                 time.sleep(2)  # 等待2 秒后查询订单
                 # 查询订单信息
@@ -1338,7 +1337,7 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
             elif bar_type == '1day':
                 N_bar = 60*60*24
                 per = 14
-            begin_time_ts = int(end_time_ts - N_bar * size)
+            begin_time_ts = int(end_time_ts - (N_bar+2) * size)
             begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(begin_time_ts))
 
         client = MongoClient('47.75.69.176', 28005)
@@ -1366,3 +1365,20 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
             bars = bars + [bar]
 
     return bars
+
+
+def order2position(order_list=None, interval='1day'):
+    '''
+    根据历史交易记录计算持仓
+    :param order_list:
+    :return:
+    '''
+
+    if len(order_list) == 0:
+        return {}
+
+    order_df = to_dataframe(order_list)
+
+    start_time = min(order_df['transact_time'])
+    end_time = time.strftime('%Y-%d-%m', time.localtime(time.time()))
+

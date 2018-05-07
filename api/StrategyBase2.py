@@ -7,6 +7,7 @@ Created on Wed Apr 25 16:02:09 2018
 
 import os
 import api.quant_api as qapi
+from api.fund_perform_eval import PerformEval
 from api import logger
 import api.connection as conn
 import time
@@ -34,6 +35,7 @@ class Strategy(object):
             掘金=md
             火币=qapi       
         '''
+
         self.name = name
         self.module = module[0]
         self.margin_currency = module[1]
@@ -100,7 +102,7 @@ class Strategy(object):
                     3、执行还券流程
                     '''
                     unpaid_volume = self.api.get_margin_volume(self.margin_order_id, currency=self.margin_currency)
-                    order = self.api.open_long(exchange=self.exchange, source='margin-api', sec_id=self.symbol_list,
+                    order = self.api.open_long(exchange=self.exchange, source='margin', sec_id=self.symbol_list,
                                                price=price, volume=unpaid_volume)
                     self.api.repay_margin(exchange=self.exchange, margin_order_id=self.margin_order_id,
                                           amount=unpaid_volume)
@@ -119,7 +121,7 @@ class Strategy(object):
                 else:
                     margin = self.api.apply_margin(exchange=self.exchange, symbol=self.symbol_list,
                                                    currency=self.margin_currency, amount=unit)
-                    order = self.api.open_long(exchange=self.exchange, source='margin-api', sec_id=self.symbol_list,
+                    order = self.api.open_long(exchange=self.exchange, source='margin', sec_id=self.symbol_list,
                                                price=price, volume=unit)
                     self.margin_order_id = margin.margin_order_id
                 self.__orderqueue.put(order)
@@ -224,13 +226,22 @@ class Strategy(object):
         '''
 
         while (1):
+            isStart = False
             now = time.localtime(time.time())
             if interval == '1day':
+                # 每日 00:00:00 进行清算
                 if now.tm_hour == 0 and now.tm_min == 0:
-                    pass
+                    isStart = True
             elif interval == '60min':
+                # 每小时清算一次，XX:00:00 进行结算
+                if now.tm_min == 0:
+                    isStart = True
 
-
+            if isStart:
+                hist_position = self.position_records
+                netvalue = qapi.to_dataframe(hist_position)
+                myindicator = qapi.Indicator()
+                perform = PerformEval(netvalue)
 
 
 
