@@ -18,6 +18,15 @@ bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
 print(bars_df)
 
+bars = hbaccount.get_bars(symbol_list='ethusdt', bar_type='1min', size=30)
+bars_dict = to_dict(bars[0])
+bars_df = to_dataframe(bars)
+print(bars_df)
+
+bars = hbaccount.get_bars(symbol_list='bchusdt', bar_type='1min', size=30)
+bars_dict = to_dict(bars[0])
+bars_df = to_dataframe(bars)
+print(bars_df)
 
 '''
 ticks = hbaccount.get_last_ticks(symbol_list='btcusdt, ethusdt')
@@ -48,7 +57,7 @@ print(order3)
 
 '''
 
-
+'''
 import time
 now = time.strftime('%Y-%m-%d', time.localtime(time.time()))
 hbaccount.get_margin_orders(symbol='btcusdt', currency='btc', start=now, direct='prev', size=100)
@@ -56,7 +65,7 @@ hbaccount.get_margin_orders(symbol='btcusdt', currency='btc', start=now, direct=
 unpaid_amount = hbaccount.get_margin_volume(margin_order_id=942857, symbol='btcusdt', currency='btc')
 result = hbaccount.repay_margin(order_id=942857, amount=unpaid_amount)
 
-'''
+
 ## 直接测试火币原始接口
 import common.HuobiClient as hb
 api_key = HBP_ACCESS_KEY

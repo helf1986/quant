@@ -47,13 +47,10 @@ class Strategy(object):
         self.filename = self.name + '_' + self.module + "2" + self.margin_currency + '.json'
         self.monitordata = {"margin_order_id": None}
         #
-<<<<<<< HEAD
-        self.MarketPosition=0           # 策略仓位记录
-        self.id=None                    #策略真实id，融资融券平仓需要
-=======
+
         self.MarketPosition = 0  # 策略仓位记录
         self.margin_order_id = None  # 策略融资融券id，融资融券平仓需要
->>>>>>> f3c1bdc7657fb9f7fc183702b38adbf8fe8541e1
+
         # 订阅数据标的类型，周期类型
         self.exchange = exchange
         self.symbol_list = symbol_list
