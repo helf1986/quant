@@ -1364,6 +1364,9 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
 
             bars = bars + [bar]
 
+    if size > 0:
+        bars = bars[-size:]
+
     return bars
 
 
