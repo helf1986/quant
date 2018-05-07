@@ -7,12 +7,21 @@ import time
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
+
 # 通过账户访问行情数据
-bars = hbaccount.get_last_bars(symbol_list='btcusdt, ethusdt', bar_type='1min')
+bars = hbaccount.get_last_bars(symbol_list='btcusdt', bar_type='1min')
 bars_dict = to_dict(bars[0])
+print(bars_dict)
 bars_df = to_dataframe(bars)
 print(bars_df)
 
+last_price = bars[0].close
+print(last_price)
+order = hbaccount.open_long(source='margin', sec_id='btcusdt', price=last_price, volume=0.001)
+print(to_dict(order))
+
+
+'''
 time.sleep(1)
 bars = hbaccount.get_bars(symbol_list='btcusdt', bar_type='1min', size=30)
 bars_dict = to_dict(bars[0])
@@ -31,7 +40,6 @@ bars_dict = to_dict(bars[0])
 bars_df = to_dataframe(bars)
 print(bars_df)
 
-'''
 ticks = hbaccount.get_last_ticks(symbol_list='btcusdt, ethusdt')
 ticks_dict = to_dict(ticks[0])
 ticks_df = to_dataframe(ticks)

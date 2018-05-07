@@ -8,6 +8,7 @@ Created on Wed Apr 25 16:02:09 2018
 import os
 import api.quant_api as qapi
 from api import logger
+import api.connection as conn
 import time
 from queue import Queue
 import threading
@@ -209,7 +210,29 @@ class Strategy(object):
         '''
         此处处理输出order到数据库，包括历史表和实时表
         '''
-        order
+        try:
+            conn.order2db(order)
+        except:
+            logger.warn('订单号 %d 写入数据库失败！'% order.order_id)
+
+    def clearing(self, interval='1day', ctime='00:00:00'):
+        '''
+        定期进行清结算
+        :param interval: 支持两种方式，interval='1day' 每天结算一次，interval='60min' 每小时结算一次
+        :param ctime: 指定每天具体时间
+        :return:
+        '''
+
+        while (1):
+            now = time.localtime(time.time())
+            if interval == '1day':
+                if now.tm_hour == 0 and now.tm_min == 0:
+                    pass
+            elif interval == '60min':
+
+
+
+
 
     # -------------------- -----更新事件队列-------------------------------------------
     def __sendevent_bar(self):
