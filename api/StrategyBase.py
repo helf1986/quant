@@ -36,7 +36,7 @@ class Strategy(object):
 
         #
         self.MarketPosition=0           # 策略仓位记录
-        self.id=None#策略真实id，融资融券平仓需要
+        self.id=None                    #策略真实id，融资融券平仓需要
         # 订阅数据标的类型，周期类型
         self.exchange=exchange
         self.symbol_list=symbol_list

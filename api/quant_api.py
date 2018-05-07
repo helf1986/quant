@@ -31,7 +31,7 @@ class TradeAccount(object):
     exchange = ''       # hbp: 火币pro, bnb: Binance, okc: okcoin
     api_key = ''
     api_secret = ''
-    client = None
+    client = None       # 访问交易所接口
     currency = ''       # 以哪种数币作为基准，比如USDT、BTC
 
 
