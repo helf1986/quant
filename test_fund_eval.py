@@ -52,9 +52,8 @@ if __name__ == '__main__':
         sec_id = each_pos.sec_id.lower()
         if sec_id != currency:
             symbol = sec_id + currency
-            print(symbol)
             tick = hbaccount.get_last_ticks(symbol_list=symbol)
-            tick = Tick()
+            print(symbol, tick.last_price)
             total_amount = total_amount + each_pos.amount*tick.last_price
         else:
             total_amount = total_amount + each_pos.amount
