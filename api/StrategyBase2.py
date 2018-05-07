@@ -107,6 +107,7 @@ class Strategy(object):
                     order = self.api.open_long(exchange=self.margin_order_id, source='api', sec_id=self.symbol_list,
                                                price=price, volume=unit)
                 self.__orderqueue.put(order)
+
         if self.MarketPosition == 0:
             self.MarketPosition = 1;
             print(self.name + "buy(%s,%s)" % (unit, price), self.MarketPosition)
