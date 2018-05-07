@@ -11,8 +11,8 @@ time.sleep(1)
 bars = hbaccount.get_bars(symbol_list='btcusdt', bar_type='1min', size=2000)
 print(len(bars))
 
-bars = get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', size=1000)
-
+bars = get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', size=20)
+print(len(bars))
 
 '''
 # 通过账户访问行情数据

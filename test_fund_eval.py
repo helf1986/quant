@@ -1,6 +1,6 @@
 
 from common.settings import HBP_SECRET_KEY, HBP_ACCESS_KEY
-import api.quant_api as qapi
+from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local, Indicator, Tick, Order, Bar
 import time
 import pandas as pd
 import numpy as np
@@ -10,7 +10,6 @@ from api.fund_perform_eval import PerformEval
 
 def tradelog(account=None):
 
-    account = qapi.TradeAccount()
     account.get_orders_by_symbol(sec_id = 'btcusdt')
 
 
@@ -37,17 +36,27 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
         if isStart:
             positions = account.get_positions(source='margin')
             hist_position = hist_position + [positions]
-            netvalue = qapi.to_dataframe(hist_position)
-            myindicator = qapi.Indicator()
+            netvalue = to_dataframe(hist_position)
+            myindicator = Indicator()
             perform = PerformEval(netvalue)
 
 
 if __name__ == '__main__':
 
-    hbaccount = qapi.TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY,api_secret=HBP_SECRET_KEY, currency='USDT')
+    hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY,api_secret=HBP_SECRET_KEY, currency='USDT')
 
-    order_records = []
+    posistions = hbaccount.get_positions(source='margin')
+    total_amount = 0
+    currency = hbaccount.currency.lower()
+    for each_pos in posistions:
+        sec_id = each_pos.sec_id.lower()
+        if sec_id != currency:
+            symbol = sec_id + currency
+            print(symbol)
+            tick = hbaccount.get_last_ticks(symbol_list=symbol)
+            tick = Tick()
+            total_amount = total_amount + each_pos.amount*tick.last_price
+        else:
+            total_amount = total_amount + each_pos.amount
 
-    position_records = {}
-
-    hbaccount.get_orders_by_symbol()
+    print(total_amount)
