@@ -45,9 +45,6 @@ def order2db(order):
     data['fillamt'] = order.filled_amount
     data['fee'] = order.filled_fee
     data['status'] = order.status
-    data['mgid'] = order.margin_order_id
-    data['mgamt'] = order.margin_amount
-    data['mgcur'] = order.margin_currency
 
     # 写入mongodb 数据库
     try:
@@ -59,8 +56,50 @@ def order2db(order):
         return True
 
     except Exception as e:
-        logger.warn('交易数据插入数据库失败！')
+        logger.warn('交易订单插入数据库失败！')
         return False
+
+
+def marginorder2db(margin_order):
+    '''
+    把融资融券订单写到数据库中，数据表名：tbmarginorder
+    :param margin_order:
+    :return:
+    '''
+
+    # 字典格式转换
+    data = {}
+    margin_order = MarginOrder()
+    data['usr'] = margin_order.account_id
+    data['sch'] = margin_order.strategy_id
+    data['cur'] = margin_order.currency
+    data['exg'] = margin_order.exchange
+    data['usrex'] = margin_order.user_id
+    data['ordid'] = margin_order.margin_order_id
+    data['ordtime'] = margin_order.sending_time
+    data['sym'] = margin_order.margin_symbol
+    data['marcur'] = margin_order.margin_currency
+    data['vol'] = margin_order.margin_volume
+    data['filltime'] = margin_order.filled_time
+    data['fillvol'] = margin_order.filled_volume
+    data['unpvol'] = margin_order.unpaid_volume
+    data['interest'] = margin_order.total_interest
+    data['unpint'] = margin_order.unpaid_interest
+    data['status'] = margin_order.status
+
+    # 写入mongodb 数据库
+    try:
+        client = connect_mongo()
+        dbbtcaccount = client['dbbtcaccount']
+        # dbbtcaccount.authenticate(MONGO_USER, MONGO_PWD)
+        tbtradeorder = dbbtcaccount['tbmarginorder']
+        tbtradeorder.insert_one(data)
+        return True
+
+    except Exception as e:
+        logger.warn('融资融券订单插入数据库失败！')
+        return False
+
 
 
 def position2db(positions):
@@ -190,5 +229,10 @@ def tradelog2db(tradelog):
         logger.warn('交易日志插入数据库失败！')
         return False
 
+def monitor2db(strategy_name=None):
+    import json
+    f = open("monitor/"+strategy_name+".json", encoding='utf-8')
+    info = json.load(f)
 
+    order = Order()
 

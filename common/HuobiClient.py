@@ -20,7 +20,6 @@ import requests
 Market data API
 '''
 
-
 # API 请求地址
 MARKET_URL = "https://api.huobi.pro"
 TRADE_URL = "https://api.huobi.pro"

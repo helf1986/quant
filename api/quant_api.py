@@ -46,7 +46,7 @@ class TradeAccount(object):
         self.exchange = exchange
         self.api_key = api_key
         self.api_secret = api_secret
-        self.currency = currency
+        self.currency = currency.upper()
 
         if self.exchange == 'hbp':
             self.client = hb.HuobiClient(self.api_key, self.api_secret)
@@ -88,14 +88,15 @@ class TradeAccount(object):
         return instrus
 
 
-    def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time=''):
+    def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='', size=0):
         '''
         提取指定时间段的历史Bar数据，支持单个代码提取或多个代码组合提取。
         :param symbol_list: 证券代码, 带交易所代码以确保唯一，如SHSE.600000，同时支持多只代码
         :param bar_type: bar周期，1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year }
         :param begin_time: 开始时间, 如2015-10-30 09:30:00
         :param end_time: 结束时间, 如2015-10-30 15:00:00
-        :param size: 取数数量，[1,2000]
+        :param size: 取数数量，[1,2000], 如果size=0，按照begin_time 和end_time 返回
+                由于火币没有现成的按照begin_time、end_time获取bars的接口，只能从历史2000个bars筛选
         :return:
         '''
 
@@ -104,11 +105,12 @@ class TradeAccount(object):
 
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
+                each_sec = each_sec.lower()         # 注意火币只支持小写字母
 
-                size = 2000
-                if begin_time != '':
-                    size = 2000
-                res = self.client.get_kline(symbol=each_sec, period=bar_type, size=size)
+                inner_size = size
+                if size == 0:
+                    inner_size = 2000
+                res = self.client.get_kline(symbol=each_sec, period=bar_type, size=inner_size)
                 if res['status'] == 'ok':
                     data = res['data']
                     for each_bar in data:
@@ -124,7 +126,10 @@ class TradeAccount(object):
                         bar.bar_type = bar_type
                         bar.utc_time = each_bar['id']
                         bar.strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(each_bar['id']))
-                        if bar.strtime >= begin_time and bar.strtime <= end_time:
+                        if size == 0:
+                            if bar.strtime >= begin_time and bar.strtime <= end_time:
+                                bars = bars + [bar]
+                        else:
                             bars = bars + [bar]
                 else:
                     logger.warn(res['err-code'] + ":" + res['error-msg'])
@@ -151,6 +156,7 @@ class TradeAccount(object):
             endTime = time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S'))
 
             for each_sec in symbol_list:
+                each_sec = each_sec.upper()         # 币安支持大写字母
                 res = self.client.get_klines(symbol=each_sec, interval=interval, startTime=startTime, endTime=endTime)
                 for each_bar in res:
                     bar = Bar()
@@ -180,14 +186,15 @@ class TradeAccount(object):
         ticks = []
 
         if self.exchange == 'hbp':
-            for each in symbol_list:
-                tick_res = self.client.get_ticker(symbol=each)
+            for each_sec in symbol_list:
+                each_sec = each_sec.lower()
+                tick_res = self.client.get_ticker(symbol=each_sec)
                 # depth_res = hb.get_depth(symbol=each, type='step5')
                 if tick_res['status'] == 'ok':
                     data = tick_res['tick']
                     tick = Tick()
                     tick.exchange = self.exchange
-                    tick.sec_id = each
+                    tick.sec_id = each_sec
                     tick.utc_time = tick_res['ts']
                     tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tick_res['ts'] / 1000))
                     tick.open = data['open']
@@ -207,6 +214,7 @@ class TradeAccount(object):
         elif self.exchange == 'bnb':
 
             for each_sec in symbol_list:
+                each_sec = each_sec.upper()
                 res = self.client.get_ticker(symbol=each_sec)
                 tick = Tick()
                 tick.exchange = self.exchange
@@ -241,14 +249,14 @@ class TradeAccount(object):
         symbol_list = symbol_list.replace(' ', '').split(',')
         bars = []
         if self.exchange == 'hbp':
-            for each in symbol_list:
-                each = each.upper()     # 币安只支持大写字母
-                bar_res = self.client.get_kline(symbol=each, period=bar_type, size=1)
+            for each_sec in symbol_list:
+                each_sec = each_sec.lower()
+                bar_res = self.client.get_kline(symbol=each_sec, period=bar_type, size=1)
                 if bar_res['status'] == 'ok':
                     data = bar_res['data'][0]
                     bar = Bar()
                     bar.exchange = self.exchange
-                    bar.sec_id = each
+                    bar.sec_id = each_sec
                     bar.bar_type = bar_type
                     bar.utc_time = data['id']
                     bar.strtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(data['id']))
@@ -265,6 +273,7 @@ class TradeAccount(object):
                     bars = bars + [bar]
                 else:
                     logger.warn('No bar data fetched!')
+
         elif self.exchange == 'bnb':
 
             endTime = time.mktime(time.localtime())
@@ -293,12 +302,12 @@ class TradeAccount(object):
                 startTime = endTime - 7*24 * 60 * 60
 
             for each_sec in symbol_list:
+                each_sec = each_sec.upper()  # 币安只支持大写字母
                 res = self.client.get_klines(symbol=each_sec, interval=interval, startTime=int(startTime*1000), endTime=int(endTime*1000))
                 for each_bar in res:
                     bar = Bar()
                     bar.exchange = self.exchange
                     bar.sec_id = each_sec
-
                     bar.utc_time = int(each_bar[0])
                     bar.strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(bar.utc_time / 1000))
                     bar.open = each_bar[1]
@@ -325,9 +334,11 @@ class TradeAccount(object):
         :return:
         '''
         if self.exchange == 'hbp':
+            symbol = symbol.lower()
             depth_res = self.client.get_depth(symbol=symbol, type=type)
 
         elif self.exchange == 'binance':
+            symbol = symbol.upper()
             depth_res = self.cilent.get_order_book(symbol=symbol)
 
         return depth_res
@@ -337,7 +348,7 @@ class TradeAccount(object):
         '''
         异步开多仓，以参数指定的symbol、价和量下单。如果价格为0，为市价单，否则为限价单。
         :param exchange: string	交易所代码，如火币网：huobipro，OKCoin: okcoin
-        :param source: string   订单接口源，api：普通订单，margin-api：融资融券订单
+        :param source: string   订单接口源，api：普通订单，margin：融资融券订单
         :param sec_id: string   证券代码
         :param price: float     委托价，如果price=0,为市价单，否则为限价单
         :param volume: float	委托量
@@ -355,6 +366,8 @@ class TradeAccount(object):
         myorder.side = 1  ## 买卖方向，1：多方向，2：空方向
 
         if self.exchange == 'hbp':  # 火币网接口
+
+            sec_id = sec_id.lower()
             if price == 0.0:
                 mtype = 'buy-market'
                 last_tick = self.get_last_ticks(symbol_list=sec_id)
@@ -363,6 +376,7 @@ class TradeAccount(object):
             else:
                 mtype = 'buy-limit'
                 amount = volume
+                last_price = price
 
             myorder.order_type = mtype  ## 订单类型
             myorder.order_src = source  ## 订单来源
@@ -370,9 +384,11 @@ class TradeAccount(object):
             # 买入指定数字货币
             myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
             if source == 'api':
-                res = self.cilent.send_order(amount=amount, source=source, symbol=sec_id, _type=mtype, price=price)
-            elif source == 'margin-api':
-                res = self.client.send_margin_order(amount=amount, source=source, symbol=sec_id, _type=mtype, price=price)
+                hb_source = 'api'
+                res = self.cilent.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+            elif source == 'margin':
+                hb_source = 'margin-api'
+                res = self.client.send_margin_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
 
             if res['status'] == 'ok':
                 myorder.ex_ord_id = int(res['data'])
@@ -401,12 +417,12 @@ class TradeAccount(object):
                 myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
                 myorder.ord_rej_reason_detail = res['err-msg']  ## 订单拒绝原因描述
                 logger.warn('%s 订单号 %s：%s 开多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
-                            (
-                            myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason,
+                            (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason,
                             myorder.ord_rej_reason_detail))
 
         elif self.exchange == 'bnb':
-            client = bnb.BinanceClient
+
+            sec_id = sec_id.upper()
             if price == 0:
                 order_type = 'MARKET'
                 myorder.order_type = 'market'
@@ -414,7 +430,7 @@ class TradeAccount(object):
                 order_type = 'LIMIT'
                 myorder.order_type = 'limit'
 
-            order = client.create_order(symbol=sec_id,
+            order = self.client.create_order(symbol=sec_id,
                                         side='BUY',
                                         type=order_type,
                                         quantity=volume,
@@ -454,7 +470,7 @@ class TradeAccount(object):
         myorder.order_src = 0  ## 订单来源
 
         if self.exchange == 'hbp':  # 火币网接口
-
+            sec_id = sec_id.lower()
             if price == 0.0:
                 mtype = 'sell-market'
             else:
@@ -463,9 +479,11 @@ class TradeAccount(object):
             myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
 
             if source == 'api':
-                res = self.client.send_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
-            elif source == 'margin-api':
-                res = self.client.send_margin_order(amount=volume, source=source, symbol=sec_id, _type=mtype, price=price)
+                hb_source = 'api'
+                res = self.client.send_order(amount=volume, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+            elif source == 'margin':
+                hb_source = 'margin-api'
+                res = self.client.send_margin_order(amount=volume, source=hb_source, symbol=sec_id, _type=mtype, price=price)
 
             if res['status'] == 'ok':
                 myorder.ex_ord_id = int(res['data'])
@@ -497,7 +515,8 @@ class TradeAccount(object):
                             myorder.ord_rej_reason_detail))
 
         elif self.exchange == 'bnb':
-            client = bnb.BinanceClient
+
+            sec_id = sec_id.upper()
             if price == 0:
                 order_type = 'MARKET'
                 myorder.order_type = 'market'
@@ -505,7 +524,12 @@ class TradeAccount(object):
                 order_type = 'LIMIT'
                 myorder.order_type = 'limit'
 
-            order = client.create_order(symbol=sec_id, type=order_type, quantity=volume, price=price)
+            if myorder.side == 1:
+                side = 'SIDE_BUY'
+            else:
+                side = 'SIDE_SELL'
+
+            order = self.client.create_order(symbol=sec_id, side=side, type=order_type, quantity=volume, price=price)
 
             myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(order['transactTime'] / 1000))
             myorder.order_id = order['orderId']
@@ -534,6 +558,7 @@ class TradeAccount(object):
                 return None
 
         elif self.exchange == 'binance':
+            sec_id = sec_id.upper()
             res = self.client.cancel_order(symbol=sec_id, orderId=order_id)
             return res['orderId']
 
@@ -544,12 +569,19 @@ class TradeAccount(object):
         :param symbol: 数字货币代码
         :param currency: 现金种类
         :param amount: 借贷额度
+                 借贷最小额度：
+                    usdt : 100
+                    btc : 0.001
         :return:
         '''
 
         if self.exchange == 'hbp':
+            symbol = symbol.lower()
+            if currency == 'usdt':
+                amount = round(amount, 2)
+            elif currency == 'btc':
+                amount = round(amount, 3)
 
-            amount = round(amount, 3)
             res = self.client.get_margin(symbol=symbol, currency=currency, amount=amount)
             if res['status'] == 'ok':
                 margin_order_id = res['data']
@@ -623,7 +655,7 @@ class TradeAccount(object):
                 return None
 
         elif self.exchange == 'bnb':
-
+            sec_id = sec_id.upper()
             res = self.client.get_all_orders(symbol=sec_id, orderId=cl_ord_id)
             order_list = []
             for each in res:
@@ -666,11 +698,11 @@ class TradeAccount(object):
 
         order_list = []
         if self.exchange == 'huobipro':
-
+            sec_id = sec_id.lower()
             if states == 'all':
                 states = 'pre-submitted,submitted,partial-filled,partial-canceled,filled,canceled'
             if types == 'all':
-                types = 'buy-market,sell-market,buy-limit,sell-limit'
+                types = 'buy-maret,sell-market,buy-limit,sell-limit'
 
             start_date = time.strftime('%Y-%m-%d', time.strptime(begin_time, '%Y-%m-%d %H:%M:%S'))
             end_date = time.strftime('%Y-%m-%d', time.strptime(end_time, '%Y-%m-%d %H:%M:%S'))
@@ -703,6 +735,7 @@ class TradeAccount(object):
 
         elif self.exchange == 'bnb':
 
+            sec_id = sec_id.upper()
             if states == 'all':
                 states = ['NEW', 'PARTIALLY_FILLED', 'FILLED', 'CANCELED', 'PENDING_CANCEL', 'REJECTED', 'EXPIRED']
             else:
@@ -752,6 +785,9 @@ class TradeAccount(object):
         :return:
         """
         if self.exchange == 'hbp':
+
+            symbol = symbol.lower()
+            currency = currency.lower()
             res = self.client.loan_orders(symbol=symbol, currency=currency, start_date=start_date, end_date=end_date,
                                  start=start, direct=direct, size=str(size))
             if res['status'] == 'ok':
@@ -790,6 +826,7 @@ class TradeAccount(object):
 
         # 借贷账户详情,支持查询单个币种
         if self.exchange == 'hbp':
+            symbol = symbol.lower()
             res = self.cleient.margin_balance(symbol=symbol)
             if res['status'] == 'ok':
                 balance = res['data']['list']
@@ -821,14 +858,22 @@ class TradeAccount(object):
         :return:
         '''
 
-        start = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-        margin_orders = self.get_margin_orders(symbol=symbol, currency=currency, start="", direct="prev", size=100)
-        if margin_order_id in margin_orders.index:
-            myorder = margin_orders.loc[margin_order_id]
-            unpaid_volume = myorder['loan-balance'] + myorder['interest-balance']
-        else:
-            logger.warn('Margin order ID %d is not found!' % margin_order_id)
-            unpaid_volume = 0
+        unpaid_volume = 0
+
+        if self.exchange == 'hbp':
+
+            symbol = symbol.lower()
+            currency = currency.lower()
+            start = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+            margin_orders = self.get_margin_orders(symbol=symbol, currency=currency, start=start, direct="prev", size=100)
+            if margin_order_id in margin_orders.index:
+                myorder = margin_orders.loc[margin_order_id]
+                unpaid_volume = myorder['loan-balance'] + myorder['interest-balance']
+            else:
+                logger.warn('Margin order ID %d is not found!' % margin_order_id)
+
+        elif self.exchange == 'bnb':
+            pass
 
         return unpaid_volume
 
@@ -854,14 +899,22 @@ class TradeAccount(object):
 
 
     def get_position(self, sec_id='btcusdt', side=0):
+        '''
 
-        pass
+        :param sec_id:
+        :param side:
+        :return:
+        '''
+        positions = self.get_positions()
+        position = Position()
+        if self.exchange == 'hbp':
+            sec_id = sec_id.lower()
 
 
-    def get_positions(self, source='api'):
+    def get_positions(self, source='spot'):
         '''
         获得所有账户持仓情况
-        :param exchange:
+        :param source: spot: 普通账户，marign：借贷账户
         :return:
         '''
 
@@ -869,16 +922,16 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             accounts = self.get_accounts()
 
-            if source == 'api':
+            if source == 'spot':
                 # 获取普通账户资金情况
                 account = accounts['spot']['id']
-            elif source == 'margin-api':
+            elif source == 'margin':
                 # 获取融资融券账户资金情况
                 account = accounts['margin']['id']
             else:
                 logger.error('No accounts found from %s!' % source)
 
-            res = hb.get_balance(acct_id=account)
+            res = self.client.get_balance(acct_id=account)
             if res['status'] == 'ok':
                 account_info = res['data']
                 account_id = account_info['id']
@@ -903,7 +956,7 @@ class TradeAccount(object):
                     position.available = float(balance_dict[each]['trade'])
                     position.order_frozen = float(balance_dict[each]['frozen'])
                     position.amount = position.available + position.order_frozen
-                    if source == 'margin-api':
+                    if source == 'margin':
                         position.loan = float(balance_dict[each]['loan'])
                         position.interest = float(balance_dict[each]['interest'])
 
@@ -911,18 +964,19 @@ class TradeAccount(object):
             else:
                 logger.warn(res['err-code'] + ':' + res['err-msg'])
 
-
         elif self.exchange == 'bnb':
-            res = self.client.get_account()
-            balance = res['balance']
-            for each in balance:
-                if each['free'] > 0 or each['locked'] > 0:
-                    position = Position()
-                    position.exchange = self.exchange
-                    position.available = each['free']
-                    position.order_frozen = each['locked']
-                    position.volume = each['free'] + each['locked']
-                    positions = positions + [position]
+            
+            if source == 'spot':
+                res = self.client.get_account()
+                balance = res['balance']
+                for each in balance:
+                    if each['free'] > 0 or each['locked'] > 0:
+                        position = Position()
+                        position.exchange = self.exchange
+                        position.available = each['free']
+                        position.order_frozen = each['locked']
+                        position.volume = each['free'] + each['locked']
+                        positions = positions + [position]
 
         return positions
 
@@ -950,14 +1004,21 @@ class TradeAccount(object):
         return cash_position
 
 
-
 def to_dict(obj):
     '''
     把对象转换成字典
     :param obj:
     :return: keys 为对象的属性，values 为属性值
     '''
-    return obj.__dict__
+
+    if isinstance(obj, object):
+        return obj.__dict__
+
+    elif isinstance(obj, list):
+        obj_list = []
+        for each in obj:
+            obj_list = obj_list + [each.__dict__]
+        return obj_list
 
 
 def to_dataframe(obj_list):
@@ -1001,10 +1062,10 @@ class Order(object):
         self.ex_ord_id = ''                   ## 交易所订单ID
         self.sec_id = ''                      ## 证券ID
         self.position_effect = 0              ## 开平标志
-        self.side = 0                         ## 买卖方向
-        self.order_type = 0                   ## 订单类型
-        self.order_src = 0                    ## 订单来源
-        self.status = 0                       ## 订单状态
+        self.side = 0                         ## 买卖方向，1：买，0：卖
+        self.order_type = 0                   ## 订单类型，market: 市价，limit: 限价
+        self.order_src = 0                    ## 订单来源， 'api': 普通账户， 'margin': 杠杆账户
+        self.status = 0                       ## 订单状态，'ok': 正常，'error': 错误
         self.ord_rej_reason = 0               ## 订单拒绝原因
         self.ord_rej_reason_detail = ''       ## 订单拒绝原因描述
 
@@ -1019,12 +1080,39 @@ class Order(object):
         self.sending_time = 0.0               ## 委托下单时间
         self.transact_time = 0.0              ## 最新一次成交时间
 
-        self.margin_order_id = ''             ### 融资融券订单号
-        self.margin_currency = ''             ### 融资融券品种
-        self.margin_vol = 0                   ### 融资融券金额
+
+class MarginOrder(object):
+    '''
+    借贷（融资融券）订单对象
+    '''
+
+    def __init__(self):
+        self.strategy_id = ''                 ## 策略ID
+        self.account_id = ''                  ## 交易账号
+        self.currency = ''                    ## 计价货币
+        self.exchange = ''                    ## 交易所代码
+        self.user_id = ''                     ## 交易所用户ID
+
+        self.margin_order_id = ''             ### 借贷订单号
+        self.margin_symbol = ''               ### 借贷交易对，火币接口要求的，实际没什么用
+        self.margin_currency = ''             ### 借贷品种
+        self.margin_volume = 0                ### 借贷下单金额
+        self.filled_volume = 0.0              ## 实际借贷金额
+        self.unpaid_volume = 0.0              ## 未归还金额
+
+        self.total_interest = 0.0             ### 总利息
+        self.unpaid_interest = 0.0            ### 未偿还利息
+
+        self.sending_time = 0.0               ## 委托下单时间
+        self.filled_time = 0.0                ## 借贷成交时间
+        self.transact_time = 0.0              ## 最新一次成交时间
+
+        self.status = 0                       ## 订单状态
+        self.ord_rej_reason = 0               ## 订单拒绝原因
+        self.ord_rej_reason_detail = ''       ## 订单拒绝原因描述
 
 
-class ExecRpt(object):
+class OrderExecRpt(object):
     '''
     订单执行结果
     '''
