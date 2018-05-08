@@ -3,9 +3,29 @@
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
 from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
 import time
+from api import logger
 
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
+
+flag = 0
+count = 0
+while (flag == 0 and count < 10):
+    # 允许最多重连10次
+    try:
+        bars = hbaccount.get_last_bars(symbol_list='btcusdt', bar_type='1min')
+        flag = 1
+    except Exception as e:
+        logger.warn('Connection Failed: ', e)
+        count = count + 1
+        time.sleep(5)
+
+if flag == 1:
+    print(bars)
+    # 请继续编写和bars相关的处理算法
+    
+
+'''
 
 time.sleep(1)
 bars = hbaccount.get_bars(symbol_list='btcusdt', bar_type='1min', size=2000)
@@ -13,6 +33,7 @@ print(len(bars))
 
 bars = get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', size=20)
 print(len(bars))
+'''
 
 '''
 # 通过账户访问行情数据
