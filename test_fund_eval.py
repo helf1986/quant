@@ -44,18 +44,60 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
 if __name__ == '__main__':
 
     hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY,api_secret=HBP_SECRET_KEY, currency='USDT')
-
-    posistions = hbaccount.get_positions(source='margin')
-    total_amount = 0
     currency = hbaccount.currency.lower()
-    for each_pos in posistions:
+
+    pos_df = pd.DataFrame([], columns=['spot', 'margin', 'loan'])
+
+    # 普通账户数量
+    positions = hbaccount.get_positions(source='spot')
+    for each_pos in positions:
         sec_id = each_pos.sec_id.lower()
+        if sec_id in pos_df.index:
+            pos_df.loc[sec_id, 'spot'] = each_pos.volume
+        else:
+            each_df = pd.DataFrame([], index=[sec_id], columns=['spot', 'margin', 'loan'])
+            each_df.loc[sec_id, 'spot'] = each_pos.volume
+            pos_df = pos_df.append(each_df)
+
+
+    # 借贷账户数量
+    positions = hbaccount.get_positions(source='margin')
+    for each_pos in positions:
+        sec_id = each_pos.sec_id.lower()
+        if sec_id in pos_df.index:
+            pos_df.ilo[sec_id, 'margin'] = each_pos.volume
+        else:
+            each_df = pd.DataFrame([], index=[sec_id], columns=['spot', 'margin', 'loan'])
+            each_df.loc[sec_id, 'margin'] = each_pos.volume
+            pos_df = pos_df.append(each_df)
+
+    '''
+    # 借贷资产需要扣除
+    for each_sec in pos_df.index:
+        sec_id = each_sec.lower()
+        symbol = sec_id + currency
+        loans = hbaccount.get_margin_balance(symbol=symbol)
+
+    '''
+
+    pos_df = pos_df.fillna(0)
+    pos_df['volume'] = pos_df['spot'] + pos_df['margin'] - pos_df['loan']
+    pos_df['price'] = 0
+
+    # 统计总的持仓
+    total_amount = 0
+    for each_sec in pos_df.index:
+        sec_id = each_sec.lower()
         if sec_id != currency:
             symbol = sec_id + currency
             tick = hbaccount.get_last_ticks(symbol_list=symbol)
-            print(symbol, tick.last_price)
-            total_amount = total_amount + each_pos.amount*tick.last_price
+            symbol_tick = tick[0]
+            print(symbol, symbol_tick.last_price)
+            pos_df.loc[each_sec, 'price'] = symbol_tick.last_price
         else:
-            total_amount = total_amount + each_pos.amount
+            pos_df.loc[each_sec, 'price'] = 1
 
+    pos_df['total'] = pos_df['volume']*pos_df['price']
+    print(pos_df)
+    total_amount = pos_df['total'].sum()
     print(total_amount)
