@@ -65,7 +65,7 @@ if __name__ == '__main__':
     for each_pos in positions:
         sec_id = each_pos.sec_id.lower()
         if sec_id in pos_df.index:
-            pos_df.ilo[sec_id, 'margin'] = each_pos.volume
+            pos_df.loc[sec_id, 'margin'] = each_pos.volume
         else:
             each_df = pd.DataFrame([], index=[sec_id], columns=['spot', 'margin', 'loan'])
             each_df.loc[sec_id, 'margin'] = each_pos.volume
