@@ -696,12 +696,12 @@ class TradeAccount(object):
         '''
 
         order_list = []
-        if self.exchange == 'huobipro':
+        if self.exchange == 'hbp':
             sec_id = sec_id.lower()
             if states == 'all':
                 states = 'pre-submitted,submitted,partial-filled,partial-canceled,filled,canceled'
             if types == 'all':
-                types = 'buy-maret,sell-market,buy-limit,sell-limit'
+                types = 'buy-market,sell-market,buy-limit,sell-limit'
 
             start_date = time.strftime('%Y-%m-%d', time.strptime(begin_time, '%Y-%m-%d %H:%M:%S'))
             end_date = time.strftime('%Y-%m-%d', time.strptime(end_time, '%Y-%m-%d %H:%M:%S'))

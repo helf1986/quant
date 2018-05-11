@@ -5,15 +5,19 @@ from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_
 import time
 from api import logger
 
+'''
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
 bars = get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='5min', size=20)
 print(to_dataframe(bars))
-
 '''
+
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
+orders = hbaccount.get_orders_by_symbol (sec_id='btcusdt', begin_time='2018-05-06 00:00:00', end_time='2018-05-12 00:00:00', states='filled', types='sell-market')
 
+
+'''
 flag = 0
 count = 0
 while (flag == 0 and count < 10):
