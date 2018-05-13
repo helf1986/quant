@@ -73,10 +73,10 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
     pos_result.to_csv('log/当前持仓明细_' + nowstr + ".csv")
 
     # 将结果发送给客户
-    subject = "BitQuant 净值报告：当前总持仓额=%.4f，单位净值=%.4f" %(total_amount, netvalue)
+    subject = "BitQuant 净值报告：当前总持仓额=%.4f %s，单位净值=%.4f" %(total_amount, currency, netvalue)
 
     pos_msg = "最新报告时间：" + nowstr + "\n"
-    pos_msg = pos_msg + "当前总持仓额=%.4f，单位净值=%.4f \n" % (total_amount, netvalue)
+    pos_msg = pos_msg + "当前总持仓额=%.4f %s，单位净值=%.4f \n" % (total_amount, currency, netvalue)
     pos_msg = pos_msg + "\n" + "当前持仓明细：" + "\n"
     for nn in range(len(pos_result)):
         sec_id = pos_result.index[nn]
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
             print(nowstr)
             # 到达设定时间（每天6:00:00 和 18:00:00），结束内循环
-            if (now.hour == 23 or now.hour==18)  and now.minute == 35:
+            if (now.tm_hour == 23 or now.tm_hour==18)  and now.tm_min == 38:
                 break
             # 不到时间就等31秒之后再次检测
             time.sleep(31)
