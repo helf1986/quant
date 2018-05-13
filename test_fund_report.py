@@ -8,7 +8,7 @@ import api.connection as conn
 from api.fund_perform_eval import PerformEval
 from api import logger
 
-receivers = ['helf1986@qq.com', 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
+receivers = ['helf1986@qq.com'] # , 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
 
 def clearing(account=None, interval='1day', ctime='00:00:00'):
     '''
@@ -76,8 +76,8 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
     subject = "BitQuant 净值报告：当前总持仓额=%.4f，单位净值=%.4f" %(total_amount, netvalue)
 
     pos_msg = "最新报告时间：" + nowstr + "\n"
-    pos_msg = pos_msg + "当前总持仓额=%f，单位净值=%f \n" %(round(total_amount, 4), round(netvalue, 4))
-    pos_msg = pos_msg + "\n" + "当前持仓明细" + "\n"
+    pos_msg = pos_msg + "当前总持仓额=%.4f，单位净值=%.4f \n" % (total_amount, netvalue)
+    pos_msg = pos_msg + "\n" + "当前持仓明细：" + "\n"
     for nn in range(len(pos_result)):
         sec_id = pos_result.index[nn]
         data = pos_result.iloc[nn]
@@ -89,6 +89,7 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
 
         pos_msg = pos_msg + "%s 持有 %s, 可用 %.4f, 冻结 %.4f, 待还借贷 %.4f, 待还利息 %.4f, 净持仓量 %.4f, 当前价格 %.4f, 总金额 %.4f \n" \
                   % (account_type, sec_id, data['可用'], data['冻结'], data['待还借贷'], data['待还利息'], data['净持仓量'], data['当前价格'], data['净额'])
+        pos_msg = pos_msg + '\n'
 
     res = logger.send_mail(subject=subject, content=pos_msg, receivers=receivers)
     if res == True:
@@ -98,4 +99,18 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
 
 
 if __name__ == '__main__':
-    clearing()
+
+    while True:
+        # 判断是否达到设定时间，例如0:00
+        while True:
+            now = time.localtime(time.time())
+            nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
+            print(nowstr)
+            # 到达设定时间（每天6:00:00 和 18:00:00），结束内循环
+            if (now.hour == 23 or now.hour==18)  and now.minute == 35:
+                break
+            # 不到时间就等31秒之后再次检测
+            time.sleep(31)
+        # 做正事，一天做一次
+        clearing()
+
