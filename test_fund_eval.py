@@ -51,10 +51,14 @@ if __name__ == '__main__':
 
     # 普通账户数量
     positions = hbaccount.get_positions(source='spot')
+    pos_tmp = to_dataframe(positions)
+    print(pos_tmp)
+
     for each_pos in positions:
         sec_id = each_pos.sec_id.lower()
         print(sec_id)
         each_df = pd.DataFrame([], index=[sec_id], columns=fields)
+        print(each_df)
         pos_df.loc[sec_id, 'type'] = 'spot'
         pos_df.loc[sec_id, 'available'] = each_pos.available
         pos_df.loc[sec_id, 'frozen'] = each_pos.order_frozen
@@ -64,6 +68,9 @@ if __name__ == '__main__':
 
     # 借贷账户数量
     positions = hbaccount.get_positions(source='margin')
+    pos_tmp = to_dataframe(positions)
+    print(pos_tmp)
+
     for each_pos in positions:
         sec_id = each_pos.sec_id.lower()
         print(sec_id)
