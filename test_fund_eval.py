@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import api.connection as conn
 from api.fund_perform_eval import PerformEval
-from api.logger import send_mail
+from api import logger
 
 receivers = ['helf1986@qq.com'] # , 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
 
@@ -72,17 +72,29 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
     pos_result.to_csv('log/当前持仓明细_' + nowstr + ".csv")
 
     # 将结果发送给客户
-
     subject = "BitQuant 净值报告：当前总持仓额=%f，单位净值=%f" %(round(total_amount, 4), round(netvalue, 4))
 
-    pos_msg = "当前总持仓额=%f，单位净值=%f" %(round(total_amount, 4), round(netvalue, 4))
-    pos_msg = pos_msg + "\n " + "当前持仓明细" + "\n"
+    pos_msg = "最新报告时间：" + nowstr
+    pos_msg = pos_msg + "当前总持仓额=%f，单位净值=%f \n" %(round(total_amount, 4), round(netvalue, 4))
+    pos_msg = pos_msg + "当前持仓明细" + "\n"
     for nn in range(len(pos_result)):
+        sec_id = pos_result.index[nn]
         data = pos_result.iloc[nn]
-        pos_msg = pos_msg + "%s 账户持有 %s, 可用 %f, 冻结 %f, 待还借贷 %f, 待还利息 %f, 净持仓量 %f, 当前价格 %f, 总金额 %f \n" % (data['账户类型'], data.index, data['可用'], data['冻结'], data['待还借贷'], data['待还利息'], data['净持仓量'], data['当前价格'], data['净额'])
+        account_type = data['账户类型']
+        if account_type == 'spot':
+            account_type = '普通账户'
+        elif account_type =='margin':
+            account_type = '杠杆账户'
 
-    send_mail(subject=subject, content=pos_msg, receivers=receivers)
+        pos_msg = pos_msg + "%s 账户持有 %s, 可用 %f, 冻结 %f, 待还借贷 %f, 待还利息 %f, 净持仓量 %f, 当前价格 %f, 总金额 %f \n" \
+                  % (account_type, sec_id, round(data['可用'],4), round(data['冻结'], 4), round(data['待还借贷'],4), \
+                     round(data['待还利息'],4), round(data['净持仓量'], 4), round(data['当前价格'],4), round(data['净额'],4))
 
+    res = logger.send_mail(subject=subject, content=pos_msg, receivers=receivers)
+    if res == True:
+        logger.info('净值报告发送成功!')
+    else:
+        logger.warn('净值报告发送失败!')
 
 
 if __name__ == '__main__':
