@@ -50,12 +50,12 @@ if __name__ == '__main__':
     # 普通账户数量
     positions = hbaccount.get_positions(source='spot')
     pos_df = to_dataframe(positions)
-    print(pos_df)
+    # print(pos_df)
 
     # 借贷账户数量
     positions = hbaccount.get_positions(source='margin')
     pos_df2 = to_dataframe(positions)
-    print(pos_df2)
+    # print(pos_df2)
 
     pos_df = pos_df.append(pos_df2)
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     pos_df['price'] = [sec_price[each] for each in pos_df.index]
     pos_df['netamt'] = pos_df['netvol']*pos_df['price']
-
+    print(pos_df)
 
     pos_df.columns = ['账户类型', '可用', '冻结', '待还借贷', '待还利息', '净持仓量', '当前价格', '净额']
     print("当前持仓明细：")
