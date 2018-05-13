@@ -956,6 +956,7 @@ class TradeAccount(object):
                     position.available = float(balance_dict[each]['trade'])
                     position.order_frozen = float(balance_dict[each]['frozen'])
                     position.volume = position.available + position.order_frozen
+                    position.update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                     if source == 'margin':
                         position.loan = float(balance_dict[each]['loan'])
                         position.interest = float(balance_dict[each]['interest'])
@@ -1177,6 +1178,8 @@ class Position(object):
     def __init__(self):
         self.strategy_id = ''           ## 策略ID
         self.account_id = ''            ## 账户id
+        self.account_type = ''          ## 账户类型
+        self.account_status = ''        ## 账户状态
         self.currency = ''              ## 计价货币
         self.exchange = ''              ## 交易所代码
         self.sec_id = ''                ## 证券ID
