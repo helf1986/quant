@@ -84,7 +84,7 @@ if __name__ == '__main__':
     pos_df['netamt'] = pos_df['netvol']*pos_df['price']
     print(pos_df)
 
-    pos_result = pos_df[['account_type', 'available', 'order_frozen', 'loan', 'interest', 'netvol', 'price', 'netamt']]
+    pos_result = pos_df[['account_type', 'available', 'frozen', 'loan', 'interest', 'netvol', 'price', 'netamt']]
     pos_result.columns = ['账户类型', '可用', '冻结', '待还借贷', '待还利息', '净持仓量', '当前价格', '净额']
     print("当前持仓明细：")
     print(pos_result)
