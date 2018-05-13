@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     # 统计总的持仓
     pos_df = pos_df.fillna(0)
-    pos_df['netvol'] = pos_df['available'] + pos_df['order_frozen'] - pos_df['loanvol'] - pos_df['interest']
+    pos_df['netvol'] = pos_df['available'] + pos_df['frozen'] + pos_df['loan'] + pos_df['interest']
     pos_df['price'] = 0
 
     pos_df = pos_df[pos_df['netvol'] != 0]
