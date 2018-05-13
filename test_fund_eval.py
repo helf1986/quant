@@ -28,7 +28,7 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
             # 每日 00:00:00 进行清算
             if now.tm_hour == 0 and now.tm_min == 0:
                 isStart = True
-        elif interval == '60min':
+        elif interval == '60min' or interval =='1hour':
             # 每小时清算一次，XX:00:00 进行结算
             if now.tm_min == 0:
                 isStart = True
@@ -43,6 +43,7 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
 
 if __name__ == '__main__':
 
+    
     hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY,api_secret=HBP_SECRET_KEY, currency='USDT')
     currency = hbaccount.currency.lower()
 
