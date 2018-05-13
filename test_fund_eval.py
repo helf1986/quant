@@ -58,12 +58,15 @@ if __name__ == '__main__':
     print(pos_df2)
 
     pos_df = pos_df.append(pos_df2)
-    print(pos_df)
 
     # 统计总的持仓
     pos_df = pos_df.fillna(0)
     pos_df['netvol'] = pos_df['available'] + pos_df['order_frozen'] - pos_df['loanvol'] - pos_df['interest']
     pos_df['price'] = 0
+
+    pos_df = pos_df[pos_df['netvol'] != 0]
+    pos_df.index = pos_df['sec_id']
+    print(pos_df)
 
     # 获取每只币种当前价格
     sec_price = {}
