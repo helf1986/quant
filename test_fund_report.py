@@ -8,7 +8,7 @@ import api.connection as conn
 from api.fund_perform_eval import PerformEval
 from api import logger
 
-receivers = ['helf1986@qq.com'] # , 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
+receivers = ['helf1986@qq.com', 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
 
 def clearing(account=None, interval='1day', ctime='00:00:00'):
     '''
@@ -107,7 +107,7 @@ if __name__ == '__main__':
             nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
             print(nowstr)
             # 到达设定时间（每天6:00:00 和 18:00:00），结束内循环
-            if (now.tm_hour == 23 or now.tm_hour==18)  and now.tm_min == 43:
+            if (now.tm_hour == 6 or now.tm_hour==18)  and now.tm_min == 00:
                 break
             # 不到时间就等31秒之后再次检测
             time.sleep(50)
