@@ -947,6 +947,7 @@ class TradeAccount(object):
                 for each in balance_dict.keys():
                     position = Position()
                     position.exchange = self.exchange
+                    position.currency = self.currency
                     position.account_id = account_id
                     position.account_type = account_type
                     position.account_status = account_status
@@ -954,7 +955,7 @@ class TradeAccount(object):
                     position.sec_id = each
                     position.available = float(balance_dict[each]['trade'])
                     position.order_frozen = float(balance_dict[each]['frozen'])
-                    position.amount = position.available + position.order_frozen
+                    position.volume = position.available + position.order_frozen
                     if source == 'margin':
                         position.loan = float(balance_dict[each]['loan'])
                         position.interest = float(balance_dict[each]['interest'])
@@ -1186,6 +1187,7 @@ class Position(object):
         self.loanvol = 0.0
         self.interest = 0.0
         self.loan_order_id = ''         # 仅对借贷资产有效，用于偿还借贷资产
+        self.amount = 0.0               # 当前持仓价值 = (volume - loanvol - interest) * price
         self.update_time = ''           ## 持仓更新时间
 
 

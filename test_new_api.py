@@ -17,6 +17,11 @@ hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_
 orders = hbaccount.get_orders_by_symbol (sec_id='btcusdt', begin_time='2018-05-06 00:00:00', end_time='2018-05-12 00:00:00', states='filled', types='sell-market')
 
 
+from common.HuobiClient import HuobiClient
+client = HuobiClient(api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY)
+res = client.orders_list(symbol='btcusdt', states='filled', types='sell-market', start_date='2018-05-06', end_date='2018-05-12')
+
+
 '''
 flag = 0
 count = 0
