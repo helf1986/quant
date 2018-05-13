@@ -46,13 +46,15 @@ if __name__ == '__main__':
     initial_amount = 100000
     hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY,api_secret=HBP_SECRET_KEY, currency='USDT')
     currency = hbaccount.currency.lower()
-    pos_df = pd.DataFrame([], columns=['type', 'available', 'frozen', 'loan', 'interest', 'netvol', 'price', 'netamt'])
+    fields = ['type', 'available', 'frozen', 'loan', 'interest', 'netvol', 'price', 'netamt']
+    pos_df = pd.DataFrame([], columns=fields)
 
     # 普通账户数量
     positions = hbaccount.get_positions(source='spot')
     for each_pos in positions:
         sec_id = each_pos.sec_id.lower()
-        each_df = pd.DataFrame([], index=[sec_id], columns=['spot', 'margin', 'loan'])
+        print(sec_id)
+        each_df = pd.DataFrame([], index=[sec_id], columns=fields)
         pos_df.loc[sec_id, 'type'] = 'spot'
         pos_df.loc[sec_id, 'available'] = each_pos.available
         pos_df.loc[sec_id, 'frozen'] = each_pos.order_frozen
@@ -65,12 +67,12 @@ if __name__ == '__main__':
     for each_pos in positions:
         sec_id = each_pos.sec_id.lower()
         print(sec_id)
-        each_df = pd.DataFrame([], index=[sec_id], columns=['spot', 'margin', 'loan'])
+        each_df = pd.DataFrame([], index=[sec_id], columns=fields)
         pos_df.loc[sec_id, 'type'] = 'margin'
         pos_df.loc[sec_id, 'available'] = each_pos.available
         pos_df.loc[sec_id, 'frozen'] = each_pos.order_frozen
-        pos_df.loc[sec_id, 'loan'] = 0.0
-        pos_df.loc[sec_id, 'interest'] = 0.0
+        pos_df.loc[sec_id, 'loan'] = each_pos.loanvol
+        pos_df.loc[sec_id, 'interest'] = each_pos.interest
         pos_df = pos_df.append(each_df)
 
     # 统计总的持仓
