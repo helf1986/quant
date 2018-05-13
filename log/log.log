@@ -3,6 +3,7 @@
 2018-05-06 00:12:13.602115	WARN	loan-amount-leverage-limit:This amount exceeds the maximum. Please re-enter.
 2018-05-06 00:25:43.743002	WARN	loan-amount-leverage-limit:This amount exceeds the maximum. Please re-enter.
 2018-05-06 00:33:15.914210	INFO	hbp 借贷订单号 942857：归还 0.001002
+<<<<<<< HEAD
 2018-05-06 23:07:48.980132	WARN	业绩数据插入数据库失败！
 2018-05-06 23:07:49.089505	WARN	业绩数据插入数据库失败！
 2018-05-06 23:07:49.089505	WARN	业绩数据插入数据库失败！
@@ -190,3 +191,9 @@
 2018-05-06 23:07:49.709079	WARN	业绩数据插入数据库失败！
 2018-05-06 23:07:49.709079	WARN	业绩数据插入数据库失败！
 2018-05-06 23:07:49.724731	WARN	业绩数据插入数据库失败！
+=======
+2018-05-08 10:15:11.676200	WARN	Connection Failed: 	HTTPSConnectionPool(host='api.huobi.pro', port=443): Max retries exceeded with url: /market/history/kline?symbol=btcusdt&period=1min&size=1 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x000000000C04C160>, 'Connection to api.huobi.pro timed out. (connect timeout=5)'))
+2018-05-08 10:15:21.713200	WARN	Connection Failed: 	HTTPSConnectionPool(host='api.huobi.pro', port=443): Max retries exceeded with url: /market/history/kline?symbol=btcusdt&period=1min&size=1 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x000000000C04C710>, 'Connection to api.huobi.pro timed out. (connect timeout=5)'))
+2018-05-08 10:15:31.816200	WARN	Connection Failed: 	HTTPSConnectionPool(host='api.huobi.pro', port=443): Max retries exceeded with url: /market/history/kline?symbol=btcusdt&period=1min&size=1 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x000000000C04CD30>, 'Connection to api.huobi.pro timed out. (connect timeout=5)'))
+2018-05-08 10:15:41.821200	WARN	Connection Failed: 	HTTPSConnectionPool(host='api.huobi.pro', port=443): Max retries exceeded with url: /market/history/kline?symbol=btcusdt&period=1min&size=1 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x00000000077DC390>, 'Connection to api.huobi.pro timed out. (connect timeout=5)'))
+>>>>>>> f4aa6b6e9303faf87567519f82c2dd20ac5972ec

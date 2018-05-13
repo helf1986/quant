@@ -7,7 +7,9 @@ Created on Wed Apr 25 16:02:09 2018
 
 import os
 import api.quant_api as qapi
+from api.fund_perform_eval import PerformEval
 from api import logger
+import api.connection as conn
 import time
 from queue import Queue
 import threading
@@ -33,6 +35,7 @@ class Strategy(object):
             掘金=md
             火币=qapi       
         '''
+
         self.name = name
         self.module = module[0]
         self.margin_currency = module[1]
@@ -99,7 +102,7 @@ class Strategy(object):
                     3、执行还券流程
                     '''
                     unpaid_volume = self.api.get_margin_volume(self.margin_order_id, currency=self.margin_currency)
-                    order = self.api.open_long(exchange=self.exchange, source='margin-api', sec_id=self.symbol_list,
+                    order = self.api.open_long(exchange=self.exchange, source='margin', sec_id=self.symbol_list,
                                                price=price, volume=unpaid_volume)
                     self.api.repay_margin(exchange=self.exchange, margin_order_id=self.margin_order_id,
                                           amount=unpaid_volume)
@@ -107,6 +110,7 @@ class Strategy(object):
                     order = self.api.open_long(exchange=self.margin_order_id, source='api', sec_id=self.symbol_list,
                                                price=price, volume=unit)
                 self.__orderqueue.put(order)
+
         if self.MarketPosition == 0:
             self.MarketPosition = 1;
             print(self.name + "buy(%s,%s)" % (unit, price), self.MarketPosition)
@@ -117,7 +121,7 @@ class Strategy(object):
                 else:
                     margin = self.api.apply_margin(exchange=self.exchange, symbol=self.symbol_list,
                                                    currency=self.margin_currency, amount=unit)
-                    order = self.api.open_long(exchange=self.exchange, source='margin-api', sec_id=self.symbol_list,
+                    order = self.api.open_long(exchange=self.exchange, source='margin', sec_id=self.symbol_list,
                                                price=price, volume=unit)
                     self.margin_order_id = margin.margin_order_id
                 self.__orderqueue.put(order)
@@ -208,7 +212,38 @@ class Strategy(object):
         '''
         此处处理输出order到数据库，包括历史表和实时表
         '''
-        order
+        try:
+            conn.order2db(order)
+        except:
+            logger.warn('订单号 %d 写入数据库失败！'% order.order_id)
+
+    def clearing(self, interval='1day', ctime='00:00:00'):
+        '''
+        定期进行清结算
+        :param interval: 支持两种方式，interval='1day' 每天结算一次，interval='60min' 每小时结算一次
+        :param ctime: 指定每天具体时间
+        :return:
+        '''
+
+        while (1):
+            isStart = False
+            now = time.localtime(time.time())
+            if interval == '1day':
+                # 每日 00:00:00 进行清算
+                if now.tm_hour == 0 and now.tm_min == 0:
+                    isStart = True
+            elif interval == '60min':
+                # 每小时清算一次，XX:00:00 进行结算
+                if now.tm_min == 0:
+                    isStart = True
+
+            if isStart:
+                hist_position = self.position_records
+                netvalue = qapi.to_dataframe(hist_position)
+                myindicator = qapi.Indicator()
+                perform = PerformEval(netvalue)
+
+
 
     # -------------------- -----更新事件队列-------------------------------------------
     def __sendevent_bar(self):

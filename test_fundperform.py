@@ -1,6 +1,6 @@
 from common.settings import MONGO_IP, MONGO_PORT
 from pymongo import MongoClient
-from api.quant_api import to_dataframe, to_dict
+from api.quant_api import Indicator, to_dataframe, to_dict
 from api.fund_perform_eval import PerformEval
 from api import logger
 import pandas as pd
@@ -22,50 +22,6 @@ def connect_mongo(ip=None, port=None):
     client = MongoClient(host=ip, port=port)
 
     return client
-
-
-class Indicator(object):
-    '''
-    账户业绩指标
-    '''
-    def __init__(self):
-        self.strategy_id = ''                       ## 策略ID
-        self.account_id = ''                        ## 账号ID
-        self.currency = ''                          ## 账户计价货币
-
-        self.init = 0.0                             ## 账户初始资金
-        self.total_amt = 0.0                        ## 当前账户总金额
-
-        self.nav = 0.0                              ## 净值(cum_inout + cum_pnl + fpnl - cum_commission)
-        self.pnl = 0.0                              ## 净收益(nav-cum_inout)
-        self.profit_ratio = 0.0                     ## 收益率(pnl/cum_inout)
-        self.profit_ratio_bench = 0.0               ## 基准收益率
-        self.sharp_ratio = 0.0                      ## 夏普比率
-        self.risk_ratio = 0.0                       ## 风险比率，波动率
-        self.trade_count = 0                        ## 交易次数
-        self.win_count = 0                          ## 盈利次数
-        self.lose_count = 0                         ## 亏损次数
-        self.win_ratio = 0.0                        ## 胜率
-        self.max_profit = 0.0                       ## 最大收益
-        self.min_profit = 0.0                       ## 最小收益
-        self.max_single_trade_profit = 0.0          ## 最大单次交易收益
-        self.min_single_trade_profit = 0.0          ## 最小单次交易收益
-        self.daily_max_single_trade_profit = 0.0    ## 今日最大单次交易收益
-        self.daily_min_single_trade_profit = 0.0    ## 今日最小单次交易收益
-        self.max_position_value = 0.0               ## 最大持仓市值或权益
-        self.min_position_value = 0.0               ## 最小持仓市值或权益
-        self.max_drawdown = 0.0                     ## 最大回撤
-        self.daily_pnl = 0.0                        ## 今日收益
-        self.daily_return = 0.0                     ## 今日收益率
-        self.total_return = 0.0                     ## 累计收益率
-        self.annual_return = 0.0                    ## 年化收益率
-
-        self.cum_inout = 0.0                        ## 累计出入金
-        self.cum_trade = 0.0                        ## 累计交易额
-        self.cum_pnl = 0.0                          ## 累计平仓收益(没扣除手续费)
-        self.cum_commission = 0.0                   ## 累计手续费
-
-        self.transact_time = 0.0                    ## 指标计算时间
 
 
 def perform2db(indicator):
