@@ -954,8 +954,8 @@ class TradeAccount(object):
 
                     position.sec_id = each
                     position.available = float(balance_dict[each]['trade'])
-                    position.order_frozen = float(balance_dict[each]['frozen'])
-                    position.volume = position.available + position.order_frozen
+                    position.frozen = float(balance_dict[each]['frozen'])
+                    position.volume = position.available + position.frozen
                     position.update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                     if source == 'margin':
                         position.loan = float(balance_dict[each]['loan'])
@@ -975,7 +975,7 @@ class TradeAccount(object):
                         position = Position()
                         position.exchange = self.exchange
                         position.available = each['free']
-                        position.order_frozen = each['locked']
+                        position.frozen = each['locked']
                         position.volume = each['free'] + each['locked']
                         positions = positions + [position]
 
@@ -1185,12 +1185,12 @@ class Position(object):
         self.sec_id = ''                ## 证券ID
         self.side = 0                   ## 买卖方向，side=1：持有该资产，side =-1：持有该资产的借贷
         self.volume = 0.0               ## 持仓量
-        self.order_frozen = 0.0         ## 挂单冻结仓位
+        self.frozen = 0.0         ## 挂单冻结仓位
         self.available = 0.0            ## 可平仓位
-        self.loanvol = 0.0
+        self.loan = 0.0
         self.interest = 0.0
         self.loan_order_id = ''         # 仅对借贷资产有效，用于偿还借贷资产
-        self.amount = 0.0               # 当前持仓价值 = (volume - loanvol - interest) * price
+        self.amount = 0.0               # 当前持仓价值 = (volume - loan - interest) * price
         self.update_time = ''           ## 持仓更新时间
 
 
