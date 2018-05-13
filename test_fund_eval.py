@@ -6,12 +6,9 @@ import pandas as pd
 import numpy as np
 import api.connection as conn
 from api.fund_perform_eval import PerformEval
+from api.logger import send_mail
 
-
-def tradelog(account=None):
-
-    account.get_orders_by_symbol(sec_id = 'btcusdt')
-
+receivers = ['helf1986@qq.com'] # , 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
 
 def clearing(account=None, interval='1day', ctime='00:00:00'):
     '''
@@ -20,28 +17,6 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
     :param ctime: 指定每天具体时间
     :return:
     '''
-
-    while (1):
-        isStart = False
-        now = time.localtime(time.time())
-        if interval == '1day':
-            # 每日 00:00:00 进行清算
-            if now.tm_hour == 0 and now.tm_min == 0:
-                isStart = True
-        elif interval == '60min' or interval =='1hour':
-            # 每小时清算一次，XX:00:00 进行结算
-            if now.tm_min == 0:
-                isStart = True
-
-        if isStart:
-            positions = account.get_positions(source='margin')
-            hist_position = hist_position + [positions]
-            netvalue = to_dataframe(hist_position)
-            myindicator = Indicator()
-            perform = PerformEval(netvalue)
-
-
-if __name__ == '__main__':
 
     initial_amount = 100000
     hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY,api_secret=HBP_SECRET_KEY, currency='USDT')
@@ -89,5 +64,26 @@ if __name__ == '__main__':
     print("当前持仓明细：")
     print(pos_result)
     total_amount = pos_result['净额'].sum()
+    netvalue = total_amount/initial_amount
     print("当前总持仓额为：", total_amount)
-    print("当前净值为：", total_amount/initial_amount)
+    print("当前净值为：", netvalue)
+
+    nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
+    pos_result.to_csv('log/当前持仓明细_' + nowstr + ".csv")
+
+    # 将结果发送给客户
+
+    subject = "BitQuant 净值报告：当前总持仓额=%f，单位净值=%f" %(round(total_amount, 4), round(netvalue, 4))
+
+    pos_msg = "当前总持仓额=%f，单位净值=%f" %(round(total_amount, 4), round(netvalue, 4))
+    pos_msg = pos_msg + "\n " + "当前持仓明细" + "\n"
+    for nn in range(len(pos_result)):
+        data = pos_result.iloc[nn]
+        pos_msg = pos_msg + "%s 账户持有 %s, 可用 %f, 冻结 %f, 待还借贷 %f, 待还利息 %f, 净持仓量 %f, 当前价格 %f, 总金额 %f \n" % (data['账户类型'], data.index, data['可用'], data['冻结'], data['待还借贷'], data['待还利息'], data['净持仓量'], data['当前价格'], data['净额'])
+
+    send_mail(subject=subject, content=pos_msg, receivers=receivers)
+
+
+
+if __name__ == '__main__':
+    clearing()
