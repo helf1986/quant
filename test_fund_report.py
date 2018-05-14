@@ -9,6 +9,8 @@ from api.fund_perform_eval import PerformEval
 from api import logger
 
 receivers = ['helf1986@qq.com']  # 收件人邮箱账号
+# 20180514 新加入资金19800 USDT
+initial_amount = ((99960*1.0007) + 19800)/1.007
 
 def clearing():
     '''
@@ -18,7 +20,6 @@ def clearing():
     :return:
     '''
 
-    initial_amount = 100000
     hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY,api_secret=HBP_SECRET_KEY, currency='USDT')
     currency = hbaccount.currency.lower()
 
@@ -115,7 +116,7 @@ if __name__ == '__main__':
             nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
             print(nowstr)
             # 到达设定时间（每天6:00:00 和 18:00:00），结束内循环
-            if (now.tm_hour == 13 or now.tm_hour==18)  and now.tm_min == 55:
+            if (now.tm_hour == 14 or now.tm_hour==18)  and now.tm_min == 5:
                 break
             # 不到时间就等31秒之后再次检测
             time.sleep(50)
