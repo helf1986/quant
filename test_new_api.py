@@ -3,6 +3,7 @@
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
 from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
 import time
+import pandas as pd
 from api import logger
 
 '''
@@ -15,23 +16,41 @@ print(to_dataframe(bars))
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
 symbol_list = ['bchusdt', 'btcusdt', 'ethusdt', 'xrpusdt','ltcusdt', 'dashusdt', 'iotausdt', 'omgusdt', 'adausdt']
+
+depth_df = pd.DataFrame([], columns=['bid_price', 'bid_amount', 'ask_price', 'ask_amount', 'strtime', 'symbol'])
+for each_symbol in symbol_list:
+    depth_data = hbaccount.get_depth(symbol=each_symbol, type='step0')
+    print(depth_data.head())
+    depth_df = depth_df.append(depth_data)
+
+print(len(depth_df))
+depth_df.to_csv('btc_depth.csv')
+
+
+
+
+'''
+symbol_list = ['bchusdt', 'btcusdt', 'ethusdt', 'xrpusdt','ltcusdt', 'dashusdt', 'iotausdt', 'omgusdt', 'adausdt']
 symbol_str = ','.join(symbol_list)
 print(symbol_str)
 bars = hbaccount.get_bars(symbol_list=symbol_str, bar_type='1day', size=2000)
 bar_df = to_dataframe(bars)
 print(bar_df.head())
 bar_df.to_csv('bar_1day.csv')
-
+'''
 
 
 
 '''
 orders = hbaccount.get_orders_by_symbol (sec_id='btcusdt', begin_time='2018-05-06 00:00:00', end_time='2018-05-12 00:00:00', states='filled', types='sell-market')
 
-
+from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
 from common.HuobiClient import HuobiClient
 client = HuobiClient(api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY)
 res = client.orders_list(symbol='btcusdt', states='filled', types='sell-market', start_date='2018-05-06', end_date='2018-05-12')
+
+res = client.get_depth(symbol='btcusdt', type='step0')
+
 
 
 

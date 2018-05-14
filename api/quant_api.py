@@ -103,11 +103,11 @@ class TradeAccount(object):
         symbol_list = symbol_list.replace(' ', '').split(',')
         bars = []
 
-        print(symbol_list)
+        # print(symbol_list)
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
                 each_sec = each_sec.lower()         # 注意火币只支持小写字母
-                print(each_sec)
+                # print(each_sec)
                 inner_size = size
                 if size == 0:
                     inner_size = 2000
@@ -336,12 +336,25 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             symbol = symbol.lower()
             depth_res = self.client.get_depth(symbol=symbol, type=type)
+            if depth_res['status'] == 'ok':
+                data = depth_res['tick']
+                utc_time = round(data['ts']/1000)
+                strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(utc_time))
+                bids_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_amount'])
+                bids_df = bids_df.sort_values(by='bid_price', ascending=False)
+                asks_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_amount'])
+                asks_df = asks_df.sort_values(by='ask_price')
+                depth_df = bids_df.join(asks_df)
+                depth_df['strtime'] = strtime
+                depth_df['symbol'] = symbol
+
 
         elif self.exchange == 'binance':
             symbol = symbol.upper()
             depth_res = self.cilent.get_order_book(symbol=symbol)
+            depth_df = None
 
-        return depth_res
+        return depth_df
 
 
     def open_long(self, source='api', sec_id='btcusdt', price=0, volume=0):
