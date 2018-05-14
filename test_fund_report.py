@@ -116,7 +116,7 @@ if __name__ == '__main__':
             nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
             print(nowstr)
             # 到达设定时间（每天6:00:00 和 18:00:00），结束内循环
-            if (now.tm_hour == 14 or now.tm_hour==18)  and now.tm_min == 5:
+            if (now.tm_hour == 6 or now.tm_hour==18)  and now.tm_min == 0:
                 break
             # 不到时间就等31秒之后再次检测
             time.sleep(50)
