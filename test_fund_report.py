@@ -8,9 +8,9 @@ import api.connection as conn
 from api.fund_perform_eval import PerformEval
 from api import logger
 
-receivers = ['helf1986@qq.com', 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
+receivers = ['helf1986@qq.com']  # 收件人邮箱账号
 
-def clearing(account=None, interval='1day', ctime='00:00:00'):
+def clearing():
     '''
     定期进行清结算
     :param interval: 支持两种方式，interval='1day' 每天结算一次，interval='60min' 每小时结算一次
@@ -90,6 +90,14 @@ def clearing(account=None, interval='1day', ctime='00:00:00'):
         pos_msg = pos_msg + "%s 持有 %s, 可用 %.4f, 冻结 %.4f, 待还借贷 %.4f, 待还利息 %.4f, 净持仓量 %.4f, 当前价格 %.4f, 总金额 %.4f \n" \
                   % (account_type, sec_id, data['可用'], data['冻结'], data['待还借贷'], data['待还利息'], data['净持仓量'], data['当前价格'], data['净额'])
         pos_msg = pos_msg + '\n'
+
+    # 读取最新的邮件列表
+    try:
+        f = open('monitor/mail_list.txt')
+        fdata = f.read()
+        receivers = fdata.replace(' ', '').split(',')
+    except:
+        logger.warn('打开邮件列表失败！\n')
 
     res = logger.send_mail(subject=subject, content=pos_msg, receivers=receivers)
     if res == True:
