@@ -103,10 +103,11 @@ class TradeAccount(object):
         symbol_list = symbol_list.replace(' ', '').split(',')
         bars = []
 
+        print(symbol_list)
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
                 each_sec = each_sec.lower()         # 注意火币只支持小写字母
-
+                print(each_sec)
                 inner_size = size
                 if size == 0:
                     inner_size = 2000
