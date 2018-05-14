@@ -10,7 +10,7 @@ from api import logger
 
 receivers = ['helf1986@qq.com']  # 收件人邮箱账号
 # 20180514 新加入资金19800 USDT
-initial_amount = ((99960*1.0007) + 19800)/1.007
+initial_amount = ((99960*1.0007) + 19980)/1.007
 
 def clearing():
     '''
