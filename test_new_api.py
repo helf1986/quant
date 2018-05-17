@@ -11,22 +11,29 @@ from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
 bars = get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='5min', size=20)
 print(to_dataframe(bars))
 '''
-
+'''
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
 symbol_list = ['bchusdt', 'btcusdt', 'ethusdt', 'xrpusdt','ltcusdt', 'dashusdt', 'iotausdt', 'omgusdt', 'adausdt']
 
+# 依次获取每个数币的深度数据
 depth_df = pd.DataFrame([], columns=['bid_price', 'bid_amount', 'ask_price', 'ask_amount', 'strtime', 'symbol'])
 for each_symbol in symbol_list:
     depth_data = hbaccount.get_depth(symbol=each_symbol, type='step0')
-    print(depth_data.head())
     depth_df = depth_df.append(depth_data)
 
-print(len(depth_df))
+print(depth_df.head())
 depth_df.to_csv('btc_depth.csv')
+'''
 
 
+import api.quant_api as qapi
+begin_time = '2018-05-15 23:40:00'
+end_time =  '2018-05-16 00:00:00'
+data = qapi.get_depth_local(exchange='hbp', symbol_list='ethusdt', step='step5', begin_time=begin_time, end_time=end_time)
+
+print(data)
 
 
 '''

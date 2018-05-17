@@ -1333,11 +1333,13 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
     symbol_list = symbol_list.replace(' ', '').split(',')
     bars = []
     for each_sec in symbol_list:
-
+        each_sec = each_sec.lower()
         if begin_time == '':
 
             end_time_ts = int(time.time())
             end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time_ts))
+            N_bar = 60
+            per = 1
             if bar_type == '1min':
                 N_bar = 60
                 per = 1
@@ -1359,11 +1361,20 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
             begin_time_ts = int(end_time_ts - (N_bar+2) * size)
             begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(begin_time_ts))
 
+        else:
+            end_time_ts = int(time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S')))
+            begin_time_ts = int(time.mktime(time.strptime(begin_time, '%Y-%m-%d %H:%M:%S')))
+
         client = MongoClient('47.75.69.176', 28005)
         coin_db = client['bc_bourse_huobipro']
         coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
-        collection = coin_db['b_btc_kline']
 
+        currency = 'usdt'
+        sec_code = each_sec.replace(currency, '')
+        table_name = 'b_' + sec_code +'_kline'
+        collection = coin_db[table_name]
+
+        print (per, begin_time_ts, end_time_ts)
         data = collection.find({'per': str(per), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})
 
         for each_bar in data:
@@ -1387,6 +1398,73 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
         bars = bars[-size:]
 
     return bars
+
+
+def get_depth_local(exchange='hbp', symbol_list='btcusdt', step='step5', begin_time='', end_time=''):
+    '''
+    从mongodb 取数
+    :param exchange:
+    :param symbol_list:
+    :param bar_type:
+    :param begin_time:
+    :param end_time:
+    :param size:
+    :return:
+    '''
+    symbol_list = symbol_list.replace(' ', '').split(',')
+    data_df = pd.DataFrame([], columns = ['symbol', 'strtime', 'step', 'direct', 'price', 'amount'])
+    for each_sec in symbol_list:
+        each_sec = each_sec.lower()
+
+        end_time_ts = int(time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S')))
+        begin_time_ts = int(time.mktime(time.strptime(begin_time, '%Y-%m-%d %H:%M:%S')))
+
+        client = MongoClient('47.75.69.176', 28005)
+        coin_db = client['bc_bourse_huobipro']
+        coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
+
+        currency = 'usdt'
+        sec_code = each_sec.replace(currency, '')
+        table_name = 'b_' + sec_code +'_depth_5'
+        collection = coin_db[table_name]
+
+        # print (sec_code, begin_time_ts*1000, end_time_ts*1000)
+        data = collection.find({"t": {"$gte": begin_time_ts*1000, "$lte":end_time_ts*1000}})
+
+        depth_list = []
+        for each_data in data:
+            # print(each_data)
+
+            '''
+            depth = {}
+            depth['symbol'] = each_sec
+            if each_data['ty'] == 0:
+                depth['direction'] = 'ask'
+            else:
+                depth['direction'] = 'bid'
+
+            depth['strtime'] = each_data['ts']
+            depth['time'] = each_data['t']
+            depth['price'] = each_data['p']
+            depth['amount'] = each_data['amt']
+
+            depth_list = depth_list + [depth]
+            '''
+            depth_list = depth_list + [each_data]
+
+        each_data = pd.DataFrame(depth_list)
+        # print(each_data.head())
+        each_data.columns = ['id', 'amount',  'ccy', 'price', 'time', 'strtime', 'direct']
+        each_data['symbol'] = each_sec
+        each_data['step'] = step
+        each_data['direct'] = ['ask' if each_data.loc[tmp]['direct']==0 else 'bid' for tmp in each_data.index]
+
+        # print(each_data.head())
+        data_df = data_df.append(each_data)
+
+    data_df = data_df[['symbol', 'strtime', 'time', 'step', 'direct', 'price', 'amount']]
+    return data_df
+
 
 
 def order2position(order_list=None, interval='1day'):
