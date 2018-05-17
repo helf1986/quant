@@ -49,8 +49,8 @@ class Subscribe_Bars(threading.Thread):
                 print(type(result))
                 new_bar = Bar()
                 data = eval(result)['tick']
-                new_bar.utc_time = data['ts']
-                structtime = time.localtime(data['ts'])
+                new_bar.utc_time = data['id']
+                structtime = time.localtime(data['id'])
                 new_bar.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
                 new_bar.open = data['open']
                 new_bar.high = data['high']
