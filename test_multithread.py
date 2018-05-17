@@ -69,7 +69,8 @@ thread2 = myThread(2, "Thread-2", 2)
 
 # 开启新线程
 thread1.start()
-thread2.start()
-thread1.join()
-thread2.join()
-print ("退出主线程")
+# thread1.join()
+
+# thread2.start()
+# thread2.join()
+# print ("退出主线程")
