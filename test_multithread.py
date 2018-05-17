@@ -9,18 +9,6 @@ from queue import Queue
 exitFlag = 0
 from api.quant_api import Bar
 
-class myThread (threading.Thread):
-
-    def __init__(self, threadID, name, counter):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.name = name
-        self.counter = counter
-
-    def run(self):
-        print ("开始线程：" + self.name)
-        print_time(self.name, self.counter, 5)
-        print ("退出线程：" + self.name)
 
 QUEUE_SIZE = 2000
 bar_queue = Queue(maxsize=QUEUE_SIZE)
@@ -58,9 +46,9 @@ class Subscribe_Bars(threading.Thread):
                 ws.send(pong)
                 ws.send(tradeStr)
             elif result[2:4] == "ch":
-                # print(result)
+                print(type(result))
                 new_bar = Bar()
-                data = result['tick']
+                data = eval(result)['tick']
                 new_bar.utc_time = data['ts']
                 structtime = time.localtime(data['ts'])
                 new_bar.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
@@ -75,6 +63,7 @@ class Subscribe_Bars(threading.Thread):
 
                 if last_bar.utc_time != new_bar.utc_time:
                     bar_queue.put(new_bar)
+                    print("websockt: %s  %f" % (new_bar.strtime, new_bar.close))
 
 
 class Strategy(threading.Thread):
@@ -92,17 +81,6 @@ class Strategy(threading.Thread):
                 print(len(bar_list))
                 print(new_bar.strtime, new_bar.close)
 
-
-
-
-
-def print_time(threadName, delay, counter):
-    while counter:
-        if exitFlag:
-            threadName.exit()
-        time.sleep(delay)
-        print ("%s: %s" % (threadName, time.ctime(time.time())))
-        counter -= 1
 
 # 创建新线程
 thread1 = Subscribe_Bars(exchange='hbp', symbol='btcusdt', type='1min')
