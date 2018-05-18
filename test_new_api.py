@@ -23,10 +23,10 @@ print(bar_df.head())
 bar_df.index = bar_df['strtime']
 
 
-symbols = np.unique(bar_df['symbol'])
+symbols = np.unique(bar_df['sec_id'])
 data_all = pd.DataFrame([], columns=symbols)
 for each_symbol in symbols:
-    tmp_index =  bar_df['symbol'] == each_symbol
+    tmp_index =  bar_df['sec_id'] == each_symbol
     data_all[each_symbol] = bar_df[tmp_index]['close']
 
 data_all.to_dict('data_all.csv')
