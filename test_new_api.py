@@ -7,6 +7,7 @@ import pandas as pd
 from api import logger
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 '''
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
@@ -29,7 +30,9 @@ for each_symbol in symbols:
     tmp_index =  bar_df['sec_id'] == each_symbol
     data_all[each_symbol] = bar_df[tmp_index]['close']
 
-data_all.to_dict('data_all.csv')
+data_all.to_csv('data_all.csv')
+plt.savefig('data_all.png')
+
 
 '''
 symbol_list = ['bchusdt', 'btcusdt', 'ethusdt', 'xrpusdt','ltcusdt', 'dashusdt', 'iotausdt', 'omgusdt', 'adausdt']
