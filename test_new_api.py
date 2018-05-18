@@ -4,6 +4,8 @@ from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
 from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
 import time
 from api import logger
+import numpy as np
+import pandas as pd
 
 '''
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
@@ -14,10 +16,25 @@ print(to_dataframe(bars))
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
-orders = hbaccount.get_orders_by_symbol (sec_id='btcusdt', begin_time='2018-05-06 00:00:00', end_time='2018-05-12 00:00:00', states='filled', types='sell-market')
+bars = hbaccount.get_bars(symbol_list='btc, tch, eth, eos', bar_type='1min', size=2000)
+bar_df = to_dataframe(bars)
+print(bar_df.head())
+bar_df.index = bar_df['strtime']
+
+
+symbols = np.unique(bar_df['symbol'])
+data_all = pd.DataFrame([], columns=symbols)
+for each_symbol in symbols:
+    tmp_index =  bar_df['symbol'] == each_symbol
+    data_all[each_symbol] = bar_df[tmp_index]['close']
+
+data_all.to_dict('data_all.csv')
 
 
 '''
+orders = hbaccount.get_orders_by_symbol (sec_id='btcusdt', begin_time='2018-05-06 00:00:00', end_time='2018-05-12 00:00:00', states='filled', types='sell-market')
+
+
 flag = 0
 count = 0
 while (flag == 0 and count < 10):
