@@ -88,7 +88,7 @@ PORT = 465
 SENDER = 'helf1986@qq.com'  # 发件人邮箱账号
 PASSWORD = 'jrhlojstnqjvcbcg'  # 发件人邮箱密码
 
-def mail(subject, content, receivers):
+def send_mail(subject, content, receivers):
     ret = True
     try:
         msg = MIMEText(content, 'plain', 'utf-8')
@@ -116,8 +116,8 @@ if __name__ == '__main__':
 
     subject = "BitQuant 交易信号测试"
     content = "2018-05-13 17:32:12 买入 1.2 BTC, 买入价格9123.4, 手续费0.0024 BTC"
-    receivers = ['helf1986@qq.com', 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号，我这边发送给自己
-    ret = mail(subject, content, receivers)
+    receivers = ['helf1986@qq.com', 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
+    ret = send_mail(subject, content, receivers)
     if ret:
         print("邮件发送成功")
     else:

@@ -103,10 +103,11 @@ class TradeAccount(object):
         symbol_list = symbol_list.replace(' ', '').split(',')
         bars = []
 
+        # print(symbol_list)
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
                 each_sec = each_sec.lower()         # 注意火币只支持小写字母
-
+                # print(each_sec)
                 inner_size = size
                 if size == 0:
                     inner_size = 2000
@@ -335,12 +336,25 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             symbol = symbol.lower()
             depth_res = self.client.get_depth(symbol=symbol, type=type)
+            if depth_res['status'] == 'ok':
+                data = depth_res['tick']
+                utc_time = round(data['ts']/1000)
+                strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(utc_time))
+                bids_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_amount'])
+                bids_df = bids_df.sort_values(by='bid_price', ascending=False)
+                asks_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_amount'])
+                asks_df = asks_df.sort_values(by='ask_price')
+                depth_df = bids_df.join(asks_df)
+                depth_df['strtime'] = strtime
+                depth_df['symbol'] = symbol
+
 
         elif self.exchange == 'binance':
             symbol = symbol.upper()
             depth_res = self.cilent.get_order_book(symbol=symbol)
+            depth_df = None
 
-        return depth_res
+        return depth_df
 
 
     def open_long(self, source='api', sec_id='btcusdt', price=0, volume=0):
@@ -947,14 +961,16 @@ class TradeAccount(object):
                 for each in balance_dict.keys():
                     position = Position()
                     position.exchange = self.exchange
+                    position.currency = self.currency
                     position.account_id = account_id
                     position.account_type = account_type
                     position.account_status = account_status
 
                     position.sec_id = each
                     position.available = float(balance_dict[each]['trade'])
-                    position.order_frozen = float(balance_dict[each]['frozen'])
-                    position.amount = position.available + position.order_frozen
+                    position.frozen = float(balance_dict[each]['frozen'])
+                    position.volume = position.available + position.frozen
+                    position.update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                     if source == 'margin':
                         position.loan = float(balance_dict[each]['loan'])
                         position.interest = float(balance_dict[each]['interest'])
@@ -973,7 +989,7 @@ class TradeAccount(object):
                         position = Position()
                         position.exchange = self.exchange
                         position.available = each['free']
-                        position.order_frozen = each['locked']
+                        position.frozen = each['locked']
                         position.volume = each['free'] + each['locked']
                         positions = positions + [position]
 
@@ -1176,16 +1192,19 @@ class Position(object):
     def __init__(self):
         self.strategy_id = ''           ## 策略ID
         self.account_id = ''            ## 账户id
+        self.account_type = ''          ## 账户类型
+        self.account_status = ''        ## 账户状态
         self.currency = ''              ## 计价货币
         self.exchange = ''              ## 交易所代码
         self.sec_id = ''                ## 证券ID
         self.side = 0                   ## 买卖方向，side=1：持有该资产，side =-1：持有该资产的借贷
         self.volume = 0.0               ## 持仓量
-        self.order_frozen = 0.0         ## 挂单冻结仓位
+        self.frozen = 0.0         ## 挂单冻结仓位
         self.available = 0.0            ## 可平仓位
-        self.loanvol = 0.0
+        self.loan = 0.0
         self.interest = 0.0
         self.loan_order_id = ''         # 仅对借贷资产有效，用于偿还借贷资产
+        self.amount = 0.0               # 当前持仓价值 = (volume - loan - interest) * price
         self.update_time = ''           ## 持仓更新时间
 
 
@@ -1314,11 +1333,13 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
     symbol_list = symbol_list.replace(' ', '').split(',')
     bars = []
     for each_sec in symbol_list:
-
+        each_sec = each_sec.lower()
         if begin_time == '':
 
             end_time_ts = int(time.time())
             end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time_ts))
+            N_bar = 60
+            per = 1
             if bar_type == '1min':
                 N_bar = 60
                 per = 1
@@ -1340,11 +1361,20 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
             begin_time_ts = int(end_time_ts - (N_bar+2) * size)
             begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(begin_time_ts))
 
+        else:
+            end_time_ts = int(time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S')))
+            begin_time_ts = int(time.mktime(time.strptime(begin_time, '%Y-%m-%d %H:%M:%S')))
+
         client = MongoClient('47.75.69.176', 28005)
         coin_db = client['bc_bourse_huobipro']
         coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
-        collection = coin_db['b_btc_kline']
 
+        currency = 'usdt'
+        sec_code = each_sec.replace(currency, '')
+        table_name = 'b_' + sec_code +'_kline'
+        collection = coin_db[table_name]
+
+        print (per, begin_time_ts, end_time_ts)
         data = collection.find({'per': str(per), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})
 
         for each_bar in data:
@@ -1368,6 +1398,73 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
         bars = bars[-size:]
 
     return bars
+
+
+def get_depth_local(exchange='hbp', symbol_list='btcusdt', step='step5', begin_time='', end_time=''):
+    '''
+    从mongodb 取数
+    :param exchange:
+    :param symbol_list:
+    :param bar_type:
+    :param begin_time:
+    :param end_time:
+    :param size:
+    :return:
+    '''
+    symbol_list = symbol_list.replace(' ', '').split(',')
+    data_df = pd.DataFrame([], columns = ['symbol', 'strtime', 'step', 'direct', 'price', 'amount'])
+    for each_sec in symbol_list:
+        each_sec = each_sec.lower()
+
+        end_time_ts = int(time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S')))
+        begin_time_ts = int(time.mktime(time.strptime(begin_time, '%Y-%m-%d %H:%M:%S')))
+
+        client = MongoClient('47.75.69.176', 28005)
+        coin_db = client['bc_bourse_huobipro']
+        coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
+
+        currency = 'usdt'
+        sec_code = each_sec.replace(currency, '')
+        table_name = 'b_' + sec_code +'_depth_5'
+        collection = coin_db[table_name]
+
+        # print (sec_code, begin_time_ts*1000, end_time_ts*1000)
+        data = collection.find({"t": {"$gte": begin_time_ts*1000, "$lte":end_time_ts*1000}})
+
+        depth_list = []
+        for each_data in data:
+            # print(each_data)
+
+            '''
+            depth = {}
+            depth['symbol'] = each_sec
+            if each_data['ty'] == 0:
+                depth['direction'] = 'ask'
+            else:
+                depth['direction'] = 'bid'
+
+            depth['strtime'] = each_data['ts']
+            depth['time'] = each_data['t']
+            depth['price'] = each_data['p']
+            depth['amount'] = each_data['amt']
+
+            depth_list = depth_list + [depth]
+            '''
+            depth_list = depth_list + [each_data]
+
+        each_data = pd.DataFrame(depth_list)
+        # print(each_data.head())
+        each_data.columns = ['id', 'amount',  'ccy', 'price', 'time', 'strtime', 'direct']
+        each_data['symbol'] = each_sec
+        each_data['step'] = step
+        each_data['direct'] = ['ask' if each_data.loc[tmp]['direct']==0 else 'bid' for tmp in each_data.index]
+
+        # print(each_data.head())
+        data_df = data_df.append(each_data)
+
+    data_df = data_df[['symbol', 'strtime', 'time', 'step', 'direct', 'price', 'amount']]
+    return data_df
+
 
 
 def order2position(order_list=None, interval='1day'):
