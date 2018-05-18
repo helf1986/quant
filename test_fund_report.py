@@ -70,7 +70,7 @@ def clearing():
     # print("当前总持仓额为：", total_amount)
     # print("当前净值为：", netvalue)
 
-    nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
+    nowstr = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     pos_result.to_csv('log/当前持仓明细_' + nowstr + ".csv")
 
     # 将结果发送给客户

@@ -17,7 +17,7 @@ print(to_dataframe(bars))
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
-bars = hbaccount.get_bars(symbol_list='btc, tch, eth, eos', bar_type='1min', size=2000)
+bars = hbaccount.get_bars(symbol_list='btcusdt, bchusdt, ethusdt, etcusdt, ltcusdt, eosusdt, xrpusdt', bar_type='1min', size=2000)
 bar_df = to_dataframe(bars)
 print(bar_df.head())
 bar_df.index = bar_df['strtime']
