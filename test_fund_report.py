@@ -70,7 +70,7 @@ def clearing():
     # print("当前总持仓额为：", total_amount)
     # print("当前净值为：", netvalue)
 
-    nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
+    nowstr = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
     pos_result.to_csv('log/当前持仓明细_' + nowstr + ".csv")
 
     # 将结果发送给客户
@@ -113,7 +113,7 @@ if __name__ == '__main__':
         # 判断是否达到设定时间，例如0:00
         while True:
             now = time.localtime(time.time())
-            nowstr = time.strftime('%Y-%d-%m %H:%M:%S', time.localtime(time.time()))
+            nowstr = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
             print(nowstr)
             # 到达设定时间（每天6:00:00 和 18:00:00），结束内循环
             if (now.tm_hour == 6 or now.tm_hour==18)  and now.tm_min == 0:
