@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import threading
+from threading import Thread
 import time
 from websocket import create_connection
 import gzip
@@ -10,10 +10,10 @@ exitFlag = 0
 from api.quant_api import Bar
 
 
-class Subscribe_Bars(threading.Thread):
+class Subscribe_Bars(Thread):
 
     def __init__(self, exchange, symbol, bar_type):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         self.exchange = exchange        # 交易所：hbp, bnb
         self.symbol = symbol            # 数币符号：ethbtc, ltcbtc, etcbtc, bchbtc......
         self.bar_type = bar_type        # bar 类型：1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year
@@ -85,10 +85,10 @@ class Subscribe_Bars(threading.Thread):
                 self.last_bar = self.new_bar()
 
 
-class Strategy(threading.Thread):
+class Strategy(Thread):
 
     def __init__(self):
-        threading.Thread.__init__(self)
+        Thread.__init__(self)
         self.subscribe = Subscribe_Bars(exchange='hbp', symbol='btcusdt', bar_type='1min')
         self.bar_list = []
         self.QUEUE_SIZE = 5000
@@ -98,10 +98,10 @@ class Strategy(threading.Thread):
         while(1):
             if self.subscribe.bar_queue.qsize() > 0:
 
-                bar_list = self.subscribe.last_bar
+                last_bar = self.subscribe.last_bar
 
                 # 每分钟保留一个数据
-
+                print("strategy: %s time=%s close= %.4f" %(last_bar.sec_id, last_bar.strtime, last_bar.close))
 
 
 
