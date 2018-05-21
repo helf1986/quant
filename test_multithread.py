@@ -106,7 +106,7 @@ class Strategy(Thread):
 
 
 # 创建新线程
-thread1 = Subscribe_Bars(exchange='hbp', symbol='btcusdt', bar_type=type='1min')
+thread1 = Subscribe_Bars(exchange='hbp', symbol='btcusdt', bar_type='1min')
 thread2 = Strategy()
 
 # 开启新线程
