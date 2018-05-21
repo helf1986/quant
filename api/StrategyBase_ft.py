@@ -40,8 +40,8 @@ class Event():
 
 #-------------------------------------------------------------
 class cerebro(object):
-    def __init__(self,exchange='', api_key='', api_secret='' , currency='',
-                 account=''):
+
+    def __init__(self,exchange='', api_key='', api_secret='' , currency='', account=''):
         self.account    = account
         self.api        = TradeAccount(exchange=exchange, api_key=api_key, api_secret=api_secret , currency=currency)
         '''
@@ -90,7 +90,7 @@ class cerebro(object):
             '''
             try:
                 for v in self.eventbarlist:
-                    bar=self.api.get_last_bars(v.symbol_list, v.bar_type)[0]
+                    bar = self.api.get_last_bars(v.symbol_list, v.bar_type)[0]
 #                    print (bar.strtime,bar.sec_id)
                     time.sleep(2)
 #                bar = self.api.get_last_bars(self.symbol_list, self.bar_type)[0]
@@ -321,8 +321,12 @@ class Strategy(object):
                 self.__orderqueue.put(order)                  
                 msg = " 开多仓 "+self.symbol_list+"@ %s,%f" % (unit, price)
                 logger.info(msg)
-                logger.send_sms(msg, phone_list)   
-            
+
+
+    def order_vwap(self, order_side=1, price_type='limit'):
+        pass
+
+
     def sellshort(self,unit,price):
         price=round(price,2)#报单只接受，两位有效数字  
         if self.MarketPosition==1:   
@@ -362,7 +366,6 @@ class Strategy(object):
                 self.__orderqueue.put(order)  
                 msg = " 开空仓 "+self.symbol_list+"@ %s,%f" % (unit, price)
                 logger.info(msg)
-                logger.send_sms(msg, phone_list)
 
     def sell(self,unit,price):
         price=round(price,2)#报单只接受，两位有效数字  
@@ -386,7 +389,6 @@ class Strategy(object):
                 self.__orderqueue.put(order)  
                 msg = " 平多仓 "+self.symbol_list+"@ %s,%f" % (unit, price)
                 logger.info(msg)
-                logger.send_sms(msg, phone_list)
 
     def buytocover(self,unit,price):
         price=round(price,2)#报单只接受，两位有效数字  
@@ -410,7 +412,7 @@ class Strategy(object):
                 self.__orderqueue.put(order)  
                 msg = " 平空仓 "+self.symbol_list+"@ %s,%f" % (unit, price)
                 logger.info(msg)
-                logger.send_sms(msg, phone_list) 
+
     '''
     基准类
     '''
@@ -447,7 +449,7 @@ class Strategy(object):
                 #--------------step 3--------------
                 msg = " Strategy(%r) on [%s,%s] is restarting @%s ...MarketPosition=%s" % (self.name, self.module,self.margin_currency,time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()),self.MarketPosition)
                 logger.info(msg)
-                logger.send_sms(msg, phone_list) 
+
                 #--------------step 1--------------
                 print (u"history data feeded successfully...")
                 print (u"realtime data on going...")

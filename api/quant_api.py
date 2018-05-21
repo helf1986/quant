@@ -1374,7 +1374,7 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
         table_name = 'b_' + sec_code +'_kline'
         collection = coin_db[table_name]
 
-        print (per, begin_time_ts, end_time_ts)
+        # print (per, begin_time_ts, end_time_ts)
         data = collection.find({'per': str(per), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})
 
         for each_bar in data:

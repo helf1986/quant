@@ -10,21 +10,27 @@ exitFlag = 0
 from api.quant_api import Bar
 
 
-QUEUE_SIZE = 2000
-bar_queue = Queue(maxsize=QUEUE_SIZE)
-last_bar = Bar()
-bar_list = []
-
 class Subscribe_Bars(threading.Thread):
 
-    def __init__(self, exchange, symbol, type):
+    def __init__(self, exchange, symbol, bar_type):
         threading.Thread.__init__(self)
         self.exchange = exchange        # 交易所：hbp, bnb
         self.symbol = symbol            # 数币符号：ethbtc, ltcbtc, etcbtc, bchbtc......
-        self.type = type                # bar 类型：1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year
+        self.bar_type = bar_type        # bar 类型：1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year
+
+        self.QUEUE_SIZE = 5000
+        self.tick_queue = Queue(maxsize=self.QUEUE_SIZE)
+        self.bar_queue = Queue(maxsize=self.QUEUE_SIZE)
+
+        self.tick_list = []
+        self.bar_list = []
+
+        self.new_bar = Bar()
+        self.last_bar = Bar()
 
     def run(self):
 
+        # 创建 websocket 连接
         while (1):
             try:
                 ws = create_connection("wss://api.huobipro.com/ws")
@@ -34,7 +40,7 @@ class Subscribe_Bars(threading.Thread):
                 time.sleep(5)
 
         # 订阅 KLine 数据
-        tradeStr = """{"sub": "market.ethusdt.kline.1min","id": "id10"}"""
+        tradeStr = """{"sub": "market.""" + self.symbol + """.kline.""" + self.bar_type + """"","id": "id10"}"""
 
         ws.send(tradeStr)
         while (1):
@@ -46,8 +52,9 @@ class Subscribe_Bars(threading.Thread):
                 ws.send(pong)
                 ws.send(tradeStr)
             elif result[2:4] == "ch":
-                print(type(result))
+
                 new_bar = Bar()
+                new_bar.utc_endtime = result['']
                 data = eval(result)['tick']
                 new_bar.utc_time = data['id']
                 structtime = time.localtime(data['id'])
@@ -57,33 +64,49 @@ class Subscribe_Bars(threading.Thread):
                 new_bar.low = data['low']
                 new_bar.close = data['close']
                 new_bar.volume = data['amount']
-                new_bar.amount = data['volume']
+                new_bar.amount = data['vol']
 
-                # 每分钟保留一个数据
+                self.new_bar = new_bar
 
-                if last_bar.utc_time != new_bar.utc_time:
-                    bar_queue.put(new_bar)
-                    print("websockt: %s  %f" % (new_bar.strtime, new_bar.close))
+                # 存入tick_list 中
+                if self.bar_queue.qsize() == self.QUEUE_SIZE:
+                    self.bar_queue.get()
+                else:
+                    self.bar_queue.put(new_bar)
+                    print("websocket new_tick: %s : close = %.2f" %(new_bar.strtime, new_bar.close))
+                    self.tick_list = self.tick_list + [new_bar]
+                    self.tick_list = self.tick_list[-self.QUEUE_SIZE:]
+
+            if self.last_bar.utc_time.tm_min != new_bar.utc_time:
+                print("websockt last_bar: %s  %f" % (new_bar.strtime, new_bar.close))
+
+                bar_list = bar_list + [new_bar]
+                bar_list = bar_list[-self.QUEUE_SIZE:]
+                self.last_bar = self.new_bar()
 
 
 class Strategy(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
+        self.subscribe = Subscribe_Bars(exchange='hbp', symbol='btcusdt', bar_type='1min')
+        self.bar_list = []
+        self.QUEUE_SIZE = 5000
 
     def run(self):
 
         while(1):
-            if bar_queue.qsize() > 0:
-                new_bar = bar_queue.get()
-                bar_list = bar_list + [new_bar]
-                bar_list = bar_list[-QUEUE_SIZE:]
-                print(len(bar_list))
-                print(new_bar.strtime, new_bar.close)
+            if self.subscribe.bar_queue.qsize() > 0:
+
+                bar_list = self.subscribe.last_bar
+
+                # 每分钟保留一个数据
+
+
 
 
 # 创建新线程
-thread1 = Subscribe_Bars(exchange='hbp', symbol='btcusdt', type='1min')
+thread1 = Subscribe_Bars(exchange='hbp', symbol='btcusdt', bar_type=type='1min')
 thread2 = Strategy()
 
 # 开启新线程
