@@ -242,7 +242,7 @@ class TradeAccount(object):
 
                     bar_flag = False        # 用来记录周期转换点
                     if bar_type == "1min":
-                        if last_tick_time.tm_min != new_tick_time.tm_min:
+                        if (last_tick_time.tm_min != new_tick_time.tm_min):
                             bar_flag = True
                     elif bar_type == "5min":
                         if last_tick_time.tm_min % 5 == 4 and new_tick_time.tm_min % 5 == 0:
@@ -257,23 +257,25 @@ class TradeAccount(object):
                     # 判断是否要更新bar 数据
                     new_bar = Bar()
                     if bar_type == 'tick':      # 直接获取tick 数据
-                        new_bar.utc_time = last_tick.utc_endtime
-                        new_bar.strtime = last_tick.strendtime
-                        new_bar.utc_endtime = new_tick.utc_endtime
-                        new_bar.strendtime = new_tick.strendtime
-                        new_bar.open = last_tick.last_price
-                        new_bar.high = max(last_tick.last_price, new_tick.last_price)
-                        new_bar.low = min(last_tick.last_price, new_tick.last_price)
-                        new_bar.close = new_tick.last_price
-                        if bar_flag:
-                            new_bar.volume = new_tick.cum_volume
-                            new_bar.amount = new_tick.cum_amount
-                        else:
-                            new_bar.volume = new_tick.cum_volume - last_tick.cum_volume     # 计算当前tick的成交量，用减法
-                            new_bar.amount = new_tick.cum_amount - last_tick.cum_amount
 
-                        print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                             % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                        if last_tick.open > 0:   # 需要跳过第一个空值
+                            new_bar.utc_time = last_tick.utc_endtime
+                            new_bar.strtime = last_tick.strendtime
+                            new_bar.utc_endtime = new_tick.utc_endtime
+                            new_bar.strendtime = new_tick.strendtime
+                            new_bar.open = last_tick.last_price
+                            new_bar.high = max(last_tick.last_price, new_tick.last_price)
+                            new_bar.low = min(last_tick.last_price, new_tick.last_price)
+                            new_bar.close = new_tick.last_price
+                            if bar_flag:
+                                new_bar.volume = new_tick.cum_volume
+                                new_bar.amount = new_tick.cum_amount
+                            else:
+                                new_bar.volume = new_tick.cum_volume - last_tick.cum_volume     # 计算当前tick的成交量，用减法
+                                new_bar.amount = new_tick.cum_amount - last_tick.cum_amount
+
+                            print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                                 % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
 
                     else:                       # 获取Bar 数据
@@ -298,8 +300,8 @@ class TradeAccount(object):
                                 queue.get()
                             queue.put(new_bar)
 
-                        print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                             % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                            print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                                 % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
                     last_tick = new_tick
 
