@@ -1,6 +1,7 @@
 from api.StrategyBase_ft import Strategy, Event,cerebro
 
 if __name__ == '__main__':
+    
     # 定义策略
     mystr1 = Strategy(name="StrategyBase1")
     mystr2 = Strategy(name="StrategyBase2")

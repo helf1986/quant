@@ -44,20 +44,24 @@ hist_df.to_csv('btc_20171101_20180516.csv')
 '''
 
 from api.quant_api import get_bars_local, to_dataframe
-bars = get_bars_local(exchange='hbp', symbol_list='bchusdt', bar_type='1min', size=1000)
+bars = get_bars_local(exchange='hbp', symbol_list='ethusdt', bar_type='1min', begin_time='2017-11-01 00:00:01', end_time='2018-05-23 23:59:00')
 bars_df = to_dataframe(bars)
 print(bars_df.tail())
+# bars_df.to_csv('eth_20171101_20180522.csv')
 
+
+
+'''
 
 client = MongoClient('47.75.69.176', 28005)
 coin_db = client['bc_bourse_huobipro']
 coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
-collection = coin_db['b_btc_kline']
+collection = coin_db['b_eos_kline']
 
 # btc, bch, eth, xrp, ltc, eos, dash, iota, neo, omg, ada
 
-end_time = "2017-05-16 00:00:00"
-data = collection.find({'per': "1", "ts": {"$gt": end_time}})
+end_time = "2017-05-24 00:00:00"
+data = collection.find({'per': "1", "ts": {"$gte": end_time}})
 
 hist_data = {}
 for each in data:
@@ -66,5 +70,5 @@ for each in data:
 hist_df = pd.DataFrame.from_dict(hist_data, orient='index')
 print(hist_df.tail())
 
-hist_df.to_csv('btc_20171101_20180516.csv')
-
+hist_df.to_csv('eos_20171101_20180523.csv')
+'''

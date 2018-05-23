@@ -12,21 +12,22 @@ from api.quant_api import Bar
 
 class Subscribe_Bars(Thread):
 
-    def __init__(self, exchange, symbol, bar_type):
+    def __init__(self, ex, symbol, bar_type):
         Thread.__init__(self)
-        self.exchange = exchange        # 交易所：hbp, bnb
+        self.exchange = ex              # 交易所：hbp, bnb
         self.symbol = symbol            # 数币符号：ethbtc, ltcbtc, etcbtc, bchbtc......
         self.bar_type = bar_type        # bar 类型：1min, 5min, 15min, 30min, 60min, 1day, 1mon, 1week, 1year
 
-        self.QUEUE_SIZE = 5000
-        self.tick_queue = Queue(maxsize=self.QUEUE_SIZE)
-        self.bar_queue = Queue(maxsize=self.QUEUE_SIZE)
+        self.QUEUE_SIZE = 5000          # 队列最大长度
+        self.tick_queue = Queue(maxsize=self.QUEUE_SIZE)        # 存储历史tiks
+        self.bar_queue = Queue(maxsize=self.QUEUE_SIZE)         # 存储历史bars
 
-        self.tick_list = []
-        self.bar_list = []
+        self.tick_list = []     # 存储历史tiks
+        self.bar_list = []      # 存储历史bars
 
-        self.new_bar = Bar()
-        self.last_bar = Bar()
+        self.new_tick = Tick()
+        self.new_bar = Bar()    # 记录最新的bar
+        self.last_bar = Bar()   # 记录上一个bar
 
     def run(self):
 
@@ -89,12 +90,15 @@ class Strategy(Thread):
 
     def __init__(self):
         Thread.__init__(self)
-        self.subscribe = Subscribe_Bars(exchange='hbp', symbol='btcusdt', bar_type='1min')
+        self.subscribe = Subscribe_Bars(ex='hbp', symbol='btcusdt', bar_type='1min')
         self.bar_list = []
         self.QUEUE_SIZE = 5000
 
     def run(self):
-
+        '''
+        此处定义策略
+        :return:
+        '''
         while(1):
             if self.subscribe.bar_queue.qsize() > 0:
 
@@ -106,7 +110,9 @@ class Strategy(Thread):
 
 
 # 创建新线程
-thread1 = Subscribe_Bars(exchange='hbp', symbol='btcusdt', bar_type='1min')
+thread1 = Subscribe_Bars(ex='hbp', symbol='btcusdt', bar_type='1min')
+thread1 = Subscribe_Bars(ex='hbp', symbol='ethusdt', bar_type='5min')
+
 thread2 = Strategy()
 
 # 开启新线程

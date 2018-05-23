@@ -12,8 +12,10 @@ from api.quant_api import TradeAccount, get_bars_local
 from api.quant_api import to_dict
 from api import logger
 import time
-from queue import Queue
-import threading    
+# from queue import Queue
+import threading
+
+from multiprocessing import Process, Queue
 import json
 import math
 import api.connection as conn
@@ -33,10 +35,10 @@ class Event():
     订阅事件对象，cerebro基础输入
     '''
     def __init__(self):        
-        self.symbol_list = ''                 ## 币种
-        self.bar_type= ''                  ## 周期
-        self.backbarnum = None             ## 历史数据数目
-        self.type_=''   #自定义数据类别--用于注册监听函数字典
+        self.symbol_list = ''                   # 币种
+        self.bar_type= ''                       # 周期
+        self.backbarnum = None                  # 历史数据数目
+        self.type_=''                           # 自定义数据类别--用于注册监听函数字典
 
 #-------------------------------------------------------------
 class cerebro(object):
@@ -51,100 +53,69 @@ class cerebro(object):
             *每个键对应的值是一个列表，列表中保存了对该事件监听的响应函数，一对多        
         '''
         self.prt            = False
-        self.eventbarlist   =[]
+        self.eventbarlist   = []
         self.__handlers     = {}
-        self.__concount     = 0 #断线重连计数
+        self.__concount     = 0         # 断线重连计数
+
 
     def initialtion(self):
         '''
         不同事件类型分别记录
-        __barqueue=bar记录队列，对应处理函数on_bar;__lastquebar记录最新推送入队的bar
-        '''        
-#        self.__barqueue=Queue();self.__lastquebar=None  
+        __barqueue=bar记录队列，对应处理函数on_bar; __lastquebar记录最新推送入队的bar
+        '''
 
         for v in self.eventbarlist:
             v.barqueue      = Queue()
             v.lastquebar    = None
 
-            
-#-------------------------------------------------------
         for v in self.eventbarlist:
             bars            = get_bars_local(exchange=self.api.exchange,symbol_list=v.symbol_list, bar_type=v.bar_type, size=v.backbarnum)
             v.backbarnum    = len(bars)#修正取数据误差
             for bar in bars:
-    #            print u"history---bar存入队列:",bar.strtime
                 v.barqueue.put(bar)
                 v.lastquebar = bar
-#        bars=get_bars_local(self.symbol_list, self.bar_type, size=self.backbarnum)
-#        self.backbarnum=len(bars)#修正取数据误差
-#        for bar in bars:
-##            print u"history---bar存入队列:",bar.strtime
-#            self.__barqueue.put(bar);self.__lastquebar=bar
 
-#-------------------- -----更新事件队列-------------------------------------------
+
+    #-------------------- -----更新事件队列-------------------------------------------
     def __sendevent_bar(self):           
-        """发送事件，向事件队列中存入事件"""      
-        while True:
-            '''
-            断线重连机制，每次查询间隔必须2s，不然报错
-            '''
-            try:
-                for v in self.eventbarlist:
-                    bar = self.api.get_last_bars(v.symbol_list, v.bar_type)[0]
-#                    print (bar.strtime,bar.sec_id)
-                    time.sleep(2)
-#                bar = self.api.get_last_bars(self.symbol_list, self.bar_type)[0]
-                #barqueue为空值或时间戳有更新时，才更新队 列
-                    try:               
-                        if bar.utc_time>v.lastquebar.utc_time:
-                            v.barqueue.put(bar)
-                            v.lastquebar=bar                        
-                            if self.prt:
-                                logger.info (u"realtime---bar存入队列:",bar.sec_id,bar.bar_type,bar.strtime,v.barqueue.qsize() )
-                    except:                  
-                        pass 
-            except Exception as e:
-                logger.warn('Connection Failed: ', e)
-                self.__concount += 1
-                logger.info('reconnect number:%s'%(self.__concount))               
-                time.sleep(5)                
-  
-            '''
-            防止死循环
-            '''
-#            time.sleep(1)
+        """发送事件，向事件队列中存入事件"""
 
-    #---------------------------主引擎-------------------------------------------    
-    #----------------------------------------------------------------------
+        client_count = 0
+        for v in self.eventbarlist:
+            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count,v.barqueue))
+            v_process.start()
+            client_count += 1
+
+
+    #---------------------------主引擎-------------------------------------------
     def Start(self):
         """启动"""
-        #子线程1=bar线事件订阅管理
-        tson    = threading.Thread(target=self.__sendevent_bar)
-        tson.setDaemon(True)#后台线程自动结束
-        tson.start()
+
+        # 多进程进行事件订阅管理
+        client_count = 0
+        for v in self.eventbarlist:
+            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count,v.barqueue))
+            v_process.start()
+            client_count += 1
 
         """引擎运行"""
         while True:
+
             # 优先处理bar类事件
             '''bar执行逻辑为一对多'''
             try:
                 for v in self.eventbarlist:
                     bar = v.barqueue.get_nowait() 
-                    if self.prt:print ("当前bar%s"%(bar.strtime))
+                    if self.prt:
+                        print ("当前bar%s" % (bar.strtime))
                     # 检查是否存在对该事件进行监听的处理函数
                     if v.type_ in self.__handlers:
                         # 若存在，则按顺序将事件传递给处理函数执行
                         for strats in self.__handlers[v.type_]:
-                            strats.on_bar(bar)                   
-#                    for strats in self.stratslist:
-#                        strats.on_bar(bar)
-#                bar = self.__barqueue.get_nowait() 
-#                if self.prt:print ("当前bar%s"%(bar.strtime))
-                #-----------------------              
-#                for strats in self.stratslist:
-#                    strats.on_bar(bar)
+                            strats.on_bar(bar)
             except:
                 pass
+
             # 开始处理monitor事件,优先于order
             '''monitor执行逻辑为完全遍历'''
             try:
@@ -154,7 +125,8 @@ class cerebro(object):
 #                for strats in self.stratslist:
 #                    strats.monitorprocess()
             except:
-                pass 
+                pass
+
             # 开始处理order事件
             '''order执行逻辑为完全遍历'''
             try:
@@ -164,9 +136,11 @@ class cerebro(object):
 #                for strats in self.stratslist:
 #                    strats.orderprocess()
             except:
-                pass  
+                pass
+
     #----------------防止死循环-----------
             time.sleep(0.01)
+
 
     def addstrategy(self,type_,strats):
         '''
@@ -211,7 +185,7 @@ class cerebro(object):
 class Strategy(object):
 
     def __init__(self, name=''):
-#    def __init__(self,module='usdt',api=md,exchange='SHSE',symbol_list='600000',bar_type=60 ):
+
         self.prt    = True          # 是否启动基类中的打印
         self.name   = name
         self.MarketPosition = 0     # 策略仓位记录
@@ -367,6 +341,7 @@ class Strategy(object):
                 msg = " 开空仓 "+self.symbol_list+"@ %s,%f" % (unit, price)
                 logger.info(msg)
 
+
     def sell(self,unit,price):
         price=round(price,2)#报单只接受，两位有效数字  
         if self.MarketPosition==1:
@@ -389,6 +364,7 @@ class Strategy(object):
                 self.__orderqueue.put(order)  
                 msg = " 平多仓 "+self.symbol_list+"@ %s,%f" % (unit, price)
                 logger.info(msg)
+
 
     def buytocover(self,unit,price):
         price=round(price,2)#报单只接受，两位有效数字  
@@ -455,6 +431,7 @@ class Strategy(object):
                 print (u"realtime data on going...")
                 self.__type='realtime'
 
+
     def orderprocess(self):
         while True:
             try:
@@ -464,6 +441,7 @@ class Strategy(object):
             except:
                 return "no more order..."
 
+
     def monitorprocess(self):
         while True:
             try:
@@ -472,7 +450,8 @@ class Strategy(object):
                 time.sleep(0.5)
             except:
                 return "no more monitor..."
-            
+
+
     def on_order(self, order):
         '''
         此处处理输出order到数据库，包括历史表和实时表
@@ -482,7 +461,8 @@ class Strategy(object):
         except:
             logger.warn('订单号写入数据库失败！')
         pass
-    
+
+
     def on_monitor(self,monitor):
         if monitor['margin_order_id']==0:
             print ("Margin error！！！")

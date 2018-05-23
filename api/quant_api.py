@@ -7,11 +7,18 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
+from websocket import WebSocket, create_connection
+import gzip
+import os
+
+from multiprocessing import Process, Queue
+
 from pymongo import MongoClient
 import common.HuobiClient as hb
 import common.BinanceClient as bnb
 from api import logger
 
+QUEUE_SIZE = 5000
 
 class ExSymbol(object):
     '''
@@ -86,6 +93,221 @@ class TradeAccount(object):
             pass
 
         return instrus
+
+
+    def connect_ws(self):
+        '''
+        连接websocket 接口
+        :return:
+        '''
+        if self.exchange == 'hbp':
+            while (1):
+                try:
+                    socket = create_connection("wss://api.huobipro.com/ws")
+                    print('websocket is connected!')
+                    return socket
+                except:
+                    print('connect ws error,retry...')
+                    time.sleep(5)
+
+
+    def subscribe_tick(self, symbol='btcusdt', client_id=0, queue=None):
+        '''
+        订阅 KLine 数据
+        :param symbol: 交易所符号
+        :param client_id: client 编号
+        :return:
+        '''
+
+        if self.exchange == 'hbp':
+            # print('Process to subscribe %s ticks: %s' % (symbol, os.getpid()))
+
+            symbol = symbol.lower()
+            tradeStr = """{"sub": "market.""" + symbol + """.kline.1min", "id": "id""" + str(client_id) + """"}"""
+            # print(tradeStr)
+
+            socket = self.connect_ws()               # 连接 websocket 接口
+            socket.send(tradeStr)      # 发送数据请求
+
+            while True:
+                compressData = socket.recv()       # 接收数据包
+                result = gzip.decompress(compressData).decode('utf-8')      # 解压缩数据
+                # print(result)
+                if result[:7] == '{"ping"':
+                    ts = result[8:21]
+                    pong = '{"pong":' + ts + '}'
+                    socket.send(pong)
+                    socket.send(tradeStr)
+
+                elif result[2:4] == "ch":
+
+                    # 把json 文本转成字典
+                    res_dict = eval(result)
+                    # print(res_dict)
+
+                    # 记录Tick 数据
+                    new_tick = Tick()
+                    new_tick.exchange = 'hbp'
+                    new_tick.sec_id = symbol
+                    new_tick.utc_endtime = round(res_dict['ts']/1000)
+                    structendtime = time.localtime(new_tick.utc_endtime)
+                    new_tick.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', structendtime)
+
+                    data = res_dict['tick']
+                    new_tick.utc_time = data['id']
+                    structtime = time.localtime(data['id'])
+                    new_tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
+
+                    new_tick.open = data['open']
+                    new_tick.high = data['high']
+                    new_tick.low = data['low']
+                    new_tick.last_price = data['close']
+                    new_tick.last_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
+                    new_tick.last_amount = data['vol']
+
+                    if queue.qsize() == QUEUE_SIZE:         # 防止队列溢出
+                        queue.get()
+                    queue.put(new_tick)
+                    # print(queue.qsize())
+
+                    print("tick=%s: time=%s, close=%.2f, volume=%.4f, amount=%.4f" \
+                          % (new_tick.sec_id, new_tick.strendtime, new_tick.last_price, new_tick.last_volume, new_tick.last_amount))
+
+
+    def subscribe_bar(self, symbol='btcusdt', bar_type='1min', client_id=1, queue=None):
+        '''
+        订阅 KLine 数据
+        :param symbol: 交易所符号
+        :param bar_type: bar类型， 'tick','1min', '5min', '15min', '30min', '60min', '1day', '1week'
+        :return:
+        '''
+
+        # print('Process to subscribe %s %s bars: %s' % (symbol, bar_type, os.getpid()))
+
+        last_tick = Tick()
+        new_tick = Tick()
+
+        if self.exchange == 'hbp':
+            symbol = symbol.lower()
+            tradeStr = """{"sub": "market.""" + symbol +""".kline.""" + bar_type + """","id": "id""" + str(client_id) + """"}"""
+            # print(tradeStr)
+
+            socket = self.connect_ws()
+            socket.send(tradeStr)
+
+            while True:
+                compressData = socket.recv()
+                result = gzip.decompress(compressData).decode('utf-8')
+                # print(result)
+                if result[:7] == '{"ping"':
+                    ts = result[8:21]
+                    pong = '{"pong":' + ts + '}'
+                    socket.send(pong)
+                    socket.send(tradeStr)
+
+                elif result[2:4] == "ch":
+
+                    # 把json 文本转成字典
+                    res_dict = eval(result)
+                    # print(res_dict)
+
+                    # 记录Tick 数据
+                    new_tick = Tick()
+                    new_tick.exchange = 'hbp'
+                    new_tick.sec_id = symbol
+                    new_tick.utc_endtime = round(res_dict['ts']/1000)
+                    structendtime = time.localtime(new_tick.utc_endtime)
+                    new_tick.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', structendtime)
+
+                    data = res_dict['tick']
+                    new_tick.utc_time = data['id']
+                    structtime = time.localtime(data['id'])
+                    new_tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
+
+                    new_tick.open = data['open']
+                    new_tick.high = data['high']
+                    new_tick.low = data['low']
+                    new_tick.last_price = data['close']
+                    new_tick.last_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
+                    new_tick.last_amount = data['vol']
+
+                    last_tick_time = time.localtime(last_tick.utc_endtime)
+                    new_tick_time = time.localtime(new_tick.utc_endtime)
+
+                    # 判断是否要更新bar 数据
+                    bar_flag = False
+                    if bar_type == 'tick':      # 直接获取tick 数据
+                        bar_flag = True
+                    elif bar_type == "1min":
+                        if last_tick_time.tm_min != new_tick_time.tm_min:
+                            bar_flag = True
+                    elif bar_type == "5min":
+                        if last_tick_time.tm_min % 5 == 4 and new_tick_time.tm_min % 5 == 0:
+                            bar_flag = True
+                    elif bar_type == "60min" or bar_type == '1hour':
+                        if last_tick_time.tm_hour != new_tick_time.tm_hour:
+                            bar_flag = True
+                    elif bar_type == "1day" or bar_type == '24hour':
+                        if last_tick_time.tm_mday != new_tick_time.tm_mday:
+                            bar_flag = True
+
+                    # 添加Bar 数据
+                    if bar_flag and last_tick.open > 0:
+                        new_bar = Bar()
+                        new_bar.sec_id = symbol
+                        new_bar.exchange = 'hbp'
+                        new_bar.utc_time = last_tick.utc_time
+                        new_bar.strtime = last_tick.strtime
+                        new_bar.utc_endtime = last_tick.utc_endtime
+                        new_bar.strendtime = last_tick.strendtime
+
+                        new_bar.open = last_tick.open
+                        new_bar.high = last_tick.high
+                        new_bar.low = last_tick.low
+                        new_bar.close = last_tick.last_price
+                        new_bar.volume = last_tick.last_volume
+                        new_bar.amount = last_tick.last_amount
+
+                        if queue.qsize() == QUEUE_SIZE:
+                            queue.get()
+                        queue.put(new_bar)
+                        last_bar = new_bar
+
+                        print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                              % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+
+                    last_tick = new_tick
+
+
+    def subscribe_depth(self, symbol='btcusdt', step=0):
+        '''
+        订阅深度数据
+        :param symbol:
+        :param step: 0、1、2、3、4、5
+        :return:
+        '''
+
+        symbol = symbol.lower()
+
+        # 订阅 Market Depth 数据
+        tradeStr="""{"sub": "market.""" + symbol + """.depth.step""" + str(step) + """", "id": "id10"}"""
+
+        self.socket.send(tradeStr)
+
+        while (1):
+            compressData = self.socket.recv()
+            result = gzip.decompress(compressData).decode('utf-8')
+            print(result)
+            if result[:7] == '{"ping"':
+                ts = result[8:21]
+                pong = '{"pong":' + ts + '}'
+                self.socket.send(pong)
+                self.socket.send(tradeStr)
+
+            elif result[2:4] == "ch":
+                print(result)
+                pass
+
 
 
     def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='', size=0):
@@ -1334,30 +1556,33 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
     bars = []
     for each_sec in symbol_list:
         each_sec = each_sec.lower()
+
+        if bar_type == '1min':
+            N_bar = 60
+            per = 1
+        elif bar_type == '5min':
+            N_bar = 60*5
+            per = 3
+        elif bar_type == '15min':
+            N_bar = 60*15
+            per = 4
+        elif bar_type == '30min':
+            N_bar = 60*60
+            per = 5
+        elif bar_type == '60min':
+            N_bar = 60*60
+            per = 6
+        elif bar_type == '1day':
+            N_bar = 60*60*24
+            per = 14
+        else:
+            N_bar = 60
+            per = 1
+
         if begin_time == '':
 
             end_time_ts = int(time.time())
             end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time_ts))
-            N_bar = 60
-            per = 1
-            if bar_type == '1min':
-                N_bar = 60
-                per = 1
-            elif bar_type == '5min':
-                N_bar = 60*5
-                per = 3
-            elif bar_type == '15min':
-                N_bar = 60*15
-                per = 4
-            elif bar_type == '30min':
-                N_bar = 60*60
-                per = 5
-            elif bar_type == '60min':
-                N_bar = 60*60
-                per = 6
-            elif bar_type == '1day':
-                N_bar = 60*60*24
-                per = 14
             begin_time_ts = int(end_time_ts - (N_bar+2) * size)
             begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(begin_time_ts))
 
@@ -1377,7 +1602,15 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
         # print (per, begin_time_ts, end_time_ts)
         data = collection.find({'per': str(per), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})
 
-        for each_bar in data:
+        data_list = [each for each in data]
+        '''
+
+        data_list = []
+        for each in data:
+            data_list = data_list + [each]
+        '''
+
+        for each_bar in data_list:
             # print(each_bar)
             bar = Bar()
             bar.exchange = exchange
