@@ -170,8 +170,8 @@ class TradeAccount(object):
                     queue.put(new_tick)
                     # print(queue.qsize())
 
-                    print("tick=%s: time=%s, close=%.2f, volume=%.4f, amount=%.4f" \
-                          % (new_tick.sec_id, new_tick.strendtime, new_tick.last_price, new_tick.last_volume, new_tick.last_amount))
+                    # print("tick=%s: time=%s, close=%.2f, volume=%.4f, amount=%.4f" \
+                    #       % (new_tick.sec_id, new_tick.strendtime, new_tick.last_price, new_tick.last_volume, new_tick.last_amount))
 
 
     def subscribe_bar(self, symbol='btcusdt', bar_type='1min', client_id=1, queue=None):
@@ -280,8 +280,8 @@ class TradeAccount(object):
                         queue.put(new_bar)
                         last_bar = new_bar
 
-                        print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                              % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                        # print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                          #     % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
                     last_tick = new_tick
 
