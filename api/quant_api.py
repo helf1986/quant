@@ -191,9 +191,11 @@ class TradeAccount(object):
             symbol = symbol.lower()
 
             if bar_type == 'tick':
-                bar_type = '1min'
+                bar_str = '1min'
+            else:
+                bar_str = bar_type
 
-            tradeStr = """{"sub": "market.""" + symbol +""".kline.""" + bar_type + """","id": "id""" + str(client_id) + """"}"""
+            tradeStr = """{"sub": "market.""" + symbol +""".kline.""" + bar_str + """","id": "id""" + str(client_id) + """"}"""
             # print(tradeStr)
 
             socket = self.connect_ws()
