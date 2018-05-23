@@ -104,7 +104,7 @@ class TradeAccount(object):
             while (1):
                 try:
                     socket = create_connection("wss://api.huobipro.com/ws")
-                    print('websocket is connected!')
+                    # print('websocket is connected!')
                     return socket
                 except:
                     print('connect ws error,retry...')
@@ -216,8 +216,8 @@ class TradeAccount(object):
                                 new_bar.volume = new_tick.cum_volume - last_tick.cum_volume     # 计算当前tick的成交量，用减法
                                 new_bar.amount = new_tick.cum_amount - last_tick.cum_amount
 
-                            # print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                            #     % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                            print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                                 % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
 
                     else:                       # 获取Bar 数据
@@ -242,8 +242,8 @@ class TradeAccount(object):
                                 queue.get()
                             queue.put(new_bar)
 
-                            # print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                             #    % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                            print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                                 % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
                     last_tick = new_tick
 
