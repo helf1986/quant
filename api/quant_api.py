@@ -255,7 +255,7 @@ class TradeAccount(object):
                             bar_flag = True
 
                     # 判断是否要更新bar 数据
-
+                    new_bar = Bar()
                     if bar_type == 'tick':      # 直接获取tick 数据
                         new_bar.utc_time = last_tick.utc_endtime
                         new_bar.strtime = last_tick.strendtime
@@ -278,8 +278,7 @@ class TradeAccount(object):
 
                     else:                       # 获取Bar 数据
 
-                        if bar_flag and last_tick.open > 0:
-                            new_bar = Bar()
+                        if bar_flag and last_tick.open > 0:     # 在周期转换点记录当前bar
                             new_bar.sec_id = symbol
                             new_bar.exchange = 'hbp'
 
