@@ -234,18 +234,14 @@ class TradeAccount(object):
                     new_tick.high = data['high']
                     new_tick.low = data['low']
                     new_tick.last_price = data['close']
-                    new_tick.last_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
-                    new_tick.last_amount = data['vol']
+                    new_tick.cum_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
+                    new_tick.cum_amount = data['vol']
 
                     last_tick_time = time.localtime(last_tick.utc_endtime)
                     new_tick_time = time.localtime(new_tick.utc_endtime)
 
-                    # 判断是否要更新bar 数据
-                    bar_flag = False
-                    if bar_type == 'tick':      # 直接获取tick 数据
-                        bar_flag = True
-                        last_tick = new_tick
-                    elif bar_type == "1min":
+                    bar_flag = False        # 用来记录周期转换点
+                    if bar_type == "1min":
                         if last_tick_time.tm_min != new_tick_time.tm_min:
                             bar_flag = True
                     elif bar_type == "5min":
@@ -258,30 +254,49 @@ class TradeAccount(object):
                         if last_tick_time.tm_mday != new_tick_time.tm_mday:
                             bar_flag = True
 
-                    # 添加Bar 数据
-                    if bar_flag and last_tick.open > 0:
-                        new_bar = Bar()
-                        new_bar.sec_id = symbol
-                        new_bar.exchange = 'hbp'
-                        new_bar.utc_time = last_tick.utc_time
-                        new_bar.strtime = last_tick.strtime
-                        new_bar.utc_endtime = last_tick.utc_endtime
-                        new_bar.strendtime = last_tick.strendtime
+                    # 判断是否要更新bar 数据
 
-                        new_bar.open = last_tick.open
-                        new_bar.high = last_tick.high
-                        new_bar.low = last_tick.low
-                        new_bar.close = last_tick.last_price
-                        new_bar.volume = last_tick.last_volume
-                        new_bar.amount = last_tick.last_amount
+                    if bar_type == 'tick':      # 直接获取tick 数据
+                        new_bar.utc_time = last_tick.utc_endtime
+                        new_bar.strtime = last_tick.strendtime
+                        new_bar.utc_endtime = new_tick.utc_endtime
+                        new_bar.strendtime = new_tick.strendtime
+                        new_bar.open = last_tick.last_price
+                        new_bar.high = max(last_tick.last_price, new_tick.last_price)
+                        new_bar.low = min(last_tick.last_price, new_tick.last_price)
+                        new_bar.close = new_tick.last_price
+                        if bar_flag:
+                            new_bar.volume = new_tick.cum_volume
+                            new_bar.amount = new_tick.cum_amount
+                        else:
+                            new_bar.volume = new_tick.cum_volume - last_tick.cum_volume     # 计算当前tick的成交量，用减法
+                            new_bar.amount = new_tick.cum_amount - last_tick.cum_amount
 
-                        if queue.qsize() == QUEUE_SIZE:
-                            queue.get()
-                        queue.put(new_bar)
-                        last_bar = new_bar
+                    else:                       # 获取Bar 数据
 
-                        # print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                          #     % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                        if bar_flag and last_tick.open > 0:
+                            new_bar = Bar()
+                            new_bar.sec_id = symbol
+                            new_bar.exchange = 'hbp'
+
+                            new_bar.utc_time = last_tick.utc_time
+                            new_bar.strtime = last_tick.strtime
+                            new_bar.utc_endtime = last_tick.utc_endtime
+                            new_bar.strendtime = last_tick.strendtime
+
+                            new_bar.open = last_tick.open
+                            new_bar.high = last_tick.high
+                            new_bar.low = last_tick.low
+                            new_bar.close = last_tick.last_price
+                            new_bar.volume = last_tick.cum_volume
+                            new_bar.amount = last_tick.cum_amount
+
+                            if queue.qsize() == QUEUE_SIZE:
+                                queue.get()
+                            queue.put(new_bar)
+
+                    print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                         % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
                     last_tick = new_tick
 
