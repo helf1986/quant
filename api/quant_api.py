@@ -111,69 +111,6 @@ class TradeAccount(object):
                     time.sleep(5)
 
 
-    def subscribe_tick(self, symbol='btcusdt', client_id=0, queue=None):
-        '''
-        订阅 KLine 数据
-        :param symbol: 交易所符号
-        :param client_id: client 编号
-        :return:
-        '''
-
-        if self.exchange == 'hbp':
-            # print('Process to subscribe %s ticks: %s' % (symbol, os.getpid()))
-
-            symbol = symbol.lower()
-            tradeStr = """{"sub": "market.""" + symbol + """.kline.1min", "id": "id""" + str(client_id) + """"}"""
-            # print(tradeStr)
-
-            socket = self.connect_ws()               # 连接 websocket 接口
-            socket.send(tradeStr)      # 发送数据请求
-
-            while True:
-                compressData = socket.recv()       # 接收数据包
-                result = gzip.decompress(compressData).decode('utf-8')      # 解压缩数据
-                # print(result)
-                if result[:7] == '{"ping"':
-                    ts = result[8:21]
-                    pong = '{"pong":' + ts + '}'
-                    socket.send(pong)
-                    socket.send(tradeStr)
-
-                elif result[2:4] == "ch":
-
-                    # 把json 文本转成字典
-                    res_dict = eval(result)
-                    # print(res_dict)
-
-                    # 记录Tick 数据
-                    new_tick = Tick()
-                    new_tick.exchange = 'hbp'
-                    new_tick.sec_id = symbol
-                    new_tick.utc_endtime = round(res_dict['ts']/1000)
-                    structendtime = time.localtime(new_tick.utc_endtime)
-                    new_tick.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', structendtime)
-
-                    data = res_dict['tick']
-                    new_tick.utc_time = data['id']
-                    structtime = time.localtime(data['id'])
-                    new_tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
-
-                    new_tick.open = data['open']
-                    new_tick.high = data['high']
-                    new_tick.low = data['low']
-                    new_tick.last_price = data['close']
-                    new_tick.last_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
-                    new_tick.last_amount = data['vol']
-
-                    if queue.qsize() == QUEUE_SIZE:         # 防止队列溢出
-                        queue.get()
-                    queue.put(new_tick)
-                    # print(queue.qsize())
-
-                    # print("tick=%s: time=%s, close=%.2f, volume=%.4f, amount=%.4f" \
-                    #       % (new_tick.sec_id, new_tick.strendtime, new_tick.last_price, new_tick.last_volume, new_tick.last_amount))
-
-
     def subscribe_bar(self, symbol='btcusdt', bar_type='1min', client_id=1, queue=None):
         '''
         订阅 KLine 数据
@@ -259,10 +196,15 @@ class TradeAccount(object):
                     if bar_type == 'tick':      # 直接获取tick 数据
 
                         if last_tick.open > 0:   # 需要跳过第一个空值
+
+                            new_bar.sec_id = symbol
+                            new_bar.exchange = 'hbp'
+
                             new_bar.utc_time = last_tick.utc_endtime
                             new_bar.strtime = last_tick.strendtime
                             new_bar.utc_endtime = new_tick.utc_endtime
                             new_bar.strendtime = new_tick.strendtime
+
                             new_bar.open = last_tick.last_price
                             new_bar.high = max(last_tick.last_price, new_tick.last_price)
                             new_bar.low = min(last_tick.last_price, new_tick.last_price)
@@ -274,8 +216,8 @@ class TradeAccount(object):
                                 new_bar.volume = new_tick.cum_volume - last_tick.cum_volume     # 计算当前tick的成交量，用减法
                                 new_bar.amount = new_tick.cum_amount - last_tick.cum_amount
 
-                            print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                                 % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                            # print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                            #     % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
 
                     else:                       # 获取Bar 数据
@@ -300,8 +242,8 @@ class TradeAccount(object):
                                 queue.get()
                             queue.put(new_bar)
 
-                            print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                                 % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                            # print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                             #    % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
 
                     last_tick = new_tick
 

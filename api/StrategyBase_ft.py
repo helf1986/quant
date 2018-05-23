@@ -69,11 +69,14 @@ class cerebro(object):
             v.lastquebar    = None
 
         for v in self.eventbarlist:
-            bars            = get_bars_local(exchange=self.api.exchange,symbol_list=v.symbol_list, bar_type=v.bar_type, size=v.backbarnum)
-            v.backbarnum    = len(bars)#修正取数据误差
-            for bar in bars:
-                v.barqueue.put(bar)
-                v.lastquebar = bar
+            if v.bar_type == 'tick':        # 目前本地数据库不支持tick数据
+                pass
+            else:
+                bars            = get_bars_local(exchange=self.api.exchange,symbol_list=v.symbol_list, bar_type=v.bar_type, size=v.backbarnum)
+                v.backbarnum    = len(bars)#修正取数据误差
+                for bar in bars:
+                    v.barqueue.put(bar)
+                    v.lastquebar = bar
 
 
     #-------------------- -----更新事件队列-------------------------------------------
