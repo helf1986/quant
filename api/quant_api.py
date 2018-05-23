@@ -189,6 +189,10 @@ class TradeAccount(object):
 
         if self.exchange == 'hbp':
             symbol = symbol.lower()
+
+            if bar_type == 'tick':
+                bar_type = '1min'
+
             tradeStr = """{"sub": "market.""" + symbol +""".kline.""" + bar_type + """","id": "id""" + str(client_id) + """"}"""
             # print(tradeStr)
 
@@ -238,6 +242,7 @@ class TradeAccount(object):
                     bar_flag = False
                     if bar_type == 'tick':      # 直接获取tick 数据
                         bar_flag = True
+                        last_tick = new_tick
                     elif bar_type == "1min":
                         if last_tick_time.tm_min != new_tick_time.tm_min:
                             bar_flag = True
