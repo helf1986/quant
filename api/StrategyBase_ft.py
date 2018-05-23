@@ -398,7 +398,7 @@ class Strategy(object):
         '''                   
         self.__barcount+=1           
         if self.prt:
-            print (u"执行中.....sec=%s,strtime=%s,barcount=%s,type=%s"%(bar.sec_id,bar.strtime,self.__barcount,self.__type) )
+            print (u"执行中.....sec=%s, strtime=%s, close=%.4f, volume=%.4f, barcount=%s, type=%s"%(bar.sec_id,bar.strtime, bar.close, bar.volume, self.__barcount,self.__type) )
 
         '''
         历史bar全部遍历，开始实时数据推送;
