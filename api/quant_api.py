@@ -906,8 +906,8 @@ class TradeAccount(object):
             hist_bars_df = to_dataframe(hist_bars)
             hist_avg_volume = np.mean(hist_bars_df['volume'])/60
 
-            avg_volume = hist_avg_volume * 0.5      # 默认不能超过平均成交量的50%
-            order_count = np.ceil(volume / avg_volume)
+            avg_volume = round(hist_avg_volume * 0.5, 4)      # 默认不能超过平均成交量的50%
+            order_count = int(np.ceil(volume / avg_volume))
 
             print(hist_bars_df)
             print(hist_avg_volume, avg_volume, order_count)
@@ -915,7 +915,7 @@ class TradeAccount(object):
             if max_ratio > 0:           # 指定每次下单量比例的情况
                 if avg_volume > hist_avg_volume * max_ratio:
                     avg_volume = round(hist_avg_volume*max_ratio, 4)  # 取4 位有效数字
-                    order_count = np.ceil(volume/avg_volume)
+                    order_count = int(np.ceil(volume/avg_volume))
 
             elif max_count > 0:         # 指定最大下单次数的情况
                 if order_count > max_count:
@@ -925,10 +925,9 @@ class TradeAccount(object):
             list_to_order = {}      # 代下单的订单
             nn = 1
             while nn < order_count:
-                list_to_order[nn] = avg_volume
+                list_to_order[nn] = round(avg_volume, 4)
                 nn = nn + 1
-
-            list_to_order[order_count] = volume - avg_volume*(order_count-1)
+            list_to_order[order_count] = round(volume - avg_volume*(order_count-1), 4)
 
             print(list_to_order)
 
@@ -936,7 +935,9 @@ class TradeAccount(object):
             order_list = []         # 记录下单的所有订单
             total_filled_volume = 0
             total_filled_amount = 0
-            while nn > 0:
+
+            max_runtime = 2*nn    # 该计数器用来避免下单不成功一直死循环的情况
+            while nn > 0 and max_runtime > 0:
                 # 买入指定数字货币
 
                 each_volume = list_to_order[nn]
@@ -1001,6 +1002,9 @@ class TradeAccount(object):
                                 (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason,
                                 myorder.ord_rej_reason_detail))
 
+                max_runtime = max_runtime - 1
+
+            # 统计累计成交量
             if len(order_list) > 0:
                 order_df = to_dataframe(order_list)
                 total_filled_volume = np.sum(order_df['filled_volume'])
