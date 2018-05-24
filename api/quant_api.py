@@ -397,7 +397,7 @@ class TradeAccount(object):
                         depth_df.sort_values(by='price', ascending=False, inplace=True)
                         '''
 
-                        print(depth_df[['symbol', 'strtime', 'ask_price', 'ask_volume', 'bid_price', 'bid_volume']])
+                        print(depth_df[['symbol', 'strtime', 'ask_price', 'ask_volume', 'bid_price', 'bid_volume']].head())
                         if queue.qsize() == QUEUE_SIZE:
                             queue.get()
                         queue.put(depth_df)
