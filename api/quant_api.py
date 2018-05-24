@@ -876,7 +876,7 @@ class TradeAccount(object):
     def order_split(self, source='api', sec_id='btcusdt', side=1, price=0, volume=0, split='vwap', max_ratio=0, max_count=0):
         '''
 
-        :param source:
+        :param source: 订单接口源，api：普通订单，margin：融资融券订单
         :param sec_id:
         :param side: 买卖方向，1：买，2：卖
         :param price:
@@ -992,7 +992,7 @@ class TradeAccount(object):
                                  myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
                     nn = nn - 1
-                    
+
                 elif res['status'] == 'error':
                     myorder.status = res['status']
                     myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
