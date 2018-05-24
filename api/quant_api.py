@@ -110,6 +110,64 @@ class TradeAccount(object):
                     print('connect ws error,retry...')
                     time.sleep(5)
 
+    def subscribe_tick (self, symbol='btcusdt', client_id=1, queue=None):
+        '''
+
+        :param symbol:
+        :param client_id:
+        :param queue:
+        :return:
+        '''
+
+        while(True):        # 如果连接失败，则无限次重连
+            tradeStr = """{"sub": "market.""" + symbol + """.trade.detail", "id": "id""" + str(client_id) + """"}"""
+            # print(tradeStr)
+
+            try:
+                socket = self.connect_ws()
+                socket.send(tradeStr)
+
+                while True:
+
+                    compressData = socket.recv()
+                    result = gzip.decompress(compressData).decode('utf-8')
+                    # print(result)
+                    if result[:7] == '{"ping"':
+                        ts = result[8:21]
+                        pong = '{"pong":' + ts + '}'
+                        socket.send(pong)
+                        socket.send(tradeStr)
+
+                    elif result[2:4] == "ch":
+
+                        # 把json 文本转成字典
+                        res_dict = eval(result)
+                        # print(res_dict)
+
+                        # 记录Tick 数据
+                        new_tick = Tick()
+                        new_tick.exchange = 'hbp'
+                        new_tick.sec_id = symbol
+
+                        data = res_dict['tick']['data'][0]
+                        new_tick.utc_time = data['ts']
+                        new_tick.strtime = datetime.datetime.fromtimestamp(data['ts']/1000).strftime('%Y-%m-%d %H:%M:%S %f')
+                        new_tick.trade_type = data['direction']
+                        new_tick.last_price = data['price']
+                        new_tick.last_volume = data['amount']  # 注意火币接口的成交量是amount和成交额volume
+                        new_tick.last_amount = data['price'] * data['amount']
+
+                        # 把新的tick 加入到队列中
+                        if queue.qsize() == QUEUE_SIZE:
+                            queue.get()
+                        queue.put(new_tick)
+                        print("Tick: symbol=%s: time=%s, direction=%s, price=%.2f, volume=%.2f"
+                            % (new_tick.sec_id, new_tick.strtime, new_tick.trade_type, new_tick.last_price, new_tick.last_volume))
+
+            except Exception as e:
+
+                logger.warn('subscribe_tick 网络连接失败，继续重连...', e)
+
 
     def subscribe_bar(self, symbol='btcusdt', bar_type='1min', client_id=1, queue=None):
         '''
@@ -276,7 +334,6 @@ class TradeAccount(object):
             elif result[2:4] == "ch":
                 print(result)
                 pass
-
 
 
     def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='', size=0):

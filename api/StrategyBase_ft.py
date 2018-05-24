@@ -85,7 +85,10 @@ class cerebro(object):
 
         client_count = 0
         for v in self.eventbarlist:
-            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count,v.barqueue))
+            if v.bar_type == 'tick':
+                v_process = Process(target=self.api.subscribe_tick, args=(v.symbol_list, client_count, v.barqueue))
+            else:
+                v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count,v.barqueue))
             v_process.start()
             client_count += 1
 
