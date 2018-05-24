@@ -926,6 +926,8 @@ class TradeAccount(object):
             nn = 1
             while nn < order_count:
                 list_to_order[nn] = avg_volume
+                nn = nn + 1
+
             list_to_order[order_count] = volume - avg_volume*(order_count-1)
 
             print(list_to_order)
@@ -989,6 +991,8 @@ class TradeAccount(object):
                                 (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume,
                                  myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
 
+                    nn = nn - 1
+                    
                 elif res['status'] == 'error':
                     myorder.status = res['status']
                     myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
