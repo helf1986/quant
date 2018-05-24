@@ -185,8 +185,11 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             symbol = symbol.lower()
 
-            if bar_type == 'tick':
+            if bar_type == 'tick':   # 订阅 Market Detail 数据
                 tradeStr = """{"sub": "market.""" + symbol + """.trade.detail", "id": "id""" + str(client_id) + """"}"""
+
+            elif bar_type == 'depth':       # 订阅 Market Depth 数据，默认合并深度为0
+                tradeStr = """{"sub": "market.""" + symbol + """.depth.step0", "id": "id""" + str(client_id) + """"}"""
 
             else:
                 bar_str = bar_type
@@ -333,7 +336,7 @@ class TradeAccount(object):
                     time.sleep(10)
 
 
-    def subscribe_depth(self, symbol='btcusdt', step=5, queue=None):
+    def subscribe_depth(self, symbol='btcusdt', step=5, client_id=1, queue=None):
         '''
         订阅深度数据
         :param symbol:
@@ -344,7 +347,7 @@ class TradeAccount(object):
         symbol = symbol.lower()
 
         # 订阅 Market Depth 数据
-        tradeStr="""{"sub": "market.""" + symbol + """.depth.step""" + str(step) + """", "id": "id10"}"""
+        tradeStr="""{"sub": "market.""" + symbol + """.depth.step""" + str(step) + """", "id": "id""" + str(client_id) + """"}"""
 
         while True:
             socket = self.connect_ws()

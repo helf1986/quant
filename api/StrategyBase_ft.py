@@ -86,7 +86,8 @@ class cerebro(object):
         client_count = 0
         for v in self.eventbarlist:
             print(v.bar_type)
-            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count,v.barqueue))
+
+            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count, v.barqueue))
             v_process.start()
             client_count += 1
 
@@ -96,11 +97,8 @@ class cerebro(object):
         """启动"""
 
         # 多进程进行事件订阅管理
-        client_count = 0
-        for v in self.eventbarlist:
-            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count,v.barqueue))
-            v_process.start()
-            client_count += 1
+        self.__sendevent_bar()
+
 
         """引擎运行"""
         while True:
@@ -182,7 +180,6 @@ class cerebro(object):
 #            self.stratslist.append(strats)
         except:
             logger.warn ("adding strategy wrong!!!")
-        
 
 
 #-----交易的基类---------
