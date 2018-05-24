@@ -194,114 +194,121 @@ class TradeAccount(object):
 
             # print(tradeStr)
 
-            socket = self.connect_ws()
-            socket.send(tradeStr)
-
             while True:
-                compressData = socket.recv()
-                result = gzip.decompress(compressData).decode('utf-8')
-                # print(result)
-                if result[:7] == '{"ping"':
-                    ts = result[8:21]
-                    pong = '{"pong":' + ts + '}'
-                    socket.send(pong)
+
+                try:    # 为了防止连接火币服务器中断，采用无限循环连接的模式，如果连接中断，停止10s后继续连接
+                    socket = self.connect_ws()
                     socket.send(tradeStr)
 
-                elif result[2:4] == "ch":
+                    while True:
+                        compressData = socket.recv()
+                        result = gzip.decompress(compressData).decode('utf-8')
+                        # print(result)
+                        if result[:7] == '{"ping"':
+                            ts = result[8:21]
+                            pong = '{"pong":' + ts + '}'
+                            socket.send(pong)
+                            socket.send(tradeStr)
 
-                    # 把json 文本转成字典
-                    res_dict = eval(result)
-                    # print(res_dict)
+                        elif result[2:4] == "ch":
 
-                    if bar_type == 'tick':      # 直接获取tick 数据
+                            # 把json 文本转成字典
+                            res_dict = eval(result)
+                            # print(res_dict)
 
-                        # 记录Tick 数据
-                        new_tick = Tick()
-                        new_tick.exchange = 'hbp'
-                        new_tick.sec_id = symbol
+                            if bar_type == 'tick':      # 直接获取tick 数据
 
-                        data = res_dict['tick']['data'][0]
-                        new_tick.utc_time = data['ts']
-                        new_tick.strtime = datetime.datetime.fromtimestamp(data['ts'] / 1000).strftime(
-                            '%Y-%m-%d %H:%M:%S %f')
-                        new_tick.trade_type = data['direction']
-                        new_tick.last_price = data['price']
-                        new_tick.last_volume = data['amount']  # 注意火币接口的成交量是amount和成交额volume
-                        new_tick.last_amount = data['price'] * data['amount']
+                                # 记录Tick 数据
+                                new_tick = Tick()
+                                new_tick.exchange = 'hbp'
+                                new_tick.sec_id = symbol
 
-                        # 把新的tick 加入到队列中
-                        if queue.qsize() == QUEUE_SIZE:
-                            queue.get()
-                        queue.put(new_tick)
-                        print("Tick: symbol=%s: time=%s, direction=%s, price=%.2f, volume=%.2f"
-                              % (new_tick.sec_id, new_tick.strtime, new_tick.trade_type, new_tick.last_price,
-                                 new_tick.last_volume))
+                                data = res_dict['tick']['data'][0]
+                                new_tick.utc_time = data['ts']
+                                new_tick.strtime = datetime.datetime.fromtimestamp(data['ts'] / 1000).strftime(
+                                    '%Y-%m-%d %H:%M:%S %f')
+                                new_tick.trade_type = data['direction']
+                                new_tick.last_price = data['price']
+                                new_tick.last_volume = data['amount']  # 注意火币接口的成交量是amount和成交额volume
+                                new_tick.last_amount = data['price'] * data['amount']
 
-                    else:       # 获取Bar 数据
+                                # 把新的tick 加入到队列中
+                                if queue.qsize() == QUEUE_SIZE:
+                                    queue.get()
+                                queue.put(new_tick)
+                                print("Tick: symbol=%s: time=%s, direction=%s, price=%.2f, volume=%.2f"
+                                      % (new_tick.sec_id, new_tick.strtime, new_tick.trade_type, new_tick.last_price,
+                                         new_tick.last_volume))
 
-                        # 先记录每一次更新数据
-                        new_tick = Tick()
-                        new_tick.exchange = 'hbp'
-                        new_tick.sec_id = symbol
-                        new_tick.utc_endtime = round(res_dict['ts']/1000)
-                        structendtime = time.localtime(new_tick.utc_endtime)
-                        new_tick.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', structendtime)
+                            else:       # 获取Bar 数据
 
-                        data = res_dict['tick']
-                        new_tick.utc_time = data['id']
-                        structtime = time.localtime(data['id'])
-                        new_tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
+                                # 先记录每一次更新数据
+                                new_tick = Tick()
+                                new_tick.exchange = 'hbp'
+                                new_tick.sec_id = symbol
+                                new_tick.utc_endtime = round(res_dict['ts']/1000)
+                                structendtime = time.localtime(new_tick.utc_endtime)
+                                new_tick.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', structendtime)
 
-                        new_tick.open = data['open']
-                        new_tick.high = data['high']
-                        new_tick.low = data['low']
-                        new_tick.last_price = data['close']
-                        new_tick.cum_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
-                        new_tick.cum_amount = data['vol']
+                                data = res_dict['tick']
+                                new_tick.utc_time = data['id']
+                                structtime = time.localtime(data['id'])
+                                new_tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
 
-                        last_tick_time = time.localtime(last_tick.utc_endtime)
-                        new_tick_time = time.localtime(new_tick.utc_endtime)
+                                new_tick.open = data['open']
+                                new_tick.high = data['high']
+                                new_tick.low = data['low']
+                                new_tick.last_price = data['close']
+                                new_tick.cum_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
+                                new_tick.cum_amount = data['vol']
 
-                        bar_flag = False        # 用来记录周期转换点
-                        if bar_type == "1min":
-                            if (last_tick_time.tm_min != new_tick_time.tm_min):
-                                bar_flag = True
-                        elif bar_type == "5min":
-                            if last_tick_time.tm_min % 5 == 4 and new_tick_time.tm_min % 5 == 0:
-                                bar_flag = True
-                        elif bar_type == "60min" or bar_type == '1hour':
-                            if last_tick_time.tm_hour != new_tick_time.tm_hour:
-                                bar_flag = True
-                        elif bar_type == "1day" or bar_type == '24hour':
-                            if last_tick_time.tm_mday != new_tick_time.tm_mday:
-                                bar_flag = True
+                                last_tick_time = time.localtime(last_tick.utc_endtime)
+                                new_tick_time = time.localtime(new_tick.utc_endtime)
 
-                        # 判断是否要更新bar 数据
-                        new_bar = Bar()
-                        if bar_flag and last_tick.open > 0:     # 在周期转换点记录当前bar
-                            new_bar.sec_id = symbol
-                            new_bar.exchange = 'hbp'
+                                bar_flag = False        # 用来记录周期转换点
+                                if bar_type == "1min":
+                                    if (last_tick_time.tm_min != new_tick_time.tm_min):
+                                        bar_flag = True
+                                elif bar_type == "5min":
+                                    if last_tick_time.tm_min % 5 == 4 and new_tick_time.tm_min % 5 == 0:
+                                        bar_flag = True
+                                elif bar_type == "60min" or bar_type == '1hour':
+                                    if last_tick_time.tm_hour != new_tick_time.tm_hour:
+                                        bar_flag = True
+                                elif bar_type == "1day" or bar_type == '24hour':
+                                    if last_tick_time.tm_mday != new_tick_time.tm_mday:
+                                        bar_flag = True
 
-                            new_bar.utc_time = last_tick.utc_time
-                            new_bar.strtime = last_tick.strtime
-                            new_bar.utc_endtime = last_tick.utc_endtime
-                            new_bar.strendtime = last_tick.strendtime
+                                # 判断是否要更新bar 数据
+                                new_bar = Bar()
+                                if bar_flag and last_tick.open > 0:     # 在周期转换点记录当前bar
+                                    new_bar.sec_id = symbol
+                                    new_bar.exchange = 'hbp'
 
-                            new_bar.open = last_tick.open
-                            new_bar.high = last_tick.high
-                            new_bar.low = last_tick.low
-                            new_bar.close = last_tick.last_price
-                            new_bar.volume = last_tick.cum_volume
-                            new_bar.amount = last_tick.cum_amount
+                                    new_bar.utc_time = last_tick.utc_time
+                                    new_bar.strtime = last_tick.strtime
+                                    new_bar.utc_endtime = last_tick.utc_endtime
+                                    new_bar.strendtime = last_tick.strendtime
 
-                            if queue.qsize() == QUEUE_SIZE:
-                                queue.get()
-                            queue.put(new_bar)
+                                    new_bar.open = last_tick.open
+                                    new_bar.high = last_tick.high
+                                    new_bar.low = last_tick.low
+                                    new_bar.close = last_tick.last_price
+                                    new_bar.volume = last_tick.cum_volume
+                                    new_bar.amount = last_tick.cum_amount
 
-                            print("symbol=%s, bar=%s: begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                                 % (new_bar.sec_id, bar_type, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                                    if queue.qsize() == QUEUE_SIZE:
+                                        queue.get()
+                                    queue.put(new_bar)
 
-                        last_tick = new_tick
+                                    print("%s: symbol=%s, begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
+                                         % (bar_type, new_bar.sec_id, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+
+                                last_tick = new_tick
+
+                except Exception as e:
+                    logger.warn('subscribe_bar 连接火币服务器失败...', e)
+                    time.sleep(10)
 
 
     def subscribe_depth(self, symbol='btcusdt', step=0):
