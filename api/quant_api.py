@@ -240,6 +240,28 @@ class TradeAccount(object):
                                       % (new_tick.sec_id, new_tick.strtime, new_tick.trade_type, new_tick.last_price,
                                          new_tick.last_volume))
 
+                            elif bar_type == 'depth':
+
+                                data = res_dict['tick']
+                                utc_time = data['ts'] / 1000
+                                strtime = datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
+
+                                ask_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
+                                ask_df.sort_values(by='ask_price', ascending=True, inplace=True)
+
+                                bid_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_volume'])
+                                bid_df.sort_values(by='bid_price', ascending=False, inplace=True)
+
+                                depth_df = ask_df.join(bid_df)
+                                depth_df['symbol'] = symbol
+                                depth_df['utc_time'] = utc_time
+                                depth_df['strtime'] = strtime
+
+                                print(depth_df)
+                                if queue.qsize() == QUEUE_SIZE:
+                                    queue.get()
+                                queue.put(depth_df)
+
                             else:       # 获取Bar 数据
 
                                 # 先记录每一次更新数据
@@ -311,7 +333,7 @@ class TradeAccount(object):
                     time.sleep(10)
 
 
-    def subscribe_depth(self, symbol='btcusdt', step=0):
+    def subscribe_depth(self, symbol='btcusdt', step=5, queue=None):
         '''
         订阅深度数据
         :param symbol:
@@ -324,21 +346,61 @@ class TradeAccount(object):
         # 订阅 Market Depth 数据
         tradeStr="""{"sub": "market.""" + symbol + """.depth.step""" + str(step) + """", "id": "id10"}"""
 
-        self.socket.send(tradeStr)
+        while True:
+            socket = self.connect_ws()
+            socket.send(tradeStr)
 
-        while (1):
-            compressData = self.socket.recv()
-            result = gzip.decompress(compressData).decode('utf-8')
-            print(result)
-            if result[:7] == '{"ping"':
-                ts = result[8:21]
-                pong = '{"pong":' + ts + '}'
-                self.socket.send(pong)
-                self.socket.send(tradeStr)
+            try:
+                while True:
+                    compressData = self.socket.recv()
+                    result = gzip.decompress(compressData).decode('utf-8')
 
-            elif result[2:4] == "ch":
-                print(result)
-                pass
+                    if result[:7] == '{"ping"':
+                        ts = result[8:21]
+                        pong = '{"pong":' + ts + '}'
+                        self.socket.send(pong)
+                        self.socket.send(tradeStr)
+
+                    elif result[2:4] == "ch":
+                        res_dict = eval(result)
+                        data = res_dict['tick']
+
+                        utc_time = data['ts']/1000
+                        strtime = datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
+
+                        ask_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
+                        ask_df.sort_values(by='ask_price', ascending=True, inplace=True)
+
+                        bid_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_volume'])
+                        bid_df.sort_values(by='bid_price', ascending=False, inplace=True)
+
+                        depth_df = ask_df.join(bid_df)
+                        depth_df['symbol'] = symbol
+                        depth_df['utc_time'] = utc_time
+                        depth_df['strtime'] = strtime
+
+                        '''
+                        ask_df = pd.DataFrame(data['asks'], columns = ['price', 'volume'])
+                        ask_df['direction'] = 'ask'
+                        ask_df.sort_values(by='price', ascending=True, inplace=True)
+                        ask_df.index = ['ask' + str(each+1) for each in range(len(ask_df))]
+        
+                        bid_df = pd.DataFrame(data['bids'], columns = ['price', 'volume'])
+                        bid_df['direction'] = 'bid'
+                        bid_df.sort_values(by='price', ascending=False, inplace=True)
+                        bid_df.index = ['bid' + str(each+1) for each in range(len(ask_df))]
+        
+                        depth_df = ask_df.append(bid_df)
+                        depth_df.sort_values(by='price', ascending=False, inplace=True)
+                        '''
+
+                        print(depth_df)
+                        if queue.qsize() == QUEUE_SIZE:
+                            queue.get()
+                        queue.put(depth_df)
+
+            except Exception as e:
+                logger.warn('subscribe_depth 连接火币网络断开...', e)
 
 
     def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='', size=0):
@@ -593,9 +655,9 @@ class TradeAccount(object):
                 data = depth_res['tick']
                 utc_time = round(data['ts']/1000)
                 strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(utc_time))
-                bids_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_amount'])
+                bids_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_volume'])
                 bids_df = bids_df.sort_values(by='bid_price', ascending=False)
-                asks_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_amount'])
+                asks_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
                 asks_df = asks_df.sort_values(by='ask_price')
                 depth_df = bids_df.join(asks_df)
                 depth_df['strtime'] = strtime

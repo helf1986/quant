@@ -15,8 +15,8 @@ if __name__ == '__main__':
     input1.type_ = input1.symbol_list + input1.bar_type
 
     input2 = Event()
-    input2.symbol_list = 'ethusdt'
-    input2.bar_type = '1min'
+    input2.symbol_list = 'btcusdt'
+    input2.bar_type = 'depth'
     input2.backbarnum = 20
     input2.type_ = input2.symbol_list + input2.bar_type
 
