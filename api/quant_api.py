@@ -717,7 +717,7 @@ class TradeAccount(object):
             myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
             if source == 'api':
                 hb_source = 'api'
-                res = self.cilent.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+                res = self.client.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
             elif source == 'margin':
                 hb_source = 'margin-api'
                 res = self.client.send_margin_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
@@ -954,7 +954,7 @@ class TradeAccount(object):
 
                 if source == 'api':
                     hb_source = 'api'
-                    res = self.cilent.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+                    res = self.client.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
                 elif source == 'margin':
                     hb_source = 'margin-api'
                     res = self.client.send_margin_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
