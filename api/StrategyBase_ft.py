@@ -85,6 +85,7 @@ class cerebro(object):
 
         client_count = 0
         for v in self.eventbarlist:
+            print(v.bar_type)
             if v.bar_type == 'tick':
                 v_process = Process(target=self.api.subscribe_tick, args=(v.symbol_list, client_count, v.barqueue))
             else:
