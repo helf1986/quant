@@ -236,7 +236,7 @@ class TradeAccount(object):
                                 if queue.qsize() == QUEUE_SIZE:
                                     queue.get()
                                 queue.put(new_tick)
-                                print("Tick: symbol=%s: time=%s, direction=%s, price=%.2f, volume=%.2f"
+                                print("Tick: symbol=%s: time=%s, direction=%s, price=%.4f, volume=%.4f"
                                       % (new_tick.sec_id, new_tick.strtime, new_tick.trade_type, new_tick.last_price,
                                          new_tick.last_volume))
 
@@ -246,14 +246,14 @@ class TradeAccount(object):
                                 new_tick = Tick()
                                 new_tick.exchange = 'hbp'
                                 new_tick.sec_id = symbol
-                                new_tick.utc_endtime = round(res_dict['ts']/1000)
+                                new_tick.utc_endtime = res_dict['ts']/1000
                                 structendtime = time.localtime(new_tick.utc_endtime)
-                                new_tick.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', structendtime)
+                                new_tick.strendtime = datetime.datetime.fromtimestamp(new_tick.utc_endtime).strftime('%Y-%m-%d %H:%M:%S %f')
 
                                 data = res_dict['tick']
                                 new_tick.utc_time = data['id']
                                 structtime = time.localtime(data['id'])
-                                new_tick.strtime = time.strftime('%Y-%m-%d %H:%M:%S', structtime)
+                                new_tick.strtime = datetime.datetime.fromtimestamp(new_tick.utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
 
                                 new_tick.open = data['open']
                                 new_tick.high = data['high']
@@ -301,8 +301,8 @@ class TradeAccount(object):
                                         queue.get()
                                     queue.put(new_bar)
 
-                                    print("%s: symbol=%s, begin_time=%s, end_time=%s, open=%.2f, high=%.2f, low=%.2f, close=%.2f"
-                                         % (bar_type, new_bar.sec_id, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.high, new_bar.low, new_bar.close))
+                                    print("%s: symbol=%s, begin_time=%s, end_time=%s, open=%.4f, close=%.4f, volume=%.4f"
+                                         % (bar_type, new_bar.sec_id, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.close, new_bar.volume))
 
                                 last_tick = new_tick
 
