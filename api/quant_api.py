@@ -928,6 +928,8 @@ class TradeAccount(object):
                 list_to_order[nn] = avg_volume
             list_to_order[order_count] = volume - avg_volume*(order_count-1)
 
+            print(list_to_order)
+
             # 按照拆单后的订单依次下单交易
             order_list = []         # 记录下单的所有订单
             total_filled_volume = 0
