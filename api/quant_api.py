@@ -247,7 +247,7 @@ class TradeAccount(object):
 
                                 data = res_dict['tick']
                                 utc_time = data['ts'] / 1000
-                                strtime = datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
+                                strtime = datetime.datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
 
                                 ask_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
                                 ask_df.sort_values(by='ask_price', ascending=True, inplace=True)
@@ -369,7 +369,7 @@ class TradeAccount(object):
                         data = res_dict['tick']
 
                         utc_time = data['ts']/1000
-                        strtime = datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
+                        strtime = datetime.datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
 
                         ask_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
                         ask_df.sort_values(by='ask_price', ascending=True, inplace=True)
