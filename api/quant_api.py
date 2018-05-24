@@ -438,8 +438,8 @@ class TradeAccount(object):
                         bar = Bar()
                         bar.exchange = self.exchange
                         bar.sec_id = each_sec
-                        bar.volume = each_bar['vol']
-                        bar.amount = each_bar['amount']
+                        bar.volume = each_bar['amount']         # 注意火币里的amount表示成交量，vol表示成交额
+                        bar.amount = each_bar['vol']
                         bar.open = each_bar['open']
                         bar.high = each_bar['high']
                         bar.low = each_bar['low']
@@ -522,8 +522,8 @@ class TradeAccount(object):
                     tick.high = data['high']
                     tick.low = data['low']
                     tick.last_price = data['close']
-                    tick.last_volume = data['vol']
-                    tick.last_amount = data['amount']
+                    tick.last_volume = data['amount']
+                    tick.last_amount = data['vol']      # 注意火币里的amount表示成交量，vol表示成交额
                     tick.last_count = data['count']
                     tick.asks = [tuple(data['ask'])]
                     tick.bids = [tuple(data['bid'])]
@@ -585,8 +585,8 @@ class TradeAccount(object):
                     bar.high = data['high']
                     bar.low = data['low']
                     bar.close = data['close']
-                    bar.volume = data['vol']
-                    bar.amount = data['amount']
+                    bar.volume = data['amount']            # 注意火币里的amount表示成交量，vol表示成交额
+                    bar.amount = data['vol']
                     bar.count = data['count']
                     bar.utc_endtime = bar_res['ts']
                     bar.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(bar_res['ts'] / 1000))
@@ -908,6 +908,9 @@ class TradeAccount(object):
 
             avg_volume = hist_avg_volume * 0.5      # 默认不能超过平均成交量的50%
             order_count = np.ceil(volume / avg_volume)
+
+            print(hist_bars_df)
+            print(hist_avg_volume, avg_volume, order_count)
 
             if max_ratio > 0:           # 指定每次下单量比例的情况
                 if avg_volume > hist_avg_volume * max_ratio:
