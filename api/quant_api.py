@@ -110,6 +110,7 @@ class TradeAccount(object):
                     print('connect ws error,retry...')
                     time.sleep(5)
 
+
     def subscribe_tick (self, symbol='btcusdt', client_id=1, queue=None):
         '''
 
@@ -781,7 +782,6 @@ class TradeAccount(object):
     def close_long(self, source='api', sec_id='btcusdt', price=0, volume=0):
         '''
          异步平多仓，
-         :param exchange: string	交易所代码，如火币网：huobipro，OKCoin: okcoin
          :param source: string   订单接口源，api：普通订单，margin-api：融资融券订单
          :param sec_id: string   证券代码，如
          :param price: float     委托价，如果price=0,为市价单，否则为限价单
@@ -871,6 +871,133 @@ class TradeAccount(object):
             myorder.status = order['status']
 
         return myorder
+
+
+    def order_split(self, source='api', sec_id='btcusdt', side=1, price=0, volume=0, split='vwap', max_ratio=0, max_count=0):
+        '''
+
+        :param source:
+        :param sec_id:
+        :param side: 买卖方向，1：买，2：卖
+        :param price:
+        :param volume:
+        :param split: 拆单算法类型，目前只支持vwap
+        :param max_ratio: 每单规模是平均成交量的最大比例
+        :param max_count: 最大下单次数
+        :return:
+        '''
+
+        if self.exchange == 'hbp':  # 火币网接口
+
+            sec_id = sec_id.lower()
+
+            # 确定订单类型
+            if side == 1 and price == 0.0:
+                mtype = 'buy-market'
+            elif side == 1 and price > 0.0:
+                mtype = 'buy-limit'
+            elif side == 2 and price == 0.0:
+                mtype = 'sell-market'
+            elif side == 2 and price > 0.0:
+                mtype = 'sell-limit'
+
+            # 计算每单下单金额和下单次数
+            hist_bars = self.get_bars(symbol_list=sec_id, bar_type='1min', size=10)
+            hist_bars_df = to_dataframe(hist_bars)
+            hist_avg_volume = np.mean(hist_bars_df['volume'])/60
+
+            avg_volume = hist_avg_volume * 0.5      # 默认不能超过平均成交量的50%
+            order_count = np.ceil(volume / avg_volume)
+
+            if max_ratio > 0:           # 指定每次下单量比例的情况
+                if avg_volume > hist_avg_volume * max_ratio:
+                    avg_volume = round(hist_avg_volume*max_ratio, 4)  # 取4 位有效数字
+                    order_count = np.ceil(volume/avg_volume)
+
+            elif max_count > 0:         # 指定最大下单次数的情况
+                if order_count > max_count:
+                    order_count = max_count
+                avg_volume = round(volume/order_count, 4)       # 取4 位有效数字
+
+            list_to_order = {}      # 代下单的订单
+            nn = 1
+            while nn < order_count:
+                list_to_order[nn] = avg_volume
+            list_to_order[order_count] = volume - avg_volume*(order_count-1)
+
+            # 按照拆单后的订单依次下单交易
+            order_list = []         # 记录下单的所有订单
+            total_filled_volume = 0
+            total_filled_amount = 0
+            while nn > 0:
+                # 买入指定数字货币
+
+                each_volume = list_to_order[nn]
+
+                myorder = Order()
+                myorder.exchange = self.exchange
+                myorder.sec_id = sec_id
+                myorder.price = price           ## 委托价
+                myorder.volume = each_volume    ## 委托量
+                myorder.side = side             ## 买卖方向，1：买，2：卖
+                myorder.order_type = mtype      ## 订单类型
+                myorder.order_src = source      ## 订单来源
+                myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+
+                if price == 0.0:
+                    last_tick = self.get_last_ticks(symbol_list=sec_id)
+                    last_price = last_tick[0].last_price
+                    amount = volume * last_price
+                else:
+                    amount = volume
+                    last_price = price
+
+                if source == 'api':
+                    hb_source = 'api'
+                    res = self.cilent.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+                elif source == 'margin':
+                    hb_source = 'margin-api'
+                    res = self.client.send_margin_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+
+                if res['status'] == 'ok':
+                    myorder.ex_ord_id = int(res['data'])
+                    myorder.order_id = int(res['data'])
+
+                    time.sleep(2)  # 等待2 秒后查询订单
+                    # 查询订单信息
+                    order_info = self.client.order_info(myorder.ex_ord_id)
+                    myorder.account_id = order_info['data']['account-id']
+                    myorder.status = order_info['data']['state']
+                    myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S",
+                                                         time.localtime(order_info['data']['created-at'] / 1000))
+                    myorder.filled_volume = float(order_info['data']['field-amount'])  ## 已成交量
+                    myorder.filled_amount = float(order_info['data']['field-cash-amount'])  ## 已成交额
+                    if (myorder.filled_volume > 0):
+                        myorder.filled_vwap = round(myorder.filled_amount / myorder.filled_volume, 4)  ## 已成交均价
+                    myorder.filled_fee = float(order_info['data']['field-fees']) * last_price  ## 手续费
+                    myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(
+                        order_info['data']['finished-at'] / 1000))  ## 最新一次成交时间
+
+                    order_list = order_list + [myorder]
+
+                    logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f usdt。' % \
+                                (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume,
+                                 myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
+
+                elif res['status'] == 'error':
+                    myorder.status = res['status']
+                    myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
+                    myorder.ord_rej_reason_detail = res['err-msg']  ## 订单拒绝原因描述
+                    logger.warn('%s 订单号 %s：%s 开多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
+                                (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason,
+                                myorder.ord_rej_reason_detail))
+
+            if len(order_list) > 0:
+                order_df = to_dataframe(order_list)
+                total_filled_volume = np.sum(order_df['filled_volume'])
+                total_filled_amount = np.sum(order_df['filled_amount'])
+
+            return total_filled_volume, total_filled_amount, order_list
 
 
     def cancel_order(self, sec_id='', order_id=''):
