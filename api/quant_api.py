@@ -260,7 +260,8 @@ class TradeAccount(object):
                                 depth_df['utc_time'] = utc_time
                                 depth_df['strtime'] = strtime
 
-                                print(depth_df)
+                                print(depth_df[['symbol', 'strtime', 'ask_price', 'ask_volume', 'bid_price',
+                                                'bid_volume']].head())
                                 if queue.qsize() == QUEUE_SIZE:
                                     queue.get()
                                 queue.put(depth_df)
