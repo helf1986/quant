@@ -7,11 +7,18 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
+from websocket import WebSocket, create_connection
+import gzip
+import os
+
+from multiprocessing import Process, Queue
+
 from pymongo import MongoClient
 import common.HuobiClient as hb
 import common.BinanceClient as bnb
 from api import logger
 
+QUEUE_SIZE = 5000
 
 class ExSymbol(object):
     '''
@@ -88,6 +95,319 @@ class TradeAccount(object):
         return instrus
 
 
+    def connect_ws(self):
+        '''
+        连接websocket 接口
+        :return:
+        '''
+        if self.exchange == 'hbp':
+            while (1):
+                try:
+                    socket = create_connection("wss://api.huobipro.com/ws")
+                    # print('websocket is connected!')
+                    return socket
+                except:
+                    print('connect ws error,retry...')
+                    time.sleep(5)
+
+
+    def subscribe_tick (self, symbol='btcusdt', client_id=1, queue=None):
+        '''
+
+        :param symbol:
+        :param client_id:
+        :param queue:
+        :return:
+        '''
+
+        while(True):        # 如果连接失败，则无限次重连
+            tradeStr = """{"sub": "market.""" + symbol + """.trade.detail", "id": "id""" + str(client_id) + """"}"""
+            # print(tradeStr)
+
+            try:
+                socket = self.connect_ws()
+                socket.send(tradeStr)
+
+                while True:
+
+                    compressData = socket.recv()
+                    result = gzip.decompress(compressData).decode('utf-8')
+                    # print(result)
+                    if result[:7] == '{"ping"':
+                        ts = result[8:21]
+                        pong = '{"pong":' + ts + '}'
+                        socket.send(pong)
+                        socket.send(tradeStr)
+
+                    elif result[2:4] == "ch":
+
+                        # 把json 文本转成字典
+                        res_dict = eval(result)
+                        # print(res_dict)
+
+                        # 记录Tick 数据
+                        new_tick = Tick()
+                        new_tick.exchange = 'hbp'
+                        new_tick.sec_id = symbol
+
+                        data = res_dict['tick']['data'][0]
+                        new_tick.utc_time = data['ts']
+                        new_tick.strtime = datetime.datetime.fromtimestamp(data['ts']/1000).strftime('%Y-%m-%d %H:%M:%S %f')
+                        new_tick.trade_type = data['direction']
+                        new_tick.last_price = data['price']
+                        new_tick.last_volume = data['amount']  # 注意火币接口的成交量是amount和成交额volume
+                        new_tick.last_amount = data['price'] * data['amount']
+
+                        # 把新的tick 加入到队列中
+                        if queue.qsize() == QUEUE_SIZE:
+                            queue.get()
+                        queue.put(new_tick)
+                        print("Tick: symbol=%s: time=%s, direction=%s, price=%.2f, volume=%.2f"
+                            % (new_tick.sec_id, new_tick.strtime, new_tick.trade_type, new_tick.last_price, new_tick.last_volume))
+
+            except Exception as e:
+
+                logger.warn('subscribe_tick 网络连接失败，继续重连...', e)
+
+
+    def subscribe_bar(self, symbol='btcusdt', bar_type='1min', client_id=1, queue=None):
+        '''
+        订阅 KLine 数据
+        :param symbol: 交易所符号
+        :param bar_type: bar类型， 'tick','1min', '5min', '15min', '30min', '60min', '1day', '1week'
+        :return:
+        '''
+
+        # print('Process to subscribe %s %s bars: %s' % (symbol, bar_type, os.getpid()))
+
+        last_tick = Tick()
+        new_tick = Tick()
+
+        if self.exchange == 'hbp':
+            symbol = symbol.lower()
+
+            if bar_type == 'tick':   # 订阅 Market Detail 数据
+                tradeStr = """{"sub": "market.""" + symbol + """.trade.detail", "id": "id""" + str(client_id) + """"}"""
+
+            elif bar_type == 'depth':       # 订阅 Market Depth 数据，默认合并深度为0
+                tradeStr = """{"sub": "market.""" + symbol + """.depth.step0", "id": "id""" + str(client_id) + """"}"""
+
+            else:
+                bar_str = bar_type
+                tradeStr = """{"sub": "market.""" + symbol + """.kline.""" + bar_str + """","id": "id""" + str(client_id) + """"}"""
+
+            # print(tradeStr)
+
+            while True:
+
+                try:    # 为了防止连接火币服务器中断，采用无限循环连接的模式，如果连接中断，停止10s后继续连接
+                    socket = self.connect_ws()
+                    socket.send(tradeStr)
+
+                    while True:
+                        compressData = socket.recv()
+                        result = gzip.decompress(compressData).decode('utf-8')
+                        # print(result)
+                        if result[:7] == '{"ping"':
+                            ts = result[8:21]
+                            pong = '{"pong":' + ts + '}'
+                            socket.send(pong)
+                            socket.send(tradeStr)
+
+                        elif result[2:4] == "ch":
+
+                            # 把json 文本转成字典
+                            res_dict = eval(result)
+                            # print(res_dict)
+
+                            if bar_type == 'tick':      # 直接获取tick 数据
+
+                                # 记录Tick 数据
+                                new_tick = Tick()
+                                new_tick.exchange = 'hbp'
+                                new_tick.sec_id = symbol
+
+                                data = res_dict['tick']['data'][0]
+                                new_tick.utc_time = data['ts']
+                                new_tick.strtime = datetime.datetime.fromtimestamp(data['ts'] / 1000).strftime(
+                                    '%Y-%m-%d %H:%M:%S %f')
+                                new_tick.trade_type = data['direction']
+                                new_tick.last_price = data['price']
+                                new_tick.last_volume = data['amount']  # 注意火币接口的成交量是amount和成交额volume
+                                new_tick.last_amount = data['price'] * data['amount']
+
+                                # 把新的tick 加入到队列中
+                                if queue.qsize() == QUEUE_SIZE:
+                                    queue.get()
+                                queue.put(new_tick)
+                                print("Tick: symbol=%s: time=%s, direction=%s, price=%.4f, volume=%.4f"
+                                      % (new_tick.sec_id, new_tick.strtime, new_tick.trade_type, new_tick.last_price,
+                                         new_tick.last_volume))
+
+                            elif bar_type == 'depth':
+
+                                data = res_dict['tick']
+                                utc_time = data['ts'] / 1000
+                                strtime = datetime.datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
+
+                                ask_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
+                                ask_df.sort_values(by='ask_price', ascending=True, inplace=True)
+
+                                bid_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_volume'])
+                                bid_df.sort_values(by='bid_price', ascending=False, inplace=True)
+
+                                depth_df = ask_df.join(bid_df)
+                                depth_df['symbol'] = symbol
+                                depth_df['utc_time'] = utc_time
+                                depth_df['strtime'] = strtime
+
+                                print(depth_df[['symbol', 'strtime', 'ask_price', 'ask_volume', 'bid_price',
+                                                'bid_volume']].head())
+                                if queue.qsize() == QUEUE_SIZE:
+                                    queue.get()
+                                queue.put(depth_df)
+
+                            else:       # 获取Bar 数据
+
+                                # 先记录每一次更新数据
+                                new_tick = Tick()
+                                new_tick.exchange = 'hbp'
+                                new_tick.sec_id = symbol
+                                new_tick.utc_endtime = res_dict['ts']/1000
+                                structendtime = time.localtime(new_tick.utc_endtime)
+                                new_tick.strendtime = datetime.datetime.fromtimestamp(new_tick.utc_endtime).strftime('%Y-%m-%d %H:%M:%S %f')
+
+                                data = res_dict['tick']
+                                new_tick.utc_time = data['id']
+                                structtime = time.localtime(data['id'])
+                                new_tick.strtime = datetime.datetime.fromtimestamp(new_tick.utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
+
+                                new_tick.open = data['open']
+                                new_tick.high = data['high']
+                                new_tick.low = data['low']
+                                new_tick.last_price = data['close']
+                                new_tick.cum_volume = data['amount']       # 注意火币的成交量和成交额概念与一般意义的不同
+                                new_tick.cum_amount = data['vol']
+
+                                last_tick_time = time.localtime(last_tick.utc_endtime)
+                                new_tick_time = time.localtime(new_tick.utc_endtime)
+
+                                bar_flag = False        # 用来记录周期转换点
+                                if bar_type == "1min":
+                                    if (last_tick_time.tm_min != new_tick_time.tm_min):
+                                        bar_flag = True
+                                elif bar_type == "5min":
+                                    if last_tick_time.tm_min % 5 == 4 and new_tick_time.tm_min % 5 == 0:
+                                        bar_flag = True
+                                elif bar_type == "60min" or bar_type == '1hour':
+                                    if last_tick_time.tm_hour != new_tick_time.tm_hour:
+                                        bar_flag = True
+                                elif bar_type == "1day" or bar_type == '24hour':
+                                    if last_tick_time.tm_mday != new_tick_time.tm_mday:
+                                        bar_flag = True
+
+                                # 判断是否要更新bar 数据
+                                new_bar = Bar()
+                                if bar_flag and last_tick.open > 0:     # 在周期转换点记录当前bar
+                                    new_bar.sec_id = symbol
+                                    new_bar.exchange = 'hbp'
+
+                                    new_bar.utc_time = last_tick.utc_time
+                                    new_bar.strtime = last_tick.strtime
+                                    new_bar.utc_endtime = last_tick.utc_endtime
+                                    new_bar.strendtime = last_tick.strendtime
+
+                                    new_bar.open = last_tick.open
+                                    new_bar.high = last_tick.high
+                                    new_bar.low = last_tick.low
+                                    new_bar.close = last_tick.last_price
+                                    new_bar.volume = last_tick.cum_volume
+                                    new_bar.amount = last_tick.cum_amount
+
+                                    if queue.qsize() == QUEUE_SIZE:
+                                        queue.get()
+                                    queue.put(new_bar)
+
+                                    print("%s: symbol=%s, begin_time=%s, end_time=%s, open=%.4f, close=%.4f, volume=%.4f"
+                                         % (bar_type, new_bar.sec_id, new_bar.strtime, new_bar.strendtime, new_bar.open, new_bar.close, new_bar.volume))
+
+                                last_tick = new_tick
+
+                except Exception as e:
+                    logger.warn('subscribe_bar 连接火币服务器失败...', e)
+                    time.sleep(10)
+
+
+    def subscribe_depth(self, symbol='btcusdt', step=5, client_id=1, queue=None):
+        '''
+        订阅深度数据
+        :param symbol:
+        :param step: 0、1、2、3、4、5
+        :return:
+        '''
+
+        symbol = symbol.lower()
+
+        # 订阅 Market Depth 数据
+        tradeStr="""{"sub": "market.""" + symbol + """.depth.step""" + str(step) + """", "id": "id""" + str(client_id) + """"}"""
+
+        while True:
+            socket = self.connect_ws()
+            socket.send(tradeStr)
+
+            try:
+                while True:
+                    compressData = self.socket.recv()
+                    result = gzip.decompress(compressData).decode('utf-8')
+
+                    if result[:7] == '{"ping"':
+                        ts = result[8:21]
+                        pong = '{"pong":' + ts + '}'
+                        self.socket.send(pong)
+                        self.socket.send(tradeStr)
+
+                    elif result[2:4] == "ch":
+                        res_dict = eval(result)
+                        data = res_dict['tick']
+
+                        utc_time = data['ts']/1000
+                        strtime = datetime.datetime.fromtimestamp(utc_time).strftime('%Y-%m-%d %H:%M:%S %f')
+
+                        ask_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
+                        ask_df.sort_values(by='ask_price', ascending=True, inplace=True)
+
+                        bid_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_volume'])
+                        bid_df.sort_values(by='bid_price', ascending=False, inplace=True)
+
+                        depth_df = ask_df.join(bid_df)
+                        depth_df['symbol'] = symbol
+                        depth_df['utc_time'] = utc_time
+                        depth_df['strtime'] = strtime
+
+                        '''
+                        ask_df = pd.DataFrame(data['asks'], columns = ['price', 'volume'])
+                        ask_df['direction'] = 'ask'
+                        ask_df.sort_values(by='price', ascending=True, inplace=True)
+                        ask_df.index = ['ask' + str(each+1) for each in range(len(ask_df))]
+        
+                        bid_df = pd.DataFrame(data['bids'], columns = ['price', 'volume'])
+                        bid_df['direction'] = 'bid'
+                        bid_df.sort_values(by='price', ascending=False, inplace=True)
+                        bid_df.index = ['bid' + str(each+1) for each in range(len(ask_df))]
+        
+                        depth_df = ask_df.append(bid_df)
+                        depth_df.sort_values(by='price', ascending=False, inplace=True)
+                        '''
+
+                        print(depth_df[['symbol', 'strtime', 'ask_price', 'ask_volume', 'bid_price', 'bid_volume']].head())
+                        if queue.qsize() == QUEUE_SIZE:
+                            queue.get()
+                        queue.put(depth_df)
+
+            except Exception as e:
+                logger.warn('subscribe_depth 连接火币网络断开...', e)
+
+
     def get_bars(self, symbol_list='btcusdt', bar_type='1min', begin_time='', end_time='', size=0):
         '''
         提取指定时间段的历史Bar数据，支持单个代码提取或多个代码组合提取。
@@ -103,10 +423,11 @@ class TradeAccount(object):
         symbol_list = symbol_list.replace(' ', '').split(',')
         bars = []
 
+        # print(symbol_list)
         if self.exchange == 'hbp':
             for each_sec in symbol_list:
                 each_sec = each_sec.lower()         # 注意火币只支持小写字母
-
+                # print(each_sec)
                 inner_size = size
                 if size == 0:
                     inner_size = 2000
@@ -117,8 +438,8 @@ class TradeAccount(object):
                         bar = Bar()
                         bar.exchange = self.exchange
                         bar.sec_id = each_sec
-                        bar.volume = each_bar['vol']
-                        bar.amount = each_bar['amount']
+                        bar.volume = each_bar['amount']         # 注意火币里的amount表示成交量，vol表示成交额
+                        bar.amount = each_bar['vol']
                         bar.open = each_bar['open']
                         bar.high = each_bar['high']
                         bar.low = each_bar['low']
@@ -201,8 +522,8 @@ class TradeAccount(object):
                     tick.high = data['high']
                     tick.low = data['low']
                     tick.last_price = data['close']
-                    tick.last_volume = data['vol']
-                    tick.last_amount = data['amount']
+                    tick.last_volume = data['amount']
+                    tick.last_amount = data['vol']      # 注意火币里的amount表示成交量，vol表示成交额
                     tick.last_count = data['count']
                     tick.asks = [tuple(data['ask'])]
                     tick.bids = [tuple(data['bid'])]
@@ -264,8 +585,8 @@ class TradeAccount(object):
                     bar.high = data['high']
                     bar.low = data['low']
                     bar.close = data['close']
-                    bar.volume = data['vol']
-                    bar.amount = data['amount']
+                    bar.volume = data['amount']            # 注意火币里的amount表示成交量，vol表示成交额
+                    bar.amount = data['vol']
                     bar.count = data['count']
                     bar.utc_endtime = bar_res['ts']
                     bar.strendtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(bar_res['ts'] / 1000))
@@ -335,12 +656,25 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             symbol = symbol.lower()
             depth_res = self.client.get_depth(symbol=symbol, type=type)
+            if depth_res['status'] == 'ok':
+                data = depth_res['tick']
+                utc_time = round(data['ts']/1000)
+                strtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(utc_time))
+                bids_df = pd.DataFrame(data['bids'], columns=['bid_price', 'bid_volume'])
+                bids_df = bids_df.sort_values(by='bid_price', ascending=False)
+                asks_df = pd.DataFrame(data['asks'], columns=['ask_price', 'ask_volume'])
+                asks_df = asks_df.sort_values(by='ask_price')
+                depth_df = bids_df.join(asks_df)
+                depth_df['strtime'] = strtime
+                depth_df['symbol'] = symbol
+
 
         elif self.exchange == 'binance':
             symbol = symbol.upper()
             depth_res = self.cilent.get_order_book(symbol=symbol)
+            depth_df = None
 
-        return depth_res
+        return depth_df
 
 
     def open_long(self, source='api', sec_id='btcusdt', price=0, volume=0):
@@ -383,7 +717,7 @@ class TradeAccount(object):
             myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
             if source == 'api':
                 hb_source = 'api'
-                res = self.cilent.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+                res = self.client.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
             elif source == 'margin':
                 hb_source = 'margin-api'
                 res = self.client.send_margin_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
@@ -448,7 +782,6 @@ class TradeAccount(object):
     def close_long(self, source='api', sec_id='btcusdt', price=0, volume=0):
         '''
          异步平多仓，
-         :param exchange: string	交易所代码，如火币网：huobipro，OKCoin: okcoin
          :param source: string   订单接口源，api：普通订单，margin-api：融资融券订单
          :param sec_id: string   证券代码，如
          :param price: float     委托价，如果price=0,为市价单，否则为限价单
@@ -538,6 +871,146 @@ class TradeAccount(object):
             myorder.status = order['status']
 
         return myorder
+
+
+    def order_split(self, source='api', sec_id='btcusdt', side=1, price=0, volume=0, split='vwap', max_ratio=0, max_count=0):
+        '''
+
+        :param source: 订单接口源，api：普通订单，margin：融资融券订单
+        :param sec_id:
+        :param side: 买卖方向，1：买，2：卖
+        :param price:
+        :param volume:
+        :param split: 拆单算法类型，目前只支持vwap
+        :param max_ratio: 每单规模是平均成交量的最大比例
+        :param max_count: 最大下单次数
+        :return:
+        '''
+
+        if self.exchange == 'hbp':  # 火币网接口
+
+            sec_id = sec_id.lower()
+
+            # 确定订单类型
+            if side == 1 and price == 0.0:
+                mtype = 'buy-market'
+            elif side == 1 and price > 0.0:
+                mtype = 'buy-limit'
+            elif side == 2 and price == 0.0:
+                mtype = 'sell-market'
+            elif side == 2 and price > 0.0:
+                mtype = 'sell-limit'
+
+            # 计算每单下单金额和下单次数
+            hist_bars = self.get_bars(symbol_list=sec_id, bar_type='1min', size=10)
+            hist_bars_df = to_dataframe(hist_bars)
+            hist_avg_volume = np.mean(hist_bars_df['volume'])/60
+
+            avg_volume = round(hist_avg_volume * 0.5, 4)      # 默认不能超过平均成交量的50%
+            order_count = int(np.ceil(volume / avg_volume))
+
+            print(hist_bars_df)
+            print(hist_avg_volume, avg_volume, order_count)
+
+            if max_ratio > 0:           # 指定每次下单量比例的情况
+                if avg_volume > hist_avg_volume * max_ratio:
+                    avg_volume = round(hist_avg_volume*max_ratio, 4)  # 取4 位有效数字
+                    order_count = int(np.ceil(volume/avg_volume))
+
+            elif max_count > 0:         # 指定最大下单次数的情况
+                if order_count > max_count:
+                    order_count = max_count
+                avg_volume = round(volume/order_count, 4)       # 取4 位有效数字
+
+            list_to_order = {}      # 代下单的订单
+            nn = 1
+            while nn < order_count:
+                list_to_order[nn] = round(avg_volume, 4)
+                nn = nn + 1
+            list_to_order[order_count] = round(volume - avg_volume*(order_count-1), 4)
+
+            print(list_to_order)
+
+            # 按照拆单后的订单依次下单交易
+            order_list = []         # 记录下单的所有订单
+            total_filled_volume = 0
+            total_filled_amount = 0
+
+            max_runtime = 2*nn    # 该计数器用来避免下单不成功一直死循环的情况
+            while nn > 0 and max_runtime > 0:
+                # 买入指定数字货币
+
+                each_volume = list_to_order[nn]
+
+                myorder = Order()
+                myorder.exchange = self.exchange
+                myorder.sec_id = sec_id
+                myorder.price = price           ## 委托价
+                myorder.volume = each_volume    ## 委托量
+                myorder.side = side             ## 买卖方向，1：买，2：卖
+                myorder.order_type = mtype      ## 订单类型
+                myorder.order_src = source      ## 订单来源
+                myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+
+                if price == 0.0:
+                    last_tick = self.get_last_ticks(symbol_list=sec_id)
+                    last_price = last_tick[0].last_price
+                    amount = volume * last_price
+                else:
+                    amount = volume
+                    last_price = price
+
+                if source == 'api':
+                    hb_source = 'api'
+                    res = self.client.send_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+                elif source == 'margin':
+                    hb_source = 'margin-api'
+                    res = self.client.send_margin_order(amount=amount, source=hb_source, symbol=sec_id, _type=mtype, price=price)
+
+                if res['status'] == 'ok':
+                    myorder.ex_ord_id = int(res['data'])
+                    myorder.order_id = int(res['data'])
+
+                    time.sleep(2)  # 等待2 秒后查询订单
+                    # 查询订单信息
+                    order_info = self.client.order_info(myorder.ex_ord_id)
+                    myorder.account_id = order_info['data']['account-id']
+                    myorder.status = order_info['data']['state']
+                    myorder.sending_time = time.strftime("%Y-%m-%d %H:%M:%S",
+                                                         time.localtime(order_info['data']['created-at'] / 1000))
+                    myorder.filled_volume = float(order_info['data']['field-amount'])  ## 已成交量
+                    myorder.filled_amount = float(order_info['data']['field-cash-amount'])  ## 已成交额
+                    if (myorder.filled_volume > 0):
+                        myorder.filled_vwap = round(myorder.filled_amount / myorder.filled_volume, 4)  ## 已成交均价
+                    myorder.filled_fee = float(order_info['data']['field-fees']) * last_price  ## 手续费
+                    myorder.transact_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(
+                        order_info['data']['finished-at'] / 1000))  ## 最新一次成交时间
+
+                    order_list = order_list + [myorder]
+
+                    logger.info('%s 订单号 %s：%s 开多仓，成交量 = %f，成交均价 = %f usdt，总成交额 = %f usdt，手续费 = %f usdt。' % \
+                                (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.filled_volume,
+                                 myorder.filled_vwap, myorder.filled_amount, myorder.filled_fee))
+
+                    nn = nn - 1
+
+                elif res['status'] == 'error':
+                    myorder.status = res['status']
+                    myorder.ord_rej_reason = res['err-code']  ## 订单拒绝原因
+                    myorder.ord_rej_reason_detail = res['err-msg']  ## 订单拒绝原因描述
+                    logger.warn('%s 订单号 %s：%s 开多仓 %f 失败，失败编码：%s，具体原因：%s。' % \
+                                (myorder.exchange, myorder.ex_ord_id, myorder.sec_id, myorder.volume, myorder.ord_rej_reason,
+                                myorder.ord_rej_reason_detail))
+
+                max_runtime = max_runtime - 1
+
+            # 统计累计成交量
+            if len(order_list) > 0:
+                order_df = to_dataframe(order_list)
+                total_filled_volume = np.sum(order_df['filled_volume'])
+                total_filled_amount = np.sum(order_df['filled_amount'])
+
+            return total_filled_volume, total_filled_amount, order_list
 
 
     def cancel_order(self, sec_id='', order_id=''):
@@ -947,14 +1420,16 @@ class TradeAccount(object):
                 for each in balance_dict.keys():
                     position = Position()
                     position.exchange = self.exchange
+                    position.currency = self.currency
                     position.account_id = account_id
                     position.account_type = account_type
                     position.account_status = account_status
 
                     position.sec_id = each
                     position.available = float(balance_dict[each]['trade'])
-                    position.order_frozen = float(balance_dict[each]['frozen'])
-                    position.amount = position.available + position.order_frozen
+                    position.frozen = float(balance_dict[each]['frozen'])
+                    position.volume = position.available + position.frozen
+                    position.update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                     if source == 'margin':
                         position.loan = float(balance_dict[each]['loan'])
                         position.interest = float(balance_dict[each]['interest'])
@@ -973,7 +1448,7 @@ class TradeAccount(object):
                         position = Position()
                         position.exchange = self.exchange
                         position.available = each['free']
-                        position.order_frozen = each['locked']
+                        position.frozen = each['locked']
                         position.volume = each['free'] + each['locked']
                         positions = positions + [position]
 
@@ -1176,16 +1651,19 @@ class Position(object):
     def __init__(self):
         self.strategy_id = ''           ## 策略ID
         self.account_id = ''            ## 账户id
+        self.account_type = ''          ## 账户类型
+        self.account_status = ''        ## 账户状态
         self.currency = ''              ## 计价货币
         self.exchange = ''              ## 交易所代码
         self.sec_id = ''                ## 证券ID
         self.side = 0                   ## 买卖方向，side=1：持有该资产，side =-1：持有该资产的借贷
         self.volume = 0.0               ## 持仓量
-        self.order_frozen = 0.0         ## 挂单冻结仓位
+        self.frozen = 0.0         ## 挂单冻结仓位
         self.available = 0.0            ## 可平仓位
-        self.loanvol = 0.0
+        self.loan = 0.0
         self.interest = 0.0
         self.loan_order_id = ''         # 仅对借贷资产有效，用于偿还借贷资产
+        self.amount = 0.0               # 当前持仓价值 = (volume - loan - interest) * price
         self.update_time = ''           ## 持仓更新时间
 
 
@@ -1314,40 +1792,62 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
     symbol_list = symbol_list.replace(' ', '').split(',')
     bars = []
     for each_sec in symbol_list:
+        each_sec = each_sec.lower()
+
+        if bar_type == '1min':
+            N_bar = 60
+            per = 1
+        elif bar_type == '5min':
+            N_bar = 60*5
+            per = 3
+        elif bar_type == '15min':
+            N_bar = 60*15
+            per = 4
+        elif bar_type == '30min':
+            N_bar = 60*60
+            per = 5
+        elif bar_type == '60min':
+            N_bar = 60*60
+            per = 6
+        elif bar_type == '1day':
+            N_bar = 60*60*24
+            per = 14
+        else:
+            N_bar = 60
+            per = 1
 
         if begin_time == '':
 
             end_time_ts = int(time.time())
             end_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time_ts))
-            if bar_type == '1min':
-                N_bar = 60
-                per = 1
-            elif bar_type == '5min':
-                N_bar = 60*5
-                per = 3
-            elif bar_type == '15min':
-                N_bar = 60*15
-                per = 4
-            elif bar_type == '30min':
-                N_bar = 60*60
-                per = 5
-            elif bar_type == '60min':
-                N_bar = 60*60
-                per = 6
-            elif bar_type == '1day':
-                N_bar = 60*60*24
-                per = 14
             begin_time_ts = int(end_time_ts - (N_bar+2) * size)
             begin_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(begin_time_ts))
+
+        else:
+            end_time_ts = int(time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S')))
+            begin_time_ts = int(time.mktime(time.strptime(begin_time, '%Y-%m-%d %H:%M:%S')))
 
         client = MongoClient('47.75.69.176', 28005)
         coin_db = client['bc_bourse_huobipro']
         coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
-        collection = coin_db['b_btc_kline']
 
+        currency = 'usdt'
+        sec_code = each_sec.replace(currency, '')
+        table_name = 'b_' + sec_code +'_kline'
+        collection = coin_db[table_name]
+
+        # print (per, begin_time_ts, end_time_ts)
         data = collection.find({'per': str(per), "t": {"$gte": begin_time_ts, "$lte":end_time_ts}})
 
-        for each_bar in data:
+        data_list = [each for each in data]
+        '''
+
+        data_list = []
+        for each in data:
+            data_list = data_list + [each]
+        '''
+
+        for each_bar in data_list:
             # print(each_bar)
             bar = Bar()
             bar.exchange = exchange
@@ -1368,6 +1868,73 @@ def get_bars_local(exchange='hbp', symbol_list='btcusdt', bar_type='1min', begin
         bars = bars[-size:]
 
     return bars
+
+
+def get_depth_local(exchange='hbp', symbol_list='btcusdt', step='step5', begin_time='', end_time=''):
+    '''
+    从mongodb 取数
+    :param exchange:
+    :param symbol_list:
+    :param bar_type:
+    :param begin_time:
+    :param end_time:
+    :param size:
+    :return:
+    '''
+    symbol_list = symbol_list.replace(' ', '').split(',')
+    data_df = pd.DataFrame([], columns = ['symbol', 'strtime', 'step', 'direct', 'price', 'amount'])
+    for each_sec in symbol_list:
+        each_sec = each_sec.lower()
+
+        end_time_ts = int(time.mktime(time.strptime(end_time, '%Y-%m-%d %H:%M:%S')))
+        begin_time_ts = int(time.mktime(time.strptime(begin_time, '%Y-%m-%d %H:%M:%S')))
+
+        client = MongoClient('47.75.69.176', 28005)
+        coin_db = client['bc_bourse_huobipro']
+        coin_db.authenticate('helifeng', 'w7UzEd3g6#he6$ahYG')
+
+        currency = 'usdt'
+        sec_code = each_sec.replace(currency, '')
+        table_name = 'b_' + sec_code +'_depth_5'
+        collection = coin_db[table_name]
+
+        # print (sec_code, begin_time_ts*1000, end_time_ts*1000)
+        data = collection.find({"t": {"$gte": begin_time_ts*1000, "$lte":end_time_ts*1000}})
+
+        depth_list = []
+        for each_data in data:
+            # print(each_data)
+
+            '''
+            depth = {}
+            depth['symbol'] = each_sec
+            if each_data['ty'] == 0:
+                depth['direction'] = 'ask'
+            else:
+                depth['direction'] = 'bid'
+
+            depth['strtime'] = each_data['ts']
+            depth['time'] = each_data['t']
+            depth['price'] = each_data['p']
+            depth['amount'] = each_data['amt']
+
+            depth_list = depth_list + [depth]
+            '''
+            depth_list = depth_list + [each_data]
+
+        each_data = pd.DataFrame(depth_list)
+        # print(each_data.head())
+        each_data.columns = ['id', 'amount',  'ccy', 'price', 'time', 'strtime', 'direct']
+        each_data['symbol'] = each_sec
+        each_data['step'] = step
+        each_data['direct'] = ['ask' if each_data.loc[tmp]['direct']==0 else 'bid' for tmp in each_data.index]
+
+        # print(each_data.head())
+        data_df = data_df.append(each_data)
+
+    data_df = data_df[['symbol', 'strtime', 'time', 'step', 'direct', 'price', 'amount']]
+    return data_df
+
 
 
 def order2position(order_list=None, interval='1day'):

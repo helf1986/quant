@@ -3,7 +3,7 @@ from api.quant_api import *
 import time
 from common.settings import MONGO_IP, MONGO_PORT, MONGO_PWD, MONGO_USER
 
-def connect_mongo(ip=None, port=None):
+def connect_mongo(ip=None, port=None, dbname=None, user=None, password=None):
     '''
     连接mongodb数据库
     :param ip:
@@ -15,6 +15,11 @@ def connect_mongo(ip=None, port=None):
         port = MONGO_PORT
 
     client = MongoClient(host=ip, port=port)
+    db = client[dbname]
+    if user and password:
+        connected = db.authenticate(user, password)
+    else:
+        connected = True
 
     return client
 

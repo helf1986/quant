@@ -3,7 +3,11 @@
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
 from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
 import time
+import pandas as pd
 from api import logger
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 '''
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
@@ -14,10 +18,70 @@ print(to_dataframe(bars))
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
-orders = hbaccount.get_orders_by_symbol (sec_id='btcusdt', begin_time='2018-05-06 00:00:00', end_time='2018-05-12 00:00:00', states='filled', types='sell-market')
+bars = hbaccount.get_bars(symbol_list='btcusdt, bchusdt, ethusdt, etcusdt, ltcusdt, eosusdt, xrpusdt', bar_type='1min', size=2000)
+bar_df = to_dataframe(bars)
+print(bar_df.head())
+bar_df.index = bar_df['strtime']
+
+
+symbols = np.unique(bar_df['sec_id'])
+data_all = pd.DataFrame([], columns=symbols)
+for each_symbol in symbols:
+    tmp_index =  bar_df['sec_id'] == each_symbol
+    data_all[each_symbol] = bar_df[tmp_index]['close']
+
+data_all.to_csv('data_all.csv')
+plt.savefig('data_all.png')
 
 
 '''
+symbol_list = ['bchusdt', 'btcusdt', 'ethusdt', 'xrpusdt','ltcusdt', 'dashusdt', 'iotausdt', 'omgusdt', 'adausdt']
+
+# 依次获取每个数币的深度数据
+depth_df = pd.DataFrame([], columns=['bid_price', 'bid_amount', 'ask_price', 'ask_amount', 'strtime', 'symbol'])
+for each_symbol in symbol_list:
+    depth_data = hbaccount.get_depth(symbol=each_symbol, type='step0')
+    depth_df = depth_df.append(depth_data)
+
+print(depth_df.head())
+depth_df.to_csv('btc_depth.csv')
+
+
+
+import api.quant_api as qapi
+begin_time = '2018-05-15 23:40:00'
+end_time =  '2018-05-16 00:00:00'
+data = qapi.get_depth_local(exchange='hbp', symbol_list='ethusdt', step='step5', begin_time=begin_time, end_time=end_time)
+
+print(data)
+
+
+symbol_list = ['bchusdt', 'btcusdt', 'ethusdt', 'xrpusdt','ltcusdt', 'dashusdt', 'iotausdt', 'omgusdt', 'adausdt']
+symbol_str = ','.join(symbol_list)
+print(symbol_str)
+bars = hbaccount.get_bars(symbol_list=symbol_str, bar_type='1day', size=2000)
+bar_df = to_dataframe(bars)
+print(bar_df.head())
+bar_df.to_csv('bar_1day.csv')
+'''
+
+
+
+
+'''
+orders = hbaccount.get_orders_by_symbol (sec_id='btcusdt', begin_time='2018-05-06 00:00:00', end_time='2018-05-12 00:00:00', states='filled', types='sell-market')
+
+
+from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
+from common.HuobiClient import HuobiClient
+client = HuobiClient(api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY)
+res = client.orders_list(symbol='btcusdt', states='filled', types='sell-market', start_date='2018-05-06', end_date='2018-05-12')
+
+res = client.get_depth(symbol='btcusdt', type='step0')
+
+
+
+
 flag = 0
 count = 0
 while (flag == 0 and count < 10):

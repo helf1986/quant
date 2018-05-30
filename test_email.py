@@ -20,6 +20,8 @@ print(response.text)
 # !/usr/bin/python
 # -*- coding: UTF-8 -*-
 
+'''
+
 import smtplib
 from email.mime.text import MIMEText
 from email.utils import formataddr
@@ -45,13 +47,22 @@ def mail(subject, content, receivers):
     except Exception:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
         ret = False
     return ret
+'''
 
 
+from api.logger import send_mail
+
+# 邮件标题
 subject = "BitQuant邮件测试"
-content = "2018-05-13 17:32:12 买入 BTC 1.2"
+# 邮件正文
+content = "2018-05-13 17:32:12 BTC 开多仓，数量=1.2，价格=8435.23"
+
+# 接收人邮箱
 receivers = ['helf1986@qq.com', 'helf@jsfund.cn']  # 收件人邮箱账号，我这边发送给自己
-ret = mail(subject, content, receivers)
-if ret:
+
+# 发送邮件
+result = send_mail(subject, content, receivers)
+if result == True:
     print("邮件发送成功")
 else:
     print("邮件发送失败")
