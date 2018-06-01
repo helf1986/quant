@@ -3,3 +3,9 @@
 *.jpg
 *.pyc
 *.log
+*.xls
+*.xlsx
+*.tmp
+*xls
+*xlsx
+*pyc
