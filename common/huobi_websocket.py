@@ -6,6 +6,9 @@ import gzip
 import time
 
 if __name__ == '__main__':
+    
+    # ws = create_connection("wss://api.huobipro.com/ws")
+            
     while(1):
         try:
             ws = create_connection("wss://api.huobipro.com/ws")
@@ -15,10 +18,10 @@ if __name__ == '__main__':
             time.sleep(5)
 
     # 订阅 KLine 数据
-    # tradeStr="""{"sub": "market.ethusdt.kline.1min","id": "id10"}"""
+    tradeStr="""{"sub": "market.ethusdt.kline.1min","id": "id10"}"""
 
     # 请求 KLine 数据
-    tradeStr="""{"req": "market.ethusdt.kline.1min","id": "id10", "from": 1513391453, "to": 1513392453}"""
+    # tradeStr="""{"req": "market.ethusdt.kline.1min","id": "id10", "from": 1513391453, "to": 1513392453}"""
 
     #订阅 Market Depth 数据
     # tradeStr="""{"sub": "market.ethusdt.depth.step5", "id": "id10"}"""

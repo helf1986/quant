@@ -70,6 +70,7 @@ class cerebro(object):
 
         for v in self.eventbarlist:
             if v.bar_type == 'tick':        # 目前本地数据库不支持tick数据
+                # print('tick data sent into queues')
                 pass
             else:
                 bars            = get_bars_local(exchange=self.api.exchange,symbol_list=v.symbol_list, bar_type=v.bar_type, size=v.backbarnum)
@@ -85,10 +86,9 @@ class cerebro(object):
 
         client_count = 0
         for v in self.eventbarlist:
-            print(v.bar_type)
-
             v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count, v.barqueue))
             v_process.start()
+            print(v.symbol_list + " " + v.bar_type + " has been started!")
             client_count += 1
 
 

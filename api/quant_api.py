@@ -178,7 +178,7 @@ class TradeAccount(object):
         :return:
         '''
 
-        # print('Process to subscribe %s %s bars: %s' % (symbol, bar_type, os.getpid()))
+        print('Process to subscribe %s %s bars: %s' % (symbol, bar_type, os.getpid()))
 
         last_tick = Tick()
         new_tick = Tick()
@@ -196,7 +196,7 @@ class TradeAccount(object):
                 bar_str = bar_type
                 tradeStr = """{"sub": "market.""" + symbol + """.kline.""" + bar_str + """","id": "id""" + str(client_id) + """"}"""
 
-            # print(tradeStr)
+            print(tradeStr)
 
             while True:
 
