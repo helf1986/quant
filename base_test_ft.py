@@ -21,7 +21,7 @@ import math
 #os.chdir(r'C:\Users\Administrator\Desktop\helf\quantbtc')
 #import api.quant_api as qapi
 #from api import logger
-from api.StrategyBase_ft import Strategy,cerebro,Event
+from api.StrategyBase_ft import Strategy, cerebro, Event
 #~~~~~~~~~~~~~~~~~~~~~~
 
 #-------------策略参数---------------------
@@ -31,12 +31,16 @@ unit=0.001
 jump=0.05/100
 #-----------系统保留变量----------
 systime=[]
-maxbackbar=10#回测bar数=maxbackbar
+maxbackbar=10   # 回测bar数=maxbackbar
 
 
 class mystr(Strategy):
+
+
     def __init__(self,name='base_test'):
+
         super(mystr, self).__init__(name='base_test')
+
         #=============系统变量重置=====================
         self.prt=True#是否启动基类中的打印
     #---------数据缓存,需要管理的series变量----------    
@@ -45,14 +49,18 @@ class mystr(Strategy):
         self.net_,self.tot_,self.nt_=[],[],[]
     #---------策略变量----------   
         self.last=0
+
+
     def on_order(self,order):   
         super(mystr, self).on_order(order)
         print ("order output；\n",to_dict(order))
         pass
-    def on_monitor(self,monitor):   
+
+    def on_monitor(self,monitor):
         super(mystr, self).on_monitor(monitor)
-        print ("monitor output；\n",monitor)
+        print ("monitor output；\n", monitor)
         pass
+
     def on_bar(self,bar):      
         super(mystr, self).on_bar(bar)
         systime.append(bar.strtime)
@@ -64,26 +72,23 @@ class mystr(Strategy):
         incon2=False
 #        incon2=(self._Strategy__type!='history') and (self.MarketPosition==0)
 #        outcon=(bar.strtime>='2018-05-06 21:14:00') and (bar.strtime<='2018-05-06 21:21:00')
-        outcon=False    
-        self.last=self._Strategy__type
+        outcon=False
 
+        self.last=self._Strategy__type
 
         if (incon1):
             self.buy(unit,bar.close*(1+jump))
             print ("*(buy@...%s)"%(bar.strtime))
 
-            
         if (incon2):
             self.sellshort(unit,bar.close*(1-jump))
             print ("(sellshort@...%s)"%(bar.strtime))
 
-            
         if (outcon):
             if self.MarketPosition ==1:
                 self.sell(unit,bar.close*(1-jump))
                 print ("(sell@...%s)"%(bar.strtime))
 
-                
             if self.MarketPosition ==-1:
                 self.buytocover(unit,bar.close*(1+jump))
                 print ("(buytocover@...%s)"%(bar.strtime))
@@ -113,8 +118,8 @@ if __name__ == '__main__':
     test1=mystr()
     
 #------------------      
-    input2=Event();
-    input2.symbol_list= 'ethusdt';input2.bar_type= '1min';input2.backbarnum= 20;
+    input2=Event()
+    input2.symbol_list= 'ethusdt';input2.bar_type= '1min';input2.backbarnum= 20
     input2.type_=input2.symbol_list+input2.bar_type
     #
     input_account='helf'

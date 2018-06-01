@@ -30,33 +30,36 @@ ft版本拓展为多品种/多周期的事件订阅，每个bar事件对应一�
 *注意：单策略在不同周期需要重新生成文件并不同命名
 '''
 #
+
+
 class Event():
     '''
     订阅事件对象，cerebro基础输入
     '''
     def __init__(self):        
         self.symbol_list = ''                   # 币种
-        self.bar_type= ''                       # 周期
+        self.bar_type = ''                       # 周期
         self.backbarnum = None                  # 历史数据数目
-        self.type_=''                           # 自定义数据类别--用于注册监听函数字典
+        self.type_ = ''                           # 自定义数据类别--用于注册监听函数字典
+
 
 #-------------------------------------------------------------
 class cerebro(object):
 
     def __init__(self,exchange='', api_key='', api_secret='' , currency='', account=''):
-        self.account    = account
-        self.api        = TradeAccount(exchange=exchange, api_key=api_key, api_secret=api_secret , currency=currency)
         '''
         执行cerebro需要初始化eventbarlist，及监听函数
         eventbarlist:bar事件订阅列表,订阅x品种x周期的数据
         __handlers：对应的事件的响应函数，键值来自__eventbarlist
-            *每个键对应的值是一个列表，列表中保存了对该事件监听的响应函数，一对多        
+            *每个键对应的值是一个列表，列表中保存了对该事件监听的响应函数，一对多
         '''
+
+        self.account    = account
+        self.api        = TradeAccount(exchange=exchange, api_key=api_key, api_secret=api_secret , currency=currency)
         self.prt            = False
         self.eventbarlist   = []
         self.__handlers     = {}
         self.__concount     = 0         # 断线重连计数
-
 
     def initialtion(self):
         '''
@@ -74,31 +77,28 @@ class cerebro(object):
                 pass
             else:
                 bars            = get_bars_local(exchange=self.api.exchange,symbol_list=v.symbol_list, bar_type=v.bar_type, size=v.backbarnum)
-                v.backbarnum    = len(bars)#修正取数据误差
+                v.backbarnum    = len(bars) # 修正取数据误差
                 for bar in bars:
                     v.barqueue.put(bar)
                     v.lastquebar = bar
 
 
-    #-------------------- -----更新事件队列-------------------------------------------
-    def __sendevent_bar(self):           
-        """发送事件，向事件队列中存入事件"""
+    #-------------------------更新事件队列-------------------------------------------
+    def __sendevent_bar(self):
+        '''
+        发送事件，向事件队列中存入事件
+        :return:
+        '''
 
-        client_count = 0
+        client_num = 0
         for v in self.eventbarlist:
-            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_count, v.barqueue))
+            v_process = Process(target=self.api.subscribe_bar, args=(v.symbol_list, v.bar_type, client_num, v.barqueue))
             v_process.start()
             print(v.symbol_list + " " + v.bar_type + " has been started!")
-            client_count += 1
-
+            client_num += 1
 
     #---------------------------主引擎-------------------------------------------
-    def Start(self):
-        """启动"""
-
-        # 多进程进行事件订阅管理
-        self.__sendevent_bar()
-
+    def MainEngine(self):
 
         """引擎运行"""
         while True:
@@ -107,9 +107,10 @@ class cerebro(object):
             '''bar执行逻辑为一对多'''
             try:
                 for v in self.eventbarlist:
-                    bar = v.barqueue.get_nowait() 
+                    bar = v.barqueue.get_nowait()
                     if self.prt:
-                        print ("当前bar%s" % (bar.strtime))
+                        print("%s 当前bar: %s, close=%.4f" % (bar.sec_id, bar.strtime, bar.close))
+
                     # 检查是否存在对该事件进行监听的处理函数
                     if v.type_ in self.__handlers:
                         # 若存在，则按顺序将事件传递给处理函数执行
@@ -124,8 +125,8 @@ class cerebro(object):
                 for v in self.eventbarlist:
                     for strats in self.__handlers[v.type_]:
                         strats.monitorprocess()
-#                for strats in self.stratslist:
-#                    strats.monitorprocess()
+            #                for strats in self.stratslist:
+            #                    strats.monitorprocess()
             except:
                 pass
 
@@ -134,15 +135,24 @@ class cerebro(object):
             try:
                 for v in self.eventbarlist:
                     for strats in self.__handlers[v.type_]:
-                        strats.orderprocess()                
-#                for strats in self.stratslist:
-#                    strats.orderprocess()
+                        strats.orderprocess()
+                        #                for strats in self.stratslist:
+            #                    strats.orderprocess()
             except:
                 pass
 
-    #----------------防止死循环-----------
+            # ----------------防止死循环-----------
             time.sleep(0.01)
 
+    # ---------------------------启动策略------------------------------------------
+    def Start(self):
+        """启动"""
+
+        # 多进程进行事件订阅管理
+        self.__sendevent_bar()
+
+        # 新建一个进程，执行主引擎
+        engine_process = Process(self.MainEngine)
 
     def addstrategy(self,type_,strats):
         '''
@@ -464,7 +474,7 @@ class Strategy(object):
         pass
 
 
-    def on_monitor(self,monitor):
+    def on_monitor(self, monitor):
         if monitor['margin_order_id']==0:
             print ("Margin error！！！")
             return
