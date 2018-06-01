@@ -100,6 +100,7 @@ class cerebro(object):
     #---------------------------主引擎-------------------------------------------
     def MainEngine(self):
 
+        print('Main Engine has been started!')
         """引擎运行"""
         while True:
 
