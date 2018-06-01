@@ -152,7 +152,8 @@ class cerebro(object):
         self.__sendevent_bar()
 
         # 新建一个进程，执行主引擎
-        engine_process = Process(self.MainEngine)
+        engine_process = Process(self.MainEngine, args=())
+        engine_process.start()
 
     def addstrategy(self,type_,strats):
         '''
