@@ -197,3 +197,36 @@
 2018-05-08 10:15:31.816200	WARN	Connection Failed: 	HTTPSConnectionPool(host='api.huobi.pro', port=443): Max retries exceeded with url: /market/history/kline?symbol=btcusdt&period=1min&size=1 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x000000000C04CD30>, 'Connection to api.huobi.pro timed out. (connect timeout=5)'))
 2018-05-08 10:15:41.821200	WARN	Connection Failed: 	HTTPSConnectionPool(host='api.huobi.pro', port=443): Max retries exceeded with url: /market/history/kline?symbol=btcusdt&period=1min&size=1 (Caused by ConnectTimeoutError(<urllib3.connection.VerifiedHTTPSConnection object at 0x00000000077DC390>, 'Connection to api.huobi.pro timed out. (connect timeout=5)'))
 >>>>>>> f4aa6b6e9303faf87567519f82c2dd20ac5972ec
+2018-05-30 14:08:03.990812	INFO	 Strategy('StrategyBase1') on [usdt,btc] is restarting @2018-05-30 14:08:03 ...MarketPosition=0
+2018-05-30 14:26:07.383123	WARN	subscribe_bar 连接火币服务器失败...	a bytes-like object is required, not 'str'
+2018-05-30 14:27:00.451678	WARN	subscribe_bar 连接火币服务器失败...	[WinError 10053] 你的主机中的软件中止了一个已建立的连接。
+2018-05-30 14:27:52.441018	WARN	subscribe_bar 连接火币服务器失败...	a bytes-like object is required, not 'str'
+2018-05-30 14:31:35.394711	WARN	subscribe_bar 连接火币服务器失败...	[WinError 10053] 你的主机中的软件中止了一个已建立的连接。
+2018-05-30 14:51:34.049680	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:08.016775	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:08.998276	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:09.168141	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:09.225788	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:09.514842	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:10.439698	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:10.726761	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:11.254130	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 16:43:12.024649	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 17:28:24.359225	WARN	subscribe_bar 连接火币服务器失败...	a bytes-like object is required, not 'str'
+2018-05-30 18:11:09.277144	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 18:11:12.650210	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 18:11:12.812320	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 19:08:21.513016	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 19:08:23.653617	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 19:08:24.929965	WARN	subscribe_bar 连接火币服务器失败...	Connection is already closed.
+2018-05-30 20:00:14.853380	WARN	subscribe_bar 连接火币服务器失败...	'NoneType' object has no attribute 'qsize'
+2018-05-30 20:00:25.058394	WARN	subscribe_bar 连接火币服务器失败...	'NoneType' object has no attribute 'qsize'
+2018-05-30 20:00:35.627750	WARN	subscribe_bar 连接火币服务器失败...	'NoneType' object has no attribute 'qsize'
+2018-05-30 20:22:44.815231	WARN	subscribe_bar 连接火币服务器失败...	[WinError 10053] 你的主机中的软件中止了一个已建立的连接。
+2018-05-30 20:22:44.818157	WARN	subscribe_bar 连接火币服务器失败...	[WinError 10053] 你的主机中的软件中止了一个已建立的连接。
+2018-05-31 18:38:59.594380	WARN	subscribe_bar 连接火币服务器失败...	a bytes-like object is required, not 'str'
+2018-05-31 19:47:52.942770	INFO	 Strategy('base_test') on [usdt,eth] is restarting @2018-05-31 19:47:52 ...MarketPosition=0
+2018-05-31 22:02:54.498397	INFO	 Strategy('base_test') on [usdt,eth] is restarting @2018-05-31 22:02:54 ...MarketPosition=0
+2018-05-31 22:09:50.103297	WARN	subscribe_bar 连接火币服务器失败...	a bytes-like object is required, not 'str'
+2018-05-31 22:20:04.771340	INFO	 Strategy('base_test') on [usdt,eth] is restarting @2018-05-31 22:20:04 ...MarketPosition=0
+2018-05-31 22:24:16.137818	WARN	subscribe_bar 连接火币服务器失败...	a bytes-like object is required, not 'str'

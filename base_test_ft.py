@@ -38,7 +38,7 @@ class mystr(Strategy):
     def __init__(self,name='base_test'):
         super(mystr, self).__init__(name='base_test')
         #=============系统变量重置=====================
-        self.prt=False#是否启动基类中的打印
+        self.prt=True#是否启动基类中的打印
     #---------数据缓存,需要管理的series变量----------    
         self.close_=[]
         self.hp_,self.lp_=[],[]
@@ -114,20 +114,20 @@ if __name__ == '__main__':
     
 #------------------      
     input2=Event();
-    input2.symbol_list= 'ethusdt';input2.bar_type= '5min';input2.backbarnum= 20;
+    input2.symbol_list= 'ethusdt';input2.bar_type= '1min';input2.backbarnum= 20;
     input2.type_=input2.symbol_list+input2.bar_type
-    
+    #
     input_account='helf'
     input_exchange='hbp'
     input_api_key= "a4594cdd-75b0037b-003d37ea-528bd"
     input_api_secret = "5f0ea6d5-a4ff1afc-9c04e15a-9e3ba"
     input_currency='usdt'
-
+    #
     
     myacc=cerebro(exchange=input_exchange, api_key=input_api_key, api_secret=input_api_secret , currency=input_currency,
                  account=input_account)  
     myacc.eventbarlist=[input2]
     myacc.initialtion()
-    myacc.addstrategy(type_=input2.type_,strats=test1)
+    myacc.addstrategy(type_=input2.type_, strats=test1)
     myacc.Start()   
 
