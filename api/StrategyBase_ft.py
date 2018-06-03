@@ -289,7 +289,8 @@ class Strategy(object):
                     self.__monitorqueue.put(self.monitordata)
                 else:
                     order=self.api.open_long(exchange=self.monitordata['margin_order_id'], source='margin', sec_id=self.symbol_list, price=price, volume=unit)
-                self.__orderqueue.put(order)  
+                self.__orderqueue.put(order)
+                
         if self.MarketPosition==0:
             self.MarketPosition=1;logger.info (self.name+"buy(%s,%s)"%(unit,price),'Marketposition=%s'%(self.MarketPosition) )     
             if self.__type=='realtime':
