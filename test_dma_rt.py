@@ -28,8 +28,8 @@ bar_type = '1min'
 trade_fee = 0.002
 N_volt = 60*24
 volt_mul = 1.5
-N_ma = 6
-N_short = 60*3
+N_ma = 60*3
+N_short = 60*12
 N_long = 60*24
 
 TEST_ACCESS_KEY = "a4594cdd-75b0037b-003d37ea-528bd"
@@ -61,7 +61,6 @@ timer_flag = False     # 用作定时器
 
 while True:
 
-    last_bars = qapi.Bar()
     current_struct = time.localtime(time.time())
 
     if bar_type == "1min":

@@ -15,11 +15,11 @@ from api import logger
 
 # 参数设置
 trade_fee = 0.002
-N_volt = 24
+N_volt = 60*24
 volt_mul = 1.5
-N_ma = 6            # 均线平滑周期
-N_short = 24        # 自适应基准线短周期
-N_long = 24*3       # 自适应基准线长周期
+N_ma = 60*3            # 均线平滑周期
+N_short = 60*12        # 自适应基准线短周期
+N_long = 60*24       # 自适应基准线长周期
 
 btc_data = pd.read_csv('btc_20171101_20180516.csv', index_col=0)
 btc_data['close'] = btc_data['cp']
@@ -39,7 +39,7 @@ data['voltility'] = 0
 data['pct_chg'] = 0
 
 
-for each in btc_data.index[60*N_long::60]:
+for each in btc_data.index[N_long:]:
 
     # 获取当前时刻的bar
     
@@ -50,7 +50,7 @@ for each in btc_data.index[60*N_long::60]:
 
     now = data.index[-1]
     last = data.index[-2]
-    # print(now)
+    print(now)
 
     # 按收盘价交易，先计算账户每日涨跌
     data.loc[now, 'chg'] = data.loc[now, 'close'] - data.loc[last, 'close']
