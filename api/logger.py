@@ -92,13 +92,13 @@ def send_mail(subject, content, receivers):
     ret = True
     try:
         msg = MIMEText(content, 'plain', 'utf-8')
-        msg['From'] = SENDER     # 括号里的对应发件人邮箱昵称、发件人邮箱账号
-        msg['To'] = ";".join(receivers)                       # 括号里的对应收件人邮箱昵称、收件人邮箱账号
+        msg['From'] = SENDER                                    # 括号里的对应发件人邮箱昵称、发件人邮箱账号
+        msg['To'] = ";".join(receivers)                         # 括号里的对应收件人邮箱昵称、收件人邮箱账号
         msg['Subject'] = subject                                # 邮件的主题，也可以说是标题
 
-        server = smtplib.SMTP_SSL(SMTP, PORT)                   # 发件人邮箱中的SMTP服务器，端口是25
+        server = smtplib.SMTP_SSL(SMTP, PORT)                    # 发件人邮箱中的SMTP服务器，端口
         server.login(SENDER, PASSWORD)                           # 括号中对应的是发件人邮箱账号、邮箱密码
-        server.sendmail(SENDER, receivers, msg.as_string())   # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
+        server.sendmail(SENDER, receivers, msg.as_string())      # 括号中对应的是发件人邮箱账号、收件人邮箱账号、发送邮件
         server.quit()  # 关闭连接
     except Exception:  # 如果 try 中的语句没有执行，则会执行下面的 ret=False
         ret = False
@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
     subject = "BitQuant 交易信号测试"
     content = "2018-05-13 17:32:12 买入 1.2 BTC, 买入价格9123.4, 手续费0.0024 BTC"
-    receivers = ['helf1986@qq.com', 'zhaoyu@zhenfund.com', 'ady.chen@icloud.com']  # 收件人邮箱账号
+    receivers = ['helf1986@qq.com']  # 收件人邮箱账号
     ret = send_mail(subject, content, receivers)
     if ret:
         print("邮件发送成功")

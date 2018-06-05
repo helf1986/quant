@@ -49,9 +49,9 @@ class cerebro(object):
     def __init__(self,exchange='', api_key='', api_secret='' , currency='', account=''):
         '''
         执行cerebro需要初始化eventbarlist，及监听函数
-        eventbarlist:bar事件订阅列表,订阅x品种x周期的数据
+        eventbarlist:bar 事件订阅列表,订阅x品种x周期的数据
         __handlers：对应的事件的响应函数，键值来自__eventbarlist
-            *每个键对应的值是一个列表，列表中保存了对该事件监听的响应函数，一对多
+            * 每个键对应的值是一个列表，列表中保存了对该事件监听的响应函数，一对多
         '''
 
         self.account    = account
@@ -290,7 +290,7 @@ class Strategy(object):
                 else:
                     order=self.api.open_long(exchange=self.monitordata['margin_order_id'], source='margin', sec_id=self.symbol_list, price=price, volume=unit)
                 self.__orderqueue.put(order)
-                
+
         if self.MarketPosition==0:
             self.MarketPosition=1;logger.info (self.name+"buy(%s,%s)"%(unit,price),'Marketposition=%s'%(self.MarketPosition) )     
             if self.__type=='realtime':

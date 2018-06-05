@@ -21,7 +21,7 @@ N_ma = 6            # 均线平滑周期
 N_short = 24        # 自适应基准线短周期
 N_long = 24*3       # 自适应基准线长周期
 
-btc_data = pd.read_csv('btc_data_20171101_20180325.csv', index_col=0)
+btc_data = pd.read_csv('btc_20171101_20180516.csv', index_col=0)
 btc_data['close'] = btc_data['cp']
 btc_data['strtime'] = btc_data['ts']
 print(btc_data.head())

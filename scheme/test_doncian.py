@@ -20,7 +20,7 @@ N = 24*2
 K1 = 1
 K2 = 1
 
-btc_data = pd.read_csv('btc_data_20171101_20180325.csv', index_col=0)
+btc_data = pd.read_csv('btc_20171101_20180523.csv', index_col=0)
 btc_data['open'] = btc_data['op']
 btc_data['high'] = btc_data['hp']
 btc_data['low'] = btc_data['lp']

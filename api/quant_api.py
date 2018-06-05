@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
-from websocket import WebSocket, create_connection
+# from websocket import WebSocket, create_connection
 import gzip
 import os
 
