@@ -1,4 +1,4 @@
-from common.HuobiClient import HuobiClient
+from common.HuobiClient_orgin import HuobiClient
 import pandas as pd
 import numpy as np
 import time

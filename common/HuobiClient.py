@@ -24,6 +24,9 @@ Market data API
 MARKET_URL = "https://api.huobi.pro"
 TRADE_URL = "https://api.huobi.pro"
 
+# MARKET_URL = "https://huobi.pxp.one"
+# TRADE_URL = "https://huobi.pxp.one"
+
 # 首次运行可通过get_accounts()获取acct_id,然后直接赋值,减少重复获取。
 ACCOUNT_ID = None
 BID_FEE = 0.002
@@ -511,6 +514,7 @@ class HuobiClient(object):
         host_url = TRADE_URL
         host_name = urllib.parse.urlparse(host_url).hostname
         host_name = host_name.lower()
+        # host_name = "api.huobi.pro"
         params['Signature'] = self.createSign(params, method, host_name, request_path, self.API_SECRET)
 
         url = host_url + request_path
@@ -528,6 +532,7 @@ class HuobiClient(object):
         host_url = TRADE_URL
         host_name = urllib.parse.urlparse(host_url).hostname
         host_name = host_name.lower()
+        # host_name = "api.huobi.pro"
         params_to_sign['Signature'] = self.createSign(params_to_sign, method, host_name, request_path, self.API_SECRET)
         url = host_url + request_path + '?' + urllib.parse.urlencode(params_to_sign)
         return self.http_post_request(url, params)
@@ -548,6 +553,15 @@ class HuobiClient(object):
 
 
 if __name__ == '__main__':
+    TEST_ACCESS_KEY = "a4594cdd-75b0037b-003d37ea-528bd"
+    TEST_SECRET_KEY = "5f0ea6d5-a4ff1afc-9c04e15a-9e3ba"
 
-    client = HuobiClient(api_key='', api_secret='')
-    print (client.get_symbols())
+    # HBP_ACCESS_KEY = "4dca37e6-c546fdac-d26a869a-6a0bd"
+    # HBP_SECRET_KEY = "58c43008-c669b9f5-d6a76827-3db29"
+
+    client = HuobiClient(api_key=TEST_ACCESS_KEY, api_secret=TEST_SECRET_KEY)
+
+    # print(client.get_accounts())
+    # print (client.get_symbols())
+    print(client.get_kline(symbol='btcusdt', period='1min', size=10))
+

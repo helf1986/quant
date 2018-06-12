@@ -36,7 +36,7 @@ TEST_ACCESS_KEY = "a4594cdd-75b0037b-003d37ea-528bd"
 TEST_SECRET_KEY = "5f0ea6d5-a4ff1afc-9c04e15a-9e3ba"
 
 myacc = qapi.TradeAccount(exchange='hbp', api_key=TEST_ACCESS_KEY, api_secret=TEST_SECRET_KEY)
-bars_data = myacc.get_bars(symbol_list=symbol, bar_type=bar_type, size=N_long+N_short)
+bars_data = myacc.get_bars(symbol_list=symbol, bar_type=bar_type, size=N_long+N_ma)
 data = qapi.to_dataframe(bars_data)
 data.index = data['strtime']
 data = data.sort_values(by='strtime')

@@ -234,6 +234,7 @@ def tradelog2db(tradelog):
         logger.warn('交易日志插入数据库失败！')
         return False
 
+
 def monitor2db(strategy_name=None):
     import json
     f = open("monitor/"+strategy_name+".json", encoding='utf-8')

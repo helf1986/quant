@@ -7,14 +7,14 @@ import matplotlib.pyplot as plt
 import time
 import datetime
 
-# from websocket import WebSocket, create_connection
+from websocket import WebSocket, create_connection
 import gzip
 import os
 
 from multiprocessing import Process, Queue
 
 from pymongo import MongoClient
-import common.HuobiClient as hb
+import common.HuobiClient_orgin as hb
 import common.BinanceClient as bnb
 from api import logger
 
@@ -132,19 +132,16 @@ class TradeAccount(object):
 
                     compressData = socket.recv()
                     result = gzip.decompress(compressData).decode('utf-8')
+                    # 把json 文本转成字典
+                    res_dict = eval(result)
                     # print(result)
-                    if result[:7] == '{"ping"':
+                    if "subbed" in res_dict.keys():
                         ts = result[8:21]
                         pong = '{"pong":' + ts + '}'
                         socket.send(pong)
                         socket.send(tradeStr)
 
-                    elif result[2:4] == "ch":
-
-                        # 把json 文本转成字典
-                        res_dict = eval(result)
-                        # print(res_dict)
-
+                    elif "tick" in res_dict.keys():
                         # 记录Tick 数据
                         new_tick = Tick()
                         new_tick.exchange = 'hbp'
@@ -208,17 +205,17 @@ class TradeAccount(object):
                         compressData = socket.recv()
                         result = gzip.decompress(compressData).decode('utf-8')
                         # print(result)
-                        if result[:7] == '{"ping"':
+                        # 把json 文本转成字典
+                        res_dict = eval(result)
+                        # print(res_dict)
+
+                        if "subbed" in res_dict.keys():
                             ts = result[8:21]
                             pong = '{"pong":' + ts + '}'
                             socket.send(pong)
                             socket.send(tradeStr)
 
-                        elif result[2:4] == "ch":
-
-                            # 把json 文本转成字典
-                            res_dict = eval(result)
-                            # print(res_dict)
+                        elif "tick" in res_dict.keys():
 
                             if bar_type == 'tick':      # 直接获取tick 数据
 
@@ -359,14 +356,17 @@ class TradeAccount(object):
                 while True:
                     compressData = self.socket.recv()
                     result = gzip.decompress(compressData).decode('utf-8')
+                    # 把json 文本转成字典
+                    res_dict = eval(result)
+                    # print(res_dict)
 
-                    if result[:7] == '{"ping"':
+                    if "subbed" in res_dict.keys():
                         ts = result[8:21]
                         pong = '{"pong":' + ts + '}'
                         self.socket.send(pong)
                         self.socket.send(tradeStr)
 
-                    elif result[2:4] == "ch":
+                    elif "tick" in res_dict.keys():
                         res_dict = eval(result)
                         data = res_dict['tick']
 
@@ -1359,10 +1359,7 @@ class TradeAccount(object):
         if self.exchange == 'hbp':
             res = self.client.get_accounts()
             if res['status'] == 'ok':
-                data = res['data']
-                accounts = {}
-                for each in data:
-                    accounts[each['type']] = each
+                accounts = res['data']
                 return accounts
             else:
                 return None
@@ -1396,47 +1393,51 @@ class TradeAccount(object):
 
             if source == 'spot':
                 # 获取普通账户资金情况
-                account = accounts['spot']['id']
+                account = [each['id'] for each in accounts if each['type'] == 'spot']
             elif source == 'margin':
                 # 获取融资融券账户资金情况
-                account = accounts['margin']['id']
+                account = [each['id'] for each in accounts if each['type'] == 'margin']
+            elif source == 'point':
+                # 获取融资融券账户资金情况
+                account = [each['id'] for each in accounts if each['type'] == 'point']
             else:
                 logger.error('No accounts found from %s!' % source)
 
-            res = self.client.get_balance(acct_id=account)
-            if res['status'] == 'ok':
-                account_info = res['data']
-                account_id = account_info['id']
-                account_type = account_info['type']
-                account_status = account_info['state']
-                account_balance = account_info['list']
+            for each_account in account:
+                res = self.client.get_balance(acct_id=each_account)
+                if res['status'] == 'ok':
+                    account_info = res['data']
+                    account_id = account_info['id']
+                    account_type = account_info['type']
+                    account_status = account_info['state']
+                    account_balance = account_info['list']
 
-                balance_dict = {}
-                for each in account_balance:
-                    balance_dict[each['currency']] = {}
-                for each in account_balance:
-                    balance_dict[each['currency']][each['type']] = each['balance']
+                    balance_dict = {}
+                    for each in account_balance:
+                        balance_dict[each['currency']] = {}
+                    for each in account_balance:
+                        balance_dict[each['currency']][each['type']] = each['balance']
 
-                for each in balance_dict.keys():
-                    position = Position()
-                    position.exchange = self.exchange
-                    position.currency = self.currency
-                    position.account_id = account_id
-                    position.account_type = account_type
-                    position.account_status = account_status
+                    for each in balance_dict.keys():
+                        position = Position()
+                        position.exchange = self.exchange
+                        position.currency = self.currency
+                        position.account_id = account_id
+                        position.account_type = account_type
+                        position.account_status = account_status
 
-                    position.sec_id = each
-                    position.available = float(balance_dict[each]['trade'])
-                    position.frozen = float(balance_dict[each]['frozen'])
-                    position.volume = position.available + position.frozen
-                    position.update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
-                    if source == 'margin':
-                        position.loan = float(balance_dict[each]['loan'])
-                        position.interest = float(balance_dict[each]['interest'])
+                        position.sec_id = each
+                        position.available = float(balance_dict[each]['trade'])
+                        position.frozen = float(balance_dict[each]['frozen'])
+                        position.volume = position.available + position.frozen
+                        position.update_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                        if source == 'margin':
+                            position.loan = float(balance_dict[each]['loan'])
+                            position.interest = float(balance_dict[each]['interest'])
 
-                    positions = positions + [position]
-            else:
-                logger.warn(res['err-code'] + ':' + res['err-msg'])
+                        positions = positions + [position]
+                else:
+                    logger.warn(res['err-code'] + ':' + res['err-msg'])
 
         elif self.exchange == 'bnb':
             
