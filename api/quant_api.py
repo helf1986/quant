@@ -432,6 +432,7 @@ class TradeAccount(object):
                 if size == 0:
                     inner_size = 2000
                 res = self.client.get_kline(symbol=each_sec, period=bar_type, size=inner_size)
+                print(res)
                 if res['status'] == 'ok':
                     data = res['data']
                     for each_bar in data:
