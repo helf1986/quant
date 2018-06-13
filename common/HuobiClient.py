@@ -347,8 +347,9 @@ class HuobiClient(object):
         """
         try:
             accounts = self.get_accounts()
-            print(accounts)
-            acct_id = accounts['data'][1]['id']
+            # print(accounts)
+            # acct_id = accounts['data'][1]['id']
+            acct_id = [each['id'] for each in accounts['data'] if each['subtype'] == symbol][0]
         except BaseException as e:
             print ('get acct_id error.%s' % e)
             acct_id = ACCOUNT_ID
