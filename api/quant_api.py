@@ -14,7 +14,7 @@ import os
 from multiprocessing import Process, Queue
 
 from pymongo import MongoClient
-import common.HuobiClient_orgin as hb
+import common.HuobiClient as hb
 import common.BinanceClient as bnb
 from api import logger
 
