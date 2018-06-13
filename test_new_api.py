@@ -26,7 +26,7 @@ print(bar_df.head())
 bar_df.index = bar_df['strtime']
 '''
 
-order = hbaccount.open_long(source='magin', sec_id='ethusdt', price=0, volume = 1)
+order = hbaccount.open_long(source='margin', sec_id='ethusdt', price=0, volume = 1)
 msg = "%s 策略 %s: %s 开多仓，数量=%.2f，价格=%.2f" % (order.transact_time, 'test', order.sec_id, order.filled_volume, order.filled_vwap)
 logger.info(msg)
 
