@@ -172,6 +172,7 @@ class HuobiClient(object):
         """
         try:
             accounts = self.get_accounts()
+            print(accounts)
             acct_id = accounts['data'][0]['id']
         except BaseException as e:
             print ('get acct_id error.%s' % e)
