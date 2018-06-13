@@ -1,7 +1,7 @@
 
 # 从api接口导入TradeAccount 交易类
 from api.quant_api import TradeAccount, to_dataframe, to_dict, get_bars_local
-from common.settings import HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
+from common.settings import TEST_ACCESS_KEY, TEST_SECRET_KEY, HBP_ACCESS_KEY, HBP_SECRET_KEY, BNB_ACCESS_KEY, BNB_SECRET_KEY
 import time
 import pandas as pd
 from api import logger
@@ -18,11 +18,20 @@ print(to_dataframe(bars))
 # 创建火币交易账户
 hbaccount = TradeAccount(exchange='hbp', api_key=HBP_ACCESS_KEY, api_secret=HBP_SECRET_KEY, currency='USDT')
 
-bars = hbaccount.get_bars(symbol_list='btcusdt, bchusdt, ethusdt, etcusdt, ltcusdt, eosusdt, xrpusdt', bar_type='1min', size=2000)
+
+bars = hbaccount.get_bars(symbol_list='btcusdt, bchusdt, ethusdt, etcusdt, ltcusdt, eosusdt, xrpusdt', bar_type='1min', size=20)
 bar_df = to_dataframe(bars)
 print(bar_df.head())
 bar_df.index = bar_df['strtime']
 
+order = hbaccount.open_long(source='magin', sec_id='ethusdt', price=0, volume = 1)
+msg = "%s 策略 %s: %s 开多仓，数量=%.2f，价格=%.2f" % (order.transact_time, 'test', order.sec_id, order.filled_volume, order.filled_vwap)
+logger.info(msg)
+
+
+
+
+'''
 
 symbols = np.unique(bar_df['sec_id'])
 data_all = pd.DataFrame([], columns=symbols)
@@ -33,6 +42,7 @@ for each_symbol in symbols:
 data_all.to_csv('data_all.csv')
 plt.savefig('data_all.png')
 
+'''
 
 '''
 symbol_list = ['bchusdt', 'btcusdt', 'ethusdt', 'xrpusdt','ltcusdt', 'dashusdt', 'iotausdt', 'omgusdt', 'adausdt']
